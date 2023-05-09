@@ -1,0 +1,28 @@
+<div class="sidebar">
+    <ng-container *ngIf="(model$ | async) as model; else spinner">
+        <ng-container *ngIf="model.state$ | async as state; else spinner">
+            <div class="search">
+                <mat-form-field>
+                    <mat-label>Поиск</mat-label>
+                    <input matInput placeholder="Поиск геообъектов" [formControl]="searchControl">
+                </mat-form-field>
+            </div>
+            <ng-container *ngIf="state === 'SUCCESS'">
+                <geo-main-view-manager [items]="model.points" (setView)="onSetMapView($event)">
+                </geo-main-view-manager>
+            </ng-container>
+            <ng-container *ngIf="state === 'PENDING'">
+                <ng-container *ngTemplateOutlet="spinner"></ng-container>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+    
+    <ng-template #spinner>
+        <div class="spinner">
+            <mat-spinner></mat-spinner>
+        </div>
+    </ng-template>
+</div>
+
+<geo-main-view-map [setView$]="setView$">
+</geo-main-view-map>

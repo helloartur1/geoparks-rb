@@ -11,6 +11,8 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
@@ -24,9 +26,9 @@
       "dom"
     ],
     "paths": {
-      "@view/*": ["./src/view"],
-      "@shared": ["./src/shared/index.ts"],
-      "@core": ["./core/index.ts"]
+      "@view/*": ["src/view"],
+      "@shared": ["src/shared/index.ts"],
+      "@core": ["src/core/index.ts"]
     }
   },
   "angularCompilerOptions": {

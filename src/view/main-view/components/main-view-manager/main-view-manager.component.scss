@@ -1,0 +1,63 @@
+:host {
+    background-color: var(--dark-grey-color);
+    display: block;
+    height: 100%;
+    padding-top: 15px;
+    overflow: hidden;
+}
+
+.manager-wrapper {
+    height: 100%;
+}
+
+.manager-list {
+    height: calc(100% - 190px);
+    overflow-y: auto;
+}
+
+.item {
+    display: block;
+    padding: 10px 15px;
+    background-color: var(--dark-grey-color);
+    border-radius: 3px;
+
+    &:not(:last-child) {
+        margin-bottom: 10px;
+    }
+
+    &:hover {
+        background-color: var(--sub-black-color);
+        .item__control-button {
+            visibility: visible;
+        }
+    }
+
+    ::ng-deep {
+        .mdc-list-item__content {
+            display: block;
+        }
+
+        .mat-mdc-list-item-unscoped-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 48px;
+        }
+    }
+    &__title {
+        margin: 0;
+        font-size: 14px;
+        line-height: 16px;
+        font-weight: 500;
+    }
+
+    &__description {
+        margin: 0;
+        font-size: 12px;
+        line-height: 14px;
+    }
+
+    &__control-button {
+        visibility: hidden;
+    }
+}

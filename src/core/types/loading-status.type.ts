@@ -1,0 +1,1 @@
+export type LoadingStatusType = 'PENDING' | 'SUCCESS' | 'ERROR' | 'INIT';
