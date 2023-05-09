@@ -31,8 +31,8 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.map?.setView(new View({
           center: [coordinates.longitude, coordinates.latitude],
           projection: 'EPSG:4326',
-          zoom: 16,
-          maxZoom: 18,
+          zoom: 18,
+          maxZoom: 20,
         }));
       })
     }
