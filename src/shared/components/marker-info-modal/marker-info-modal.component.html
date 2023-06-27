@@ -1,0 +1,25 @@
+<h4 class="modal-title">{{ data.name }}</h4>
+<div class="wrapper">
+  <div class="image">
+    <img src="../../../assets/img/image.png" alt="Изображение геообъекта" width="450" height="300">
+  </div>
+  <ul class="modal-list">
+    <li class="modal-item">
+        <span class="modal-item-key">Координаты:</span>
+        {{ data.latitude }}, &nbsp;
+        {{ data.longitude }}
+    </li>
+    <li class="modal-item">
+        <span class="modal-item-key">Категория:</span>
+        {{ data.type }}
+    </li>
+    <li class="modal-item" *ngIf="data.description">
+        <span class="modal-item-key">Описание:</span>
+        {{ data.description }}
+    </li>
+  </ul>
+</div>
+<div class="modal-buttons">
+  <button mat-raised-button (click)="close()" color="warn">Закрыть</button>
+  <button mat-raised-button (click)="confirm()" color="primary">Перейти</button>
+</div>

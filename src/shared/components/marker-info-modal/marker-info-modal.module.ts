@@ -1,26 +1,24 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MainViewMapComponent } from './main-view-map.component';
-import { MatIconModule } from '@angular/material/icon';
+import { MarkerInfoModalComponent } from './marker-info-modal.component';
 import { MatButtonModule } from '@angular/material/button';
-import { MarkerInfoModalModule } from '@shared';
+import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 
 
 
 @NgModule({
   declarations: [
-    MainViewMapComponent
+    MarkerInfoModalComponent
   ],
   imports: [
     CommonModule,
-    MatIconModule,
     MatButtonModule,
-    MarkerInfoModalModule,
+    MatIconModule,
     MatDialogModule,
   ],
   exports: [
-    MainViewMapComponent,
+    MarkerInfoModalComponent,
   ]
 })
-export class MainViewMapModule { }
+export class MarkerInfoModalModule { }

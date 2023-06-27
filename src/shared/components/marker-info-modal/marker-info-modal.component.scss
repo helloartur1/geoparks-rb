@@ -1,0 +1,57 @@
+:host {
+    display: block;
+    width: 512px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.modal-title {
+    margin: 0;
+    margin-bottom: 15px;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 24px;
+    color: var(--base-font-color);
+}
+
+.image {
+    margin-bottom: 15px;
+}
+
+.modal-list {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 15px;
+    list-style: none;
+}
+
+.modal-item {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: var(--base-font-color);
+    &:not(:last-child) {
+        margin-bottom: 10px;
+    }
+}
+
+.modal-item-key {
+    font-weight: 700;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
