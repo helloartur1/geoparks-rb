@@ -15,7 +15,7 @@ export class PointMarksService {
       return points.filter((point: IPointGeoObject) => {
         return point.name.toLowerCase().includes(search.toLowerCase()) ||
         point.type.toLowerCase().includes(search.toLowerCase());
-      })
+      });
     }));
   }
 }

@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { CoordinatesType, IPointGeoObject } from '@core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { CoordinatesType, IGeoObjectFilterFields, IPointGeoObject } from '@core';
 import { MarkerInfoModalComponent, POINTS, TypeIconMap } from '@shared';
 import Map from 'ol/Map';
 import View, { ViewOptions } from 'ol/View';
@@ -11,9 +11,8 @@ import VectorLayer from 'ol/layer/Vector';
 import Feature from 'ol/Feature';
 import Icon from 'ol/style/Icon';
 import Style from 'ol/style/Style';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, debounceTime, takeUntil } from 'rxjs';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
-import Layer from 'ol/layer/Layer';
 import { MatDialog } from '@angular/material/dialog';
 
 const DEFAULT_EXTENT: ViewOptions = {
@@ -30,10 +29,14 @@ const DEFAULT_EXTENT: ViewOptions = {
 export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   public setView$: Subject<CoordinatesType> | undefined = undefined;
+  @Input()
+  public setSearch$: Subject<string> | undefined = undefined;
   public map: Map | undefined = undefined;
   public destroy$: Subject<void> = new Subject<void>();
+  public hidden: boolean = false;
+  private markerLayer: VectorLayer<any> | undefined = undefined;
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) {}
 
   public ngOnInit(): void {
     if (this.setView$) {
@@ -45,6 +48,12 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
           maxZoom: 20,
         }));
       })
+    }
+
+    if (this.setSearch$) {
+      this.setSearch$.pipe(takeUntil(this.destroy$), debounceTime(500)).subscribe((search: string) => {
+        this.searchMap(search);
+      });
     }
   }
 
@@ -62,22 +71,13 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
     });
 
-    const features: Feature[] = POINTS.map((point: IPointGeoObject) => {
-      const feature: Feature = new Feature({ 
-        geometry: new Point([point.longitude, point.latitude]), 
-        ...point, 
-      });
-      feature.setId(point.id);
-      feature.setStyle(new Style({
-           image: new Icon({src: `../../../../assets/icons/${TypeIconMap.get(point.type)}`, scale: [0.5, 0.5]}),
-      }));
-      return feature;
-    });
+    const features: Feature<Point>[] = this.getFeatures(POINTS);
     const markerLayer: VectorLayer<any> = new VectorLayer<any>({
       source: new VectorSource({
         features,
-      })
+      }),
     });
+    this.markerLayer = markerLayer;
     this.map.addLayer(markerLayer);
     this.addMarkerClickListener();
   }
@@ -99,11 +99,38 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private getLayerByUid(uid: number): Layer | undefined {
-    const markerFeature: Layer | undefined = this.map?.getAllLayers().find((feature: Layer) => {
-      return (feature as any)['ol_uid'] === uid.toString()
+  private searchMap(search: string): void {
+   const features: Feature[] = this.markerLayer?.getSource().getFeatures();
+   if (features) {
+      features.forEach((feature: Feature) => {
+        feature.setStyle(this.getStyle(feature.getProperties() as IGeoObjectFilterFields, search));
+      });
+   }
+
+  }
+
+  private getFeatures(points: IPointGeoObject[]): Feature<Point>[] {
+    const features: Feature<Point>[] = points.map((point: IPointGeoObject) => {
+      const feature: Feature<Point> = new Feature<Point>({ 
+        geometry: new Point([point.longitude, point.latitude]), 
+        ...point, 
+      });
+      feature.setId(point.id);
+      feature.setStyle(new Style({
+           image: new Icon({src: `../../../../assets/icons/${TypeIconMap.get(point.type)}`, scale: [0.5, 0.5]}),
+      }));
+      return feature;
     });
-    return markerFeature;
+    return features;
+  }
+
+  private getStyle({ name, type, description }: IGeoObjectFilterFields, search: string): Style {
+    if (name.toLowerCase().includes(search.toLowerCase()) || type.toLowerCase().includes(search.toLowerCase())) {
+      return new Style({
+        image: new Icon({src: `../../../../assets/icons/${TypeIconMap.get(type)}`, scale: [0.5, 0.5]}),
+      });
+    }
+    return new Style({})
   }
 
   public ngOnDestroy(): void {

@@ -15,6 +15,7 @@ export class MainViewComponent {
   public searchControl: FormControl<string | null> = new FormControl<string>('');
   public destroy$: Subject<void>= new Subject<void>();
   public setView$: Subject<CoordinatesType> = new Subject<CoordinatesType>();
+  public setSearch$: Subject<string> = new Subject<string>();
   constructor(private mainViewModelService: MainViewModelService) {
     this.model$ = this.mainViewModelService.model$;
   }
@@ -27,6 +28,7 @@ export class MainViewComponent {
 
   public onSearch(search: string): void {
     this.mainViewModelService.searchInit(search);
+    this.setSearch$.next(search);
   }
 
   public onSetMapView(coordinates: CoordinatesType): void {
