@@ -10,7 +10,7 @@
                     <mat-icon>more_vert</mat-icon>
                   </button>
                   <mat-menu #menu="matMenu">
-                    <button mat-menu-item>
+                    <button mat-menu-item (click)="navigateToDetailPage(item.id)">
                       <mat-icon>call_made</mat-icon>
                       <span>Перейти к странице геообъекта</span>
                     </button>
