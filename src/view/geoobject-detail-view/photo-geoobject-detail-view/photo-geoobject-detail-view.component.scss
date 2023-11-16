@@ -1,0 +1,44 @@
+.photo_obj{
+  margin-left: 70px;
+  margin-right: 70px;
+}
+.photo_obj img{
+  padding: 10px;
+}
+
+.photo-gallery {
+  display: flex;
+  align-items: center;
+  width: 30%;
+}
+
+.photos-container {
+  display: flex;
+  overflow-x: scroll;
+  scroll-behavior: smooth;
+}
+
+.photo {
+  width: 250px;
+  height: 250px;
+  padding: 50px;
+}
+
+
+.arrow-button {
+  padding: 15px;
+  font-size: 48px;
+  background-color: transparent;
+  border: 1px solid #D6EAD8;
+  color: #303030;
+}
+
+.photos-container {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+.photos-container::-webkit-scrollbar {
+  display: none;
+}
