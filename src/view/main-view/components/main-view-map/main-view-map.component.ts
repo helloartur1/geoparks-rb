@@ -4,7 +4,7 @@ import { MarkerInfoModalComponent, POINTS, TypeIconMap } from '@shared';
 import Map from 'ol/Map';
 import View, { ViewOptions } from 'ol/View';
 import { Point } from 'ol/geom';
-import TileLayer from 'ol/layer/Tile';
+import Tile from 'ol/layer/Tile';
 import { OSM } from 'ol/source';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
@@ -14,12 +14,11 @@ import Style from 'ol/style/Style';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { MatDialog } from '@angular/material/dialog';
+import { fromLonLat } from 'ol/proj';
 
 const DEFAULT_EXTENT: ViewOptions = {
-  center: [58.155889, 55.179724],
-  projection: 'EPSG:4326',
+  center: fromLonLat([58.155889, 55.179724]),
   zoom: 11,
-  maxZoom: 18,
 }
 @Component({
   selector: 'geo-main-view-map',
@@ -42,10 +41,8 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.setView$) {
       this.setView$.pipe(takeUntil(this.destroy$)).subscribe((coordinates: CoordinatesType) => {
         this.map?.setView(new View({
-          center: [coordinates.longitude, coordinates.latitude],
-          projection: 'EPSG:4326',
+          center: fromLonLat([coordinates.longitude, coordinates.latitude]),
           zoom: 18,
-          maxZoom: 20,
         }));
       })
     }
@@ -61,7 +58,7 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
   public ngAfterViewInit(): void {
     this.map = new Map({
       layers: [
-        new TileLayer({
+        new Tile({
           source: new OSM(),
         }),
       ],
@@ -112,7 +109,7 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private getFeatures(points: IPointGeoObject[]): Feature<Point>[] {
     const features: Feature<Point>[] = points.map((point: IPointGeoObject) => {
       const feature: Feature<Point> = new Feature<Point>({ 
-        geometry: new Point([point.longitude, point.latitude]), 
+        geometry: new Point(fromLonLat([point.longitude, point.latitude])), 
         ...point, 
       });
       feature.setId(point.id);

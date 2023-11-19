@@ -28,7 +28,8 @@
     "paths": {
       "@view/*": ["src/view"],
       "@shared": ["src/shared/index.ts"],
-      "@core": ["src/core/index.ts"]
+      "@core": ["src/core/index.ts"],
+      "@api": ["api/index.ts"]
     }
   },
   "angularCompilerOptions": {

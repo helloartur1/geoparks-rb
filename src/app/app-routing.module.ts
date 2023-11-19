@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { GeoobjectDetailViewComponent } from 'src/view/geoobject-detail-view/geoobject-detail-view.component';
+import { GeoobjectDetailViewModule } from 'src/view/geoobject-detail-view/geoobject-detail-view.module';
 import { MainViewComponent } from 'src/view/main-view/main-view.component';
 
 const routes: Routes = [

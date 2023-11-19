@@ -6,6 +6,9 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PageWrapperModule } from '../view/page-wrapper/page-wrapper.module';
 import { MainViewModule } from 'src/view/main-view/main-view.module';
+import { ApiModule, Configuration } from 'api';
+import { HttpClientModule } from '@angular/common/http';
+import { GeoobjectDetailViewModule } from 'src/view/geoobject-detail-view/geoobject-detail-view.module';
 
 @NgModule({
   declarations: [
@@ -15,8 +18,11 @@ import { MainViewModule } from 'src/view/main-view/main-view.module';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    GeoobjectDetailViewModule,
     PageWrapperModule,
-    MainViewModule
+    MainViewModule,
+    HttpClientModule,
+    ApiModule.forRoot(() => new Configuration({ basePath: "http://localhost:8000"})),
   ],
   providers: [],
   bootstrap: [AppComponent]
