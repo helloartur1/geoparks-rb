@@ -8,4 +8,5 @@ export interface IMainViewModel {
     search: string;
     filters: IMainViewModelFilters;
     points: IPointGeoObject[];
+    rawPoints: IPointGeoObject[]
 }

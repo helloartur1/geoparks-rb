@@ -1,6 +1,6 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { CoordinatesType, IGeoObjectFilterFields, IPointGeoObject } from '@core';
-import { MarkerInfoModalComponent, POINTS, TypeIconMap } from '@shared';
+import { MarkerInfoModalComponent, TypeIconMap } from '@shared';
 import Map from 'ol/Map';
 import View, { ViewOptions } from 'ol/View';
 import { Point } from 'ol/geom';
@@ -25,17 +25,37 @@ const DEFAULT_EXTENT: ViewOptions = {
   templateUrl: './main-view-map.component.html',
   styleUrls: ['./main-view-map.component.scss']
 })
-export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, OnDestroy {
   @Input()
   public setView$: Subject<CoordinatesType> | undefined = undefined;
   @Input()
   public setSearch$: Subject<string> | undefined = undefined;
+  @Input()
+  public points: IPointGeoObject[] = [];
   public map: Map | undefined = undefined;
   public destroy$: Subject<void> = new Subject<void>();
   public hidden: boolean = false;
   private markerLayer: VectorLayer<any> | undefined = undefined;
+  private markerListenerCallBack: ((evt: MapBrowserEvent<any>) => void) | undefined = undefined;
 
   constructor(private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) {}
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    console.log(changes);
+    if (changes['points']) {
+      if (changes['points'].currentValue?.length !== changes['points'].previousValue?.length) {
+        const features: Feature<Point>[] = this.getFeatures(this.points);
+      const markerLayer: VectorLayer<any> = new VectorLayer<any>({
+        source: new VectorSource({
+          features,
+        }),
+      });
+      this.markerLayer = markerLayer;
+      this.map?.addLayer(markerLayer);
+      this.addMarkerClickListener();
+      }
+    }
+  }
 
   public ngOnInit(): void {
     if (this.setView$) {
@@ -67,8 +87,8 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
         ...DEFAULT_EXTENT
       }),
     });
-
-    const features: Feature<Point>[] = this.getFeatures(POINTS);
+    if (this.points.length) {
+      const features: Feature<Point>[] = this.getFeatures(this.points);
     const markerLayer: VectorLayer<any> = new VectorLayer<any>({
       source: new VectorSource({
         features,
@@ -77,6 +97,7 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.markerLayer = markerLayer;
     this.map.addLayer(markerLayer);
     this.addMarkerClickListener();
+    }
   }
 
   public setFullExtent(): void {
@@ -84,7 +105,10 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private addMarkerClickListener(): void {
-    this.map?.on('click', (evt: MapBrowserEvent<any>) => {
+    if (this.markerListenerCallBack) {
+      this.map?.un('click', this.markerListenerCallBack);
+    }
+    this.markerListenerCallBack = (evt: MapBrowserEvent<any>) => {
       const markerFeature = this.map?.forEachFeatureAtPixel(evt.pixel, (feature) => {
         return feature;
       });
@@ -93,7 +117,8 @@ export class MainViewMapComponent implements OnInit, AfterViewInit, OnDestroy {
           ...markerFeature.getProperties()
         }})
       }
-    });
+    }
+    this.map?.on('click', this.markerListenerCallBack);
   }
 
   private searchMap(search: string): void {

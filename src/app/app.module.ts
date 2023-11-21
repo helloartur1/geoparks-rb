@@ -9,6 +9,8 @@ import { MainViewModule } from 'src/view/main-view/main-view.module';
 import { ApiModule, Configuration } from 'api';
 import { HttpClientModule } from '@angular/common/http';
 import { GeoobjectDetailViewModule } from 'src/view/geoobject-detail-view/geoobject-detail-view.module';
+import { BASE_STATIC_URL } from './deps/base-static-url';
+import { LoginFormModule } from 'src/view/login-form/login-form.module';
 
 @NgModule({
   declarations: [
@@ -16,15 +18,21 @@ import { GeoobjectDetailViewModule } from 'src/view/geoobject-detail-view/geoobj
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
     BrowserAnimationsModule,
+    AppRoutingModule,
     GeoobjectDetailViewModule,
+    LoginFormModule,
     PageWrapperModule,
     MainViewModule,
     HttpClientModule,
     ApiModule.forRoot(() => new Configuration({ basePath: "http://localhost:8000"})),
   ],
-  providers: [],
+  providers: [
+    {
+      provide: BASE_STATIC_URL,
+      useValue: 'http://localhost:8000',
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

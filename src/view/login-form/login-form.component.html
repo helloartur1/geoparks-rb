@@ -1,0 +1,19 @@
+<div class="login">
+    <div class="login-form" [formGroup]="form">
+        <h3 class="login-form__title">Вход</h3>
+        <div class="login-form__fields">
+            <mat-form-field>
+                <mat-label>Имя пользователя</mat-label>
+                <input matInput type="text" placeholder="Имя пользователя" formControlName="userName">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Пароль</mat-label>
+                <input matInput type="password" placeholder="Пароль" formControlName="password">
+            </mat-form-field>
+        </div>
+        <button class="login-button" mat-raised-button color="primary" (click)="loginSubmit()">Войти</button>
+    </div>
+    <ng-container *ngIf="showError">
+        <p class="login-error">Произошла ошибка при входе</p>
+    </ng-container>
+</div>

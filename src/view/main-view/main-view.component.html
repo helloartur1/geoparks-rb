@@ -1,6 +1,6 @@
-<div class="sidebar">
-    <ng-container *ngIf="(model$ | async) as model; else spinner">
-        <ng-container *ngIf="model.state$ | async as state; else spinner">
+<ng-container *ngIf="(model$ | async) as model; else spinner">
+    <ng-container *ngIf="model.state$ | async as state; else spinner">
+        <div class="sidebar">
             <div class="search">
                 <mat-form-field>
                     <mat-label>Поиск</mat-label>
@@ -11,18 +11,17 @@
                 <geo-main-view-manager [items]="model.points" (setView)="onSetMapView($event)">
                 </geo-main-view-manager>
             </ng-container>
-            <ng-container *ngIf="state === 'PENDING'">
-                <ng-container *ngTemplateOutlet="spinner"></ng-container>
-            </ng-container>
+        </div>
+        <geo-main-view-map [setView$]="setView$" [setSearch$]="setSearch$" [points]="model.rawPoints">
+        </geo-main-view-map>
+        <ng-container *ngIf="state === 'PENDING'">
+            <ng-container *ngTemplateOutlet="spinner"></ng-container>
         </ng-container>
     </ng-container>
-    
-    <ng-template #spinner>
-        <div class="spinner">
-            <mat-spinner></mat-spinner>
-        </div>
-    </ng-template>
-</div>
+</ng-container>
 
-<geo-main-view-map [setView$]="setView$" [setSearch$]="setSearch$">
-</geo-main-view-map>
+<ng-template #spinner>
+    <div class="spinner">
+        <mat-spinner></mat-spinner>
+    </div>
+</ng-template>

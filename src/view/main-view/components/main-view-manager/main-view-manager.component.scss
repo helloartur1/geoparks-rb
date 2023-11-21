@@ -1,5 +1,5 @@
 :host {
-    background-color: var(--dark-grey-color);
+    background-color: var(--base-green-light-color);
     display: block;
     height: 100%;
     padding-top: 15px;
@@ -18,7 +18,7 @@
 .item {
     display: block;
     padding: 10px 15px;
-    background-color: var(--dark-grey-color);
+    background-color: var(--base-green-middle-color);
     border-radius: 3px;
 
     &:not(:last-child) {
@@ -26,7 +26,7 @@
     }
 
     &:hover {
-        background-color: var(--sub-black-color);
+        background-color: var(--base-green-color);
         .item__control-button {
             visibility: visible;
         }
@@ -49,12 +49,14 @@
         font-size: 14px;
         line-height: 16px;
         font-weight: 500;
+        color: var(--sub-black-color);
     }
 
     &__description {
         margin: 0;
         font-size: 12px;
         line-height: 14px;
+        color: var(--sub-black-color);
     }
 
     &__control-button {

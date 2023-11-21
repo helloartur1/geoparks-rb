@@ -7,7 +7,7 @@
 .sidebar {
     width: 30%;
     height: 100%;
-    background-color: var(--dark-grey-color);
+    background-color: var(--base-green-light-color);
 }
 
 .spinner {
@@ -22,6 +22,7 @@
     padding: 10px;
     width: 100%;
     box-sizing: border-box;
+    background-color: var(--base-green-light-color);
     ::ng-deep {
         mat-form-field {
             width: 100%;

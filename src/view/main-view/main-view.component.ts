@@ -4,6 +4,7 @@ import { Observable, Subject, debounceTime, takeUntil } from 'rxjs';
 import { IMainViewModel } from './services/main-view-model/main-view.model.interface';
 import { FormControl } from '@angular/forms';
 import { CoordinatesType } from '@core';
+import { GeoobjectService } from '@api';
 
 @Component({
   selector: 'app-main-view',
@@ -16,7 +17,7 @@ export class MainViewComponent {
   public destroy$: Subject<void>= new Subject<void>();
   public setView$: Subject<CoordinatesType> = new Subject<CoordinatesType>();
   public setSearch$: Subject<string> = new Subject<string>();
-  constructor(private mainViewModelService: MainViewModelService) {
+  constructor(private mainViewModelService: MainViewModelService, private geoobjectService: GeoobjectService) {
     this.model$ = this.mainViewModelService.model$;
   }
 
@@ -24,6 +25,7 @@ export class MainViewComponent {
     this.searchControl.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(200)).subscribe((search: string | null) => {
       this.onSearch(search || '');
     });
+    this.mainViewModelService.init();
   }
 
   public onSearch(search: string): void {

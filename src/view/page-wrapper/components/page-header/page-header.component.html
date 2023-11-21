@@ -1,5 +1,16 @@
 <header class="page-header">
-    <a class="page-header__link">
-        <img src="../../../../assets/img/geoparks-logo.png" alt="Лога геопарка">
+    <a class="page-header__link" (click)="moveToMainPage()">
+        <img src="../../../../assets/img/geoparks-logo-green.png" alt="Лога геопарка">
     </a>
+    <div class="auth-banner" *ngIf="showBanner()">
+        <ng-container *ngIf="authData; else loginButton">
+            <h5 class="auth-banner__username">{{ authData.userName }}</h5>
+            <button class="logout-button" mat-icon-button (click)="logout()">
+                <mat-icon>input icon</mat-icon>
+            </button>
+        </ng-container>
+    </div>
+    <ng-template #loginButton>
+        <button mat-button class="login-button" (click)="moveToLoginPage()">Войти</button>
+    </ng-template>
 </header>

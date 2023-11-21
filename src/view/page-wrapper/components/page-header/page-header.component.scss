@@ -1,6 +1,39 @@
 .page-header {
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
     padding: 12px;
-    background-color: var(--base-purple-color);
-} 
+    background-color: var(--base-green-dark-color);
+}
+.auth-banner {
+    width: 200px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &__username {
+        margin: 0;
+        font-size: 16px;
+        line-height: 18px;
+        color: #fff;
+    }
+}
+.page-header__link {
+    cursor: pointer;
+}
+
+.logout-button {
+    color: #fff;
+    &.mat-mdc-button {
+        color: #fff;
+    }
+
+}
+.login-button {
+    font-size: 16px;
+    line-height: 18px;
+    &.mat-mdc-button:not(:disabled) {
+        color: #fff;
+    }
+}
