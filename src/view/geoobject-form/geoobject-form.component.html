@@ -1,1 +1,38 @@
-<p>geoobject-form works!</p>
+<div class="form" [formGroup]="form">
+    <mat-form-field class="form-field">
+        <mat-label>Название</mat-label>
+        <input type="text" matInput formControlName="name"/>
+    </mat-form-field>
+    <mat-form-field class="form-field">
+        <mat-label>Описание</mat-label>
+        <input type="text" matInput formControlName="description"/>
+    </mat-form-field>
+    <mat-form-field class="form-field">
+        <mat-label>Долгота</mat-label>
+        <input type="number" matInput formControlName="longitude"/>
+    </mat-form-field>
+    <mat-form-field class="form-field">
+        <mat-label>Широта</mat-label>
+        <input type="number" matInput formControlName="latitude"/>
+    </mat-form-field>
+    <mat-form-field class="form-field">
+        <mat-label>Категория</mat-label>
+        <mat-select formControlName="type">
+            <ng-container *ngFor="let category of categories">
+                <mat-option [value]="category.value">{{ category.name}}</mat-option>
+            </ng-container>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field class="form-field">
+        <mat-label>Геопарк</mat-label>
+        <mat-select [disabled]="true" formControlName="geopark">
+            <mat-option [value]="'41f271c8-e8ba-4225-b21d-403f9751e5a7'">Геопарк Янган-Тау</mat-option>   
+        </mat-select>
+    </mat-form-field>
+    <button mat-raised-button [disabled]="!form.valid" (click)="save()">Сохранить</button>
+    <div class="error" *ngIf="error">
+        Произошла ошибка при сохранении данных
+    </div>
+</div>
+
+<div class="map" id="form-map"></div>

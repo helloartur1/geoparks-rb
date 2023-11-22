@@ -18,6 +18,12 @@
     justify-content: center;
 }
 
+.add-button {
+    &.mat-mdc-raised-button:not(:disabled) {
+        background-color: var(--base-green-dark-color);
+    }
+}
+
 .search {
     padding: 10px;
     width: 100%;

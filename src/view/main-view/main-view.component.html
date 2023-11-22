@@ -6,6 +6,9 @@
                     <mat-label>Поиск</mat-label>
                     <input matInput placeholder="Поиск геообъектов" [formControl]="searchControl">
                 </mat-form-field>
+                <div *ngIf="isAdmin">
+                    <button class="add-button" mat-raised-button color="primary" (click)="moveToCreateObject()">Добавить геообъект</button>
+                </div>
             </div>
             <ng-container *ngIf="state === 'SUCCESS'">
                 <geo-main-view-manager [items]="model.points" (setView)="onSetMapView($event)">

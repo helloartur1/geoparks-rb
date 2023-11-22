@@ -3,8 +3,9 @@ import { MainViewModelService } from './services/main-view-model/main-view-model
 import { Observable, Subject, debounceTime, takeUntil } from 'rxjs';
 import { IMainViewModel } from './services/main-view-model/main-view.model.interface';
 import { FormControl } from '@angular/forms';
-import { CoordinatesType } from '@core';
-import { GeoobjectService } from '@api';
+import { AppRoutes, CoordinatesType } from '@core';
+import { AuthAdminService } from '@shared';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main-view',
@@ -17,7 +18,7 @@ export class MainViewComponent {
   public destroy$: Subject<void>= new Subject<void>();
   public setView$: Subject<CoordinatesType> = new Subject<CoordinatesType>();
   public setSearch$: Subject<string> = new Subject<string>();
-  constructor(private mainViewModelService: MainViewModelService, private geoobjectService: GeoobjectService) {
+  constructor(private mainViewModelService: MainViewModelService, private authAdminService: AuthAdminService, private router: Router) {
     this.model$ = this.mainViewModelService.model$;
   }
 
@@ -35,6 +36,15 @@ export class MainViewComponent {
 
   public onSetMapView(coordinates: CoordinatesType): void {
     this.setView$.next(coordinates);
+  }
+
+  public get isAdmin(): boolean {
+    return !!this.authAdminService.getAuthData();
+  }
+
+  public moveToCreateObject(): void {
+    this.router.navigate([AppRoutes.CREATE_FORM]);
+
   }
 
   public ngOnDestroy(): void {
