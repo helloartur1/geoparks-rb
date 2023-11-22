@@ -1,11 +1,14 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Inject, Input, ViewChild} from '@angular/core';
+import { BASE_STATIC_URL } from 'src/app/deps/base-static-url';
 
 @Component({
   selector: 'geo-photo-geoobject-detail-view',
   templateUrl: './photo-geoobject-detail-view.component.html',
   styleUrls: ['./photo-geoobject-detail-view.component.scss']
 })
-export class PhotoGeoobjectDetailViewComponent implements OnInit{
+export class PhotoGeoobjectDetailViewComponent {
+  @Input()
+  public photoPaths: Array<{ path: string }> = [];
   @ViewChild('container') container!: ElementRef;
   photos: string[] = [
     '../../../assets/img/1.jpg',
@@ -36,8 +39,11 @@ export class PhotoGeoobjectDetailViewComponent implements OnInit{
   }
 
 
-  constructor() {
+  constructor(@Inject(BASE_STATIC_URL) private baseStaticUrl: string) {
   }
-  ngOnInit():void {}
+  
+  public getPhotoUrl(path: string): string {
+    return this.baseStaticUrl + path;
+  }
 
 }

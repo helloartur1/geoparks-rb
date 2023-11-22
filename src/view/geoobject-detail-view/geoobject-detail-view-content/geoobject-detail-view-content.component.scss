@@ -1,0 +1,25 @@
+:host {
+    display: block;
+    width: 100%;
+}
+.detail-sidebar {
+    padding: 20px;
+    width: 35%;
+}
+
+.detail {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    &-title {
+        margin: 20px 0;
+        font-size: 18px;
+        line-height: 14px;
+        font-weight: 500;
+    }
+}
+
+.map {
+    width: 65%;
+    height: 1000px;
+}

@@ -481,11 +481,11 @@
         }
       }
     },
-    "/photos_geoobject{geoobject_id}": {
+    "/photos_geoobject/{geoobject_id}": {
       "get": {
         "tags": ["photo"],
         "summary": "Photos By Geoobject",
-        "operationId": "photos_by_geoobject_photos_geoobject_geoobject_id__get",
+        "operationId": "photos_by_geoobject_photos_geoobject__geoobject_id__get",
         "parameters": [
           {
             "name": "geoobject_id",

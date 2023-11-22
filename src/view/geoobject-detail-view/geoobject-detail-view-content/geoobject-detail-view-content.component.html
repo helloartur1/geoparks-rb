@@ -1,0 +1,8 @@
+<div class="detail">
+    <div class="detail-sidebar">
+        <h3 class="detail-title">{{ geoobject.name }}</h3>
+      <geo-photo-geoobject-detail-view *ngIf="photos.length" [photoPaths]="photos"></geo-photo-geoobject-detail-view>
+      <p class="detail-description">{{ geoobject.description }}</p> 
+    </div>
+    <div class="map" id="map1"></div>
+</div>

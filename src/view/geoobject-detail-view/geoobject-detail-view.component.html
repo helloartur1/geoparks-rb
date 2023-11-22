@@ -1,10 +1,33 @@
-<div id="map1" style = 'width:70%;height:1000px; float: right'>
+<ng-container *ngIf="model$ | async as model; else loader">
+  <ng-container *ngIf="model.state$ | async as state; else loader">
+    <ng-container *ngIf="state === 'PENDING'">
+      <ng-container *ngTemplateOutlet="loader"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="state === 'ERROR'">
+      <ng-container *ngTemplateOutlet="error"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="state === 'SUCCESS'">
 
-</div>
-<div class="all">
-  <geo-name-geoobject-detail-view></geo-name-geoobject-detail-view>
-  <geo-photo-geoobject-detail-view></geo-photo-geoobject-detail-view>
-  <geo-desc-geoobject-detail-view></geo-desc-geoobject-detail-view> 
-</div>
+      <geo-geoobject-detail-view-content 
+        *ngIf="model.geoobject" 
+        [geoobject]="model.geoobject" 
+        [photos]="model.photos || []"
+      >
+      </geo-geoobject-detail-view-content>
+    </ng-container>
+  </ng-container>
+</ng-container>
+<ng-template #loader>
+  <div class="detail-loader">
+    <mat-spinner></mat-spinner>
+  </div>
+</ng-template>
+<ng-template #error>
+  <div class="detail-error">
+    <h3 class="detail-error__title">
+      Произошла ошибка при загрузке детальной информации о геообъекте
+    </h3>
+  </div>
+</ng-template>
 
 

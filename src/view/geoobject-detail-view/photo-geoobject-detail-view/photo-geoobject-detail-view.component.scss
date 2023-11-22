@@ -1,15 +1,18 @@
-.photo_obj{
+:host {
+  display: block;
+  width: 100%;
+}
+.photo_obj {
   margin-left: 70px;
   margin-right: 70px;
 }
-.photo_obj img{
+.photo_obj img {
   padding: 10px;
 }
 
 .photo-gallery {
   display: flex;
   align-items: center;
-  width: 30%;
 }
 
 .photos-container {

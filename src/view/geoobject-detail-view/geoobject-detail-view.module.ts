@@ -1,22 +1,27 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GeoobjectDetailViewComponent } from './geoobject-detail-view.component';
-import { PhotoGeoobjectDetailViewComponent } from './photo-geoobject-detail-view/photo-geoobject-detail-view.component';
-import { NameGeoobjectDetailViewComponent } from './name-geoobject-detail-view/name-geoobject-detail-view.component';
-import { DescGeoobjectDetailViewModule } from './desc-geoobject-detail-view/desc-geoobject-detail-view.module';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { GeoobjectDetailViewContentModule } from './geoobject-detail-view-content/geoobject-detail-view-content.module';
+import { BASE_STATIC_URL } from 'src/app/deps/base-static-url';
 
 @NgModule({
   declarations: [
     GeoobjectDetailViewComponent,
-    PhotoGeoobjectDetailViewComponent,
-    NameGeoobjectDetailViewComponent,
   ],
     imports: [
         CommonModule,
-        DescGeoobjectDetailViewModule,
+        MatProgressSpinnerModule,
+        GeoobjectDetailViewContentModule,
     ],
   exports: [
     GeoobjectDetailViewComponent,
   ],
+  providers: [
+    {
+      provide: BASE_STATIC_URL,
+      useValue: 'http://localhost:8000',
+    }
+  ]
 })
 export class GeoobjectDetailViewModule { }

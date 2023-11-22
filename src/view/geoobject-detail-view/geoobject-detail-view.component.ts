@@ -13,6 +13,8 @@ import { Point } from "ol/geom";
 import VectorSource from "ol/source/Vector";
 import Style from "ol/style/Style";
 import Icon from "ol/style/Icon";
+import { GeoobjectDetailModelService, IGeoobjectDetailModel } from './services/geoobject-detail-model.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'geo-geoobject-detail-view',
@@ -26,17 +28,17 @@ export class GeoobjectDetailViewComponent implements OnInit, AfterViewInit {
 
   public geoobjectUid: string = '';
   public geoobject: IPointGeoObject | undefined = undefined;
+  public model$: Observable<IGeoobjectDetailModel>;
 
-  constructor(private activatedRoute: ActivatedRoute) {
+  constructor(private activatedRoute: ActivatedRoute, private geoobjectDetailModelService: GeoobjectDetailModelService) {
+    this.model$ = this.geoobjectDetailModelService.model$.asObservable();
   }
 
   public ngOnInit(): void {
-    this.geoobjectUid = this.activatedRoute.snapshot.params['geoobjectUid'] || '';
+    const geoobjectUid = this.activatedRoute.snapshot.params['geoobjectUid'] || '';
+    this.geoobjectDetailModelService.init(geoobjectUid);
     if (this.geoobjectUid) {
       this.geoobject = POINTS.find((item: IPointGeoObject) => item.id === this.geoobjectUid);
-      console.log(this.geoobject);
-      console.log(this.geoobject?.latitude);
-      console.log(this.geoobject?.longitude);
     }
   }
 
