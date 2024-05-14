@@ -7,10 +7,17 @@ import { GeoobjectFormComponent } from 'src/view/geoobject-form/geoobject-form.c
 import { LoginFormComponent } from 'src/view/login-form/login-form.component';
 import { MainViewComponent } from 'src/view/main-view/main-view.component';
 import { MainGuard } from './guards/main.guard';
+import { GeoparksComponent } from 'src/view/geoparks/geoparks.component';
+import { MatIconModule } from '@angular/material/icon';
+import { RoutesComponent } from 'src/view/routes/routes.component';
 
 const routes: Routes = [
   {
     path: '',
+    component: GeoparksComponent,
+  },
+  {
+    path: 'geopark/:id',
     component: MainViewComponent,
   },
   {
@@ -30,6 +37,10 @@ const routes: Routes = [
     path: AppRoutes.CREATE_FORM,
     component: GeoobjectFormComponent,
     canActivate: [MainGuard],
+  },
+  {
+    path: AppRoutes.ROUTES,
+    component: RoutesComponent
   }
 ];
 

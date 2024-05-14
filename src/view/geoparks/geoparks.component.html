@@ -1,0 +1,55 @@
+
+<section class="geoparks-intro">
+    <h2 class="geoparks-intro__title">Геопарки ЮНЕСКО: Сокровища Земли в ваших руках</h2>
+    <div class="geoparks-intro-content intro-content">
+        <div class="container">
+            <div class="intro-content-wrapper">
+                <div class="intro-content-definition">
+                    <p class="intro-content-definition__text"><span class="intro-content-definition__text-main">Геопарк</span> &mdash; территория, объединяющая геологические объекты международного значения, природные и историко-культурные объекты. Место, где человек может встретиться с первозданной природой и познакомиться с вековыми традициями башкирской земли.</p> 
+                </div>
+                <div class="intro-content-galery">
+                    <a class="arrow-prev" (click)="togglePrevPhoto($event)">
+                        <img src="../../assets/img/arrow_left_white.png" alt="Вперед" width="32" height="32">
+                    </a>
+                    <div class="active-image">
+                        <img [src]="imagePaths[activeImageIndex]" alt="Изображение геопарка" width="700" height="370">
+                    </div>
+                    <a class="arrow-next" (click)="toggleNextPhoto($event)">
+                        <img src="../../assets/img/arrow_right_white.png" alt="Назад" width="32" height="32">
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+<section class="select">
+    <div class="container">
+        <h3 class="select-title">Выберите геопарк</h3>
+        <div class="select-wrapper">
+            <a class="select-item-link" (click)="moveToGeopark($event, '07599ea7-76aa-4bbf-8335-86e2436b0254')">
+                <div class="select-item select-item--left">
+                    <b class="select-item-action">Перейти к геопарку</b>
+                    <h3 class="select-item-title">Торатау</h3>
+                    <p class="select-item-description">Уникальный шихан Торатау, возвышающийся над бескрайнями просторами Башкирии, манит своей мистической атмосферой и легендами о спрятанных сокровищах. Любители активного отдыха оценят возможность покорить вершину шихану, а поклонники истории - исследовать древние пещеры и археологические памятники</p>
+                </div>
+            </a>
+            <a class="select-item-link" (click)="moveToGeopark($event, '41f271c8-e8ba-4225-b21d-403f9751e5a7')">
+                <div class="select-item select-item--right">
+                    <b class="select-item-action">Перейти к геопарку</b>
+                    <h3 class="select-item-title">Янгантау</h3>
+                    <p class="select-item-description">Жемчужина Южного Урала, Янгантау, очаровывает лазурными озерами, реликтовыми лесами и причудливыми скальными образованиями. Здесь можно не только насладиться живописными водами, но и оздоровиться в целебных источниках, познакомиться с самобытной культурой башкирского народа и отведать вкуснейшие национальные блюда</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+<div class="map-wrapper">
+    <div class="map" id="map"></div>
+
+    <div class="map-custom-controls">
+        <button class="full-button" mat-mini-fab color="primary" aria-label="Полный экстент" (click)="setFullExtent()">
+            <!-- <mat-icon>public</mat-icon> -->
+        </button>
+    </div>
+</div>

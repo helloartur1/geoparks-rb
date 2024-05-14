@@ -144,7 +144,8 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
       type,
       latitude,
       longitude,
-      geoparkId: geopark
+      geoparkId: geopark,
+      commonType: type,
     }).pipe(take(1)).subscribe({
       next: () => {
         this.router.navigate([AppRoutes.MAIN]);

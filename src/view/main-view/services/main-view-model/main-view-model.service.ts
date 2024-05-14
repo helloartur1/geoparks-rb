@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { PointMarksService } from '@shared';
-import { BehaviorSubject, Subject, catchError, combineLatest, debounceTime, of, switchMap, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, Subject, catchError, combineLatest, debounceTime, forkJoin, of, switchMap, takeUntil, tap } from 'rxjs';
 import { IMainViewModel } from './main-view.model.interface';
 import { LoadingStatusType } from 'src/core/types/loading-status.type';
 import { IMainViewModelFilters } from './main-view.model.filters.interface';
 import { IPointGeoObject } from '@core';
-import { GeoobjectModel, GeoobjectService } from '@api';
+import { GeoobjectModel, GeoobjectService, GeoparkModel, GeoparkService } from '@api';
 
 const DEFAULT_GEOPARK_UID = '41f271c8-e8ba-4225-b21d-403f9751e5a7';
 export const DEFAULT_MODEL: IMainViewModel = {
@@ -14,6 +14,7 @@ export const DEFAULT_MODEL: IMainViewModel = {
   filters: {},
   points: [],
   rawPoints: [],
+  geopark: undefined,
 }
 @Injectable()
 export class MainViewModelService {
@@ -26,7 +27,7 @@ export class MainViewModelService {
     state$: this.state$.asObservable()
   });
 
-  constructor(private pointMarksService: PointMarksService, private geoobjectService: GeoobjectService) {
+  constructor(private pointMarksService: PointMarksService, private geoobjectService: GeoobjectService, private geoparkrsService: GeoparkService) {
     this.search$.pipe(debounceTime(400)).subscribe((search: string) => {
       this.state$.next('PENDING');
 
@@ -41,15 +42,18 @@ export class MainViewModelService {
     });
   }
 
-  public init(): void {
+  public init(geoparkId: string
+    ): void {
     this.state$.next('PENDING');
-    this.geoobjectService.getGeoobjectsByGeoparkGeoobjectGeoparkGeoparkIdGet(DEFAULT_GEOPARK_UID).subscribe({
-      next: (geeoobjects: GeoobjectModel[]) => {
+    console.log(geoparkId);
+    forkJoin([this.geoobjectService.getGeoobjectsByGeoparkGeoobjectGeoparkGeoparkIdGet(geoparkId), this.geoparkrsService.getGeoparkByIdGeoparkIdGet(geoparkId)]).subscribe({
+      next: ([geeoobjects, geopark]: [GeoobjectModel[], GeoparkModel]) => {
         this.state$.next('SUCCESS');
         this.model$.next({
           ...this.model$.value,
           points: [...geeoobjects],
           rawPoints: [...geeoobjects],
+          geopark,
         });
       },
       error: () => {

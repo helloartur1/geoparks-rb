@@ -4,4 +4,27 @@
     <button class="full-button" mat-mini-fab color="primary" aria-label="Полный экстент" (click)="setFullExtent()">
         <mat-icon>public</mat-icon>
     </button>
+    <button class="legend-button" mat-mini-fab color="primary" aria-label="Легенда" (click)="toggleLegend()">
+        <mat-icon>info</mat-icon>
+    </button>
+</div>
+
+<div class="legend" *ngIf="isLegendShowed">
+    <h4 class="legend-title">Условные обозначения</h4>
+    <div class="legend-item">
+        <img class="legend-item-image" src="../../../../assets/icons/culture2.png" alt="Культура, история и образование">
+        <h5 class="legend-item-name">Культура, история и образование</h5>
+    </div>
+    <div class="legend-item">
+        <img class="legend-item-image" src="../../../../assets/icons/restore2.png" alt="Рекрация, отдых и развлечения">
+        <h5 class="legend-item-name">Рекрация, отдых и развлечения</h5>
+    </div>
+    <div class="legend-item">
+        <img class="legend-item-image" src="../../../../assets/icons/nature3.png" alt="Природа и геология">
+        <h5 class="legend-item-name">Природа и геология</h5>
+    </div>
+    <div class="legend-item">
+        <img class="legend-item-image" src="../../../../assets/icons/infrastructure2.png" alt="Общая инфраструктура">
+        <h5 class="legend-item-name">Общая инфраструктура</h5>
+    </div>
 </div>

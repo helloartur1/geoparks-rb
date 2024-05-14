@@ -6,3 +6,4 @@ export * from './types/loading-status.type';
 export * from './enums/app-routes.enum';
 export * from './interfaces/user-data.interface';
 export * from './utils/token.utils';
+export * from './interfaces/geopark.interface';

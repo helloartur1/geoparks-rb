@@ -7,4 +7,11 @@ export const TypeIconMap = new Map([
     ['Родники и источники', 'nature.png'],
     ['Горы/Скалы', 'terrain.png'],
     ['Музеи', 'home.png']
-])
+]);
+
+export const CommonTypeIconMap = new Map([
+    ['Культура, история и образование', 'culture2.png'],
+    ['Рекрация, отдых и развлечения', 'restore2.png'],
+    ['Природа и геология', 'nature3.png'],
+    ['Общая инфраструктура', 'infrastructure2.png'],
+]);

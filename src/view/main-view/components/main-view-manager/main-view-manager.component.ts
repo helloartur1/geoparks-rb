@@ -1,7 +1,30 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { CoordinatesType, IPointGeoObject } from '@core';
 
+export interface ICategoryItem {
+  name: string;
+  items: IPointGeoObject[];
+}
+const CATEGORY_NAMES: string[] = ['Культура, история и образование', 'Рекрация, отдых и развлечения', 'Природа и геология', 'Общая инфраструктура']
+const DEFAULT_CATEGORY_LIST: ICategoryItem[] = [
+  {
+    name: 'Культура, история и образование',
+    items: [],
+  },
+  {
+    name: 'Рекрация, отдых и развлечения',
+    items: [],
+  },
+  {
+    name: 'Природа и геология',
+    items: [],
+  },
+  {
+    name: 'Общая инфраструктура',
+    items: [],
+  },
+];
 const DETAIL_PAGE_ROUTE: string = 'detail';
 @Component({
   selector: 'geo-main-view-manager',
@@ -15,7 +38,19 @@ export class MainViewManagerComponent {
   @Output()
   public setView: EventEmitter<CoordinatesType> = new EventEmitter<CoordinatesType>();
 
+  public categoryItems: ICategoryItem[] = [...DEFAULT_CATEGORY_LIST];
+
   constructor(private router: Router) {}
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (changes['items'].currentValue) {
+      this.initListByCategories(changes['items'].currentValue);
+    }
+  }
+
+  public ngOnInit(): void {
+    this.initListByCategories(this.items);
+  }
 
   public zoomToObject(latitude: number, longitude: number): void {
     this.setView.emit({ latitude, longitude });
@@ -23,5 +58,28 @@ export class MainViewManagerComponent {
 
   public navigateToDetailPage(uid: string): void {
     this.router.navigate([`${DETAIL_PAGE_ROUTE}/${uid}`]);
+  }
+
+  public trackByCategory(index: number, categoryItem: ICategoryItem): string {
+    return categoryItem.name;
+  }
+
+  public trackByItem(index: number, item: IPointGeoObject): string {
+    return item.id;
+  }
+
+  public initListByCategories(items: IPointGeoObject[]): void {
+    this.categoryItems = CATEGORY_NAMES.map((category: string) => {
+      return {
+        name: category,
+        items: [],
+      }
+    });
+    items.forEach((item: IPointGeoObject) => {
+      let categoryIndex: number = this.categoryItems.findIndex((categoryItem: ICategoryItem) => categoryItem.name === item.commonType);
+      if (categoryIndex >= 0) {
+        this.categoryItems[categoryIndex].items = [...this.categoryItems[categoryIndex].items, item]
+      }
+    });
   }
 }

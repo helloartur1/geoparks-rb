@@ -12,7 +12,7 @@ export class PageHeaderComponent {
   constructor(private router: Router, private authAdminService: AuthAdminService, private activatedRoute: ActivatedRoute) {}
 
   public moveToMainPage(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['']);
   }
 
   public get authData(): IUserData | null {
@@ -20,7 +20,6 @@ export class PageHeaderComponent {
   }
 
   public moveToLoginPage(): void {
-    console.log(this.activatedRoute.snapshot);
     this.router.navigate([AppRoutes.LOGIN]);
   }
 

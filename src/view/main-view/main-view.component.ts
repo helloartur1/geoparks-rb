@@ -5,7 +5,7 @@ import { IMainViewModel } from './services/main-view-model/main-view.model.inter
 import { FormControl } from '@angular/forms';
 import { AppRoutes, CoordinatesType } from '@core';
 import { AuthAdminService } from '@shared';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-main-view',
@@ -18,7 +18,7 @@ export class MainViewComponent {
   public destroy$: Subject<void>= new Subject<void>();
   public setView$: Subject<CoordinatesType> = new Subject<CoordinatesType>();
   public setSearch$: Subject<string> = new Subject<string>();
-  constructor(private mainViewModelService: MainViewModelService, private authAdminService: AuthAdminService, private router: Router) {
+  constructor(private mainViewModelService: MainViewModelService, private authAdminService: AuthAdminService, private router: Router, private activatedRoute: ActivatedRoute) {
     this.model$ = this.mainViewModelService.model$;
   }
 
@@ -26,7 +26,8 @@ export class MainViewComponent {
     this.searchControl.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(200)).subscribe((search: string | null) => {
       this.onSearch(search || '');
     });
-    this.mainViewModelService.init();
+    const geoparkId: string = this.activatedRoute.snapshot.params['id'];
+    this.mainViewModelService.init(geoparkId);
   }
 
   public onSearch(search: string): void {

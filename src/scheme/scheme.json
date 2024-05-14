@@ -1,119 +1,210 @@
 {
   "openapi": "3.1.0",
-  "info": { "title": "FastAPI", "version": "0.1.0" },
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
   "paths": {
-    "/user": {
+    "/user/": {
       "get": {
-        "tags": ["user"],
+        "tags": [
+          "user"
+        ],
         "summary": "Test",
-        "operationId": "test_user_get",
+        "operationId": "test_user__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           }
         }
       },
       "post": {
-        "tags": ["user"],
+        "tags": [
+          "user"
+        ],
         "summary": "Create User",
-        "operationId": "create_user_user_post",
-        "security": [{ "OAuth2PasswordBearer": [] }],
+        "operationId": "create_user_user__post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/User" }
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
             }
           }
         },
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
         }
       },
       "put": {
-        "tags": ["user"],
+        "tags": [
+          "user"
+        ],
         "summary": "Update User Role",
-        "operationId": "update_user_role_user_put",
-        "security": [{ "OAuth2PasswordBearer": [] }],
+        "operationId": "update_user_role_user__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "user_username",
             "in": "query",
             "required": true,
-            "schema": { "type": "string", "title": "User Username" }
+            "schema": {
+              "type": "string",
+              "title": "User Username"
+            }
           },
           {
             "name": "new_role",
             "in": "query",
             "required": true,
-            "schema": { "type": "string", "title": "New Role" }
+            "schema": {
+              "type": "string",
+              "title": "New Role"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
         }
       },
       "delete": {
-        "tags": ["user"],
+        "tags": [
+          "user"
+        ],
         "summary": "Delete User",
-        "operationId": "delete_user_user_delete",
-        "security": [{ "OAuth2PasswordBearer": [] }],
+        "operationId": "delete_user_user__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "username",
             "in": "query",
             "required": true,
-            "schema": { "type": "string", "title": "Username" }
+            "schema": {
+              "type": "string",
+              "title": "Username"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
         }
       }
     },
-    "/login": {
+    "/user/about_me": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "About Me",
+        "operationId": "about_me_user_about_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/login/": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "summary": "Auth",
-        "operationId": "auth_login_post",
+        "operationId": "auth_login__post",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
-              "schema": { "$ref": "#/components/schemas/Body_auth_login_post" }
+              "schema": {
+                "$ref": "#/components/schemas/Body_auth_login__post"
+              }
             }
           },
           "required": true
@@ -121,128 +212,66 @@
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
         }
       }
     },
-    "/about_me": {
+    "/geoobject/": {
       "get": {
-        "tags": ["auth"],
-        "summary": "About Me",
-        "operationId": "about_me_about_me_get",
+        "tags": [
+          "geoobject"
+        ],
+        "summary": "Get All Geobjects",
+        "operationId": "get_all_geobjects_geoobject__get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/User" }
-              }
-            }
-          }
-        },
-        "security": [{ "OAuth2PasswordBearer": [] }]
-      }
-    },
-    "/photo": {
-      "put": {
-        "tags": ["photo"],
-        "summary": "Change Photo",
-        "operationId": "change_photo_photo_put",
-        "security": [{ "OAuth2PasswordBearer": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/ChangePictures" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": ["photo"],
-        "summary": "Delete Photo",
-        "operationId": "delete_photo_photo_delete",
-        "security": [{ "OAuth2PasswordBearer": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/DeletePicture" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GeoobjectModel"
+                  },
+                  "title": "Response Get All Geobjects Geoobject  Get"
+                }
               }
             }
           }
         }
       },
       "post": {
-        "tags": ["photo"],
-        "summary": "Add Photo By Id Geoobject",
-        "operationId": "add_photo_by_id_geoobject_photo_post",
-        "parameters": [
+        "tags": [
+          "geoobject"
+        ],
+        "summary": "Create Geoobject",
+        "operationId": "create_geoobject_geoobject__post",
+        "security": [
           {
-            "name": "geoobject_id",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Geoobject Id"
-            }
-          },
-          {
-            "name": "path_photo",
-            "in": "query",
-            "required": true,
-            "schema": { "type": "string", "title": "Path Photo" }
-          },
-          {
-            "name": "preview_photo",
-            "in": "query",
-            "required": true,
-            "schema": { "type": "boolean", "title": "Preview Photo" }
+            "OAuth2PasswordBearer": []
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Body_add_photo_by_id_geoobject_photo_post"
+                "$ref": "#/components/schemas/GeoobjectModel"
               }
             }
           }
@@ -250,13 +279,117 @@
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "geoobject"
+        ],
+        "summary": "Update Geoobject",
+        "operationId": "update_geoobject_geoobject__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGeoobjectModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "geoobject"
+        ],
+        "summary": "Delete Geoobject",
+        "operationId": "delete_geoobject_geoobject__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -265,7 +398,9 @@
     },
     "/geoobject/{id}": {
       "get": {
-        "tags": ["geoobject"],
+        "tags": [
+          "geoobject"
+        ],
         "summary": "Get Geoobject",
         "operationId": "get_geoobject_geoobject__id__get",
         "parameters": [
@@ -273,40 +408,11 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "format": "uuid", "title": "Id" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/GeoobjectModel" }
-              }
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Id"
             }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/geoobject_geopark/{geopark_id}": {
-      "get": {
-        "tags": ["geoobject"],
-        "summary": "Get Geoobjects By Geopark",
-        "operationId": "get_geoobjects_by_geopark_geoobject_geopark__geopark_id__get",
-        "parameters": [
-          {
-            "name": "geopark_id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string", "title": "Geopark Id" }
           }
         ],
         "responses": {
@@ -315,140 +421,29 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/GeoobjectModel" },
-                  "title": "Response Get Geoobjects By Geopark Geoobject Geopark  Geopark Id  Get"
+                  "$ref": "#/components/schemas/GeoobjectModel"
                 }
               }
             }
           },
           "422": {
             "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/geoobject": {
-      "get": {
-        "tags": ["geoobject"],
-        "summary": "Get All Geobjects",
-        "operationId": "get_all_geobjects_geoobject_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/GeoobjectModel" },
-                  "title": "Response Get All Geobjects Geoobject Get"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": ["geoobject"],
-        "summary": "Update Geoobject",
-        "operationId": "update_geoobject_geoobject_put",
-        "security": [{ "OAuth2PasswordBearer": [] }],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": true,
-            "schema": { "type": "string", "format": "uuid", "title": "Id" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdateGeoobjectModel" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": ["geoobject"],
-        "summary": "Create Geoobject",
-        "operationId": "create_geoobject_geoobject_post",
-        "security": [{ "OAuth2PasswordBearer": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/GeoobjectModel" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": ["geoobject"],
-        "summary": "Delete Geoobject",
-        "operationId": "delete_geoobject_geoobject_delete",
-        "security": [{ "OAuth2PasswordBearer": [] }],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "required": true,
-            "schema": { "type": "string", "format": "uuid", "title": "Id" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       }
     },
-    "/geoobject_detail/{id}": {
+    "/geoobject/detail/{id}": {
       "get": {
-        "tags": ["geoobject"],
+        "tags": [
+          "geoobject"
+        ],
         "summary": "Get Geoobject And Photos",
         "operationId": "get_geoobject_and_photos_geoobject_detail__id__get",
         "parameters": [
@@ -456,7 +451,11 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string", "format": "uuid", "title": "Id" }
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Id"
+            }
           }
         ],
         "responses": {
@@ -474,18 +473,136 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
         }
       }
     },
-    "/photos_geoobject/{geoobject_id}": {
+    "/geoobject/geopark/{geopark_id}": {
       "get": {
-        "tags": ["photo"],
+        "tags": [
+          "geoobject"
+        ],
+        "summary": "Get Geoobjects By Geopark",
+        "operationId": "get_geoobjects_by_geopark_geoobject_geopark__geopark_id__get",
+        "parameters": [
+          {
+            "name": "geopark_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Geopark Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GeoobjectModel"
+                  },
+                  "title": "Response Get Geoobjects By Geopark Geoobject Geopark  Geopark Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/geopark/": {
+      "get": {
+        "tags": [
+          "geopark"
+        ],
+        "summary": "Get Geoparks",
+        "operationId": "get_geoparks_geopark__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GeoparkModel"
+                  },
+                  "type": "array",
+                  "title": "Response Get Geoparks Geopark  Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/geopark/{id}": {
+      "get": {
+        "tags": [
+          "geopark"
+        ],
+        "summary": "Get Geopark By Id",
+        "operationId": "get_geopark_by_id_geopark__id__get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeoparkModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/photo/geoobject/{geoobject_id}": {
+      "get": {
+        "tags": [
+          "photo"
+        ],
         "summary": "Photos By Geoobject",
-        "operationId": "photos_by_geoobject_photos_geoobject__geoobject_id__get",
+        "operationId": "photos_by_geoobject_photo_geoobject__geoobject_id__get",
         "parameters": [
           {
             "name": "geoobject_id",
@@ -501,104 +618,461 @@
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": { "application/json": { "schema": {} } }
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/geopark": {
-      "get": {
-        "tags": ["geopark"],
-        "summary": "Get Geoparks",
-        "operationId": "get_geoparks_geopark_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
                 "schema": {
-                  "items": { "$ref": "#/components/schemas/GeoparkModel" },
-                  "type": "array",
-                  "title": "Response Get Geoparks Geopark Get"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
           }
         }
       }
+    },
+    "/photo/": {
+      "post": {
+        "tags": [
+          "photo"
+        ],
+        "summary": "Add Photo By Id Geoobject",
+        "operationId": "add_photo_by_id_geoobject_photo__post",
+        "parameters": [
+          {
+            "name": "geoobject_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Geoobject Id"
+            }
+          },
+          {
+            "name": "path_photo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Path Photo"
+            }
+          },
+          {
+            "name": "preview_photo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean",
+              "title": "Preview Photo"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_add_photo_by_id_geoobject_photo__post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "photo"
+        ],
+        "summary": "Change Photo",
+        "operationId": "change_photo_photo__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePictures"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "photo"
+        ],
+        "summary": "Delete Photo",
+        "operationId": "delete_photo_photo__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletePicture"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/route/{user_id}": {
+      "get": {
+        "tags": [
+          "route"
+        ],
+        "summary": "Get Route",
+        "operationId": "get_route_route__user_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/route/": {
+      "put": {
+        "tags": [
+          "route"
+        ],
+        "summary": "Put Route",
+        "operationId": "put_route_route__put",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "route"
+        ],
+        "summary": "Post Route",
+        "operationId": "post_route_route__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/routesDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "route"
+        ],
+        "summary": "Delete Route",
+        "operationId": "delete_route_route__delete",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
-      "Body_add_photo_by_id_geoobject_photo_post": {
+      "Body_add_photo_by_id_geoobject_photo__post": {
         "properties": {
-          "file": { "type": "string", "format": "binary", "title": "File" }
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          }
         },
         "type": "object",
-        "required": ["file"],
-        "title": "Body_add_photo_by_id_geoobject_photo_post"
+        "required": [
+          "file"
+        ],
+        "title": "Body_add_photo_by_id_geoobject_photo__post"
       },
-      "Body_auth_login_post": {
+      "Body_auth_login__post": {
         "properties": {
           "grant_type": {
             "anyOf": [
-              { "type": "string", "pattern": "password" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "pattern": "password"
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Grant Type"
           },
-          "username": { "type": "string", "title": "Username" },
-          "password": { "type": "string", "title": "Password" },
-          "scope": { "type": "string", "title": "Scope", "default": "" },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "scope": {
+            "type": "string",
+            "title": "Scope",
+            "default": ""
+          },
           "client_id": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Client Id"
           },
           "client_secret": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Client Secret"
           }
         },
         "type": "object",
-        "required": ["username", "password"],
-        "title": "Body_auth_login_post"
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Body_auth_login__post"
       },
       "ChangePictures": {
         "properties": {
-          "id": { "type": "integer", "title": "Id" },
-          "old_name": { "type": "string", "title": "Old Name" },
-          "new_name": { "type": "string", "title": "New Name" }
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "old_name": {
+            "type": "string",
+            "title": "Old Name"
+          },
+          "new_name": {
+            "type": "string",
+            "title": "New Name"
+          }
         },
         "type": "object",
-        "required": ["id", "old_name", "new_name"],
+        "required": [
+          "id",
+          "old_name",
+          "new_name"
+        ],
         "title": "ChangePictures"
       },
       "DeletePicture": {
         "properties": {
-          "id": { "type": "integer", "title": "Id" },
-          "picture_name": { "type": "string", "title": "Picture Name" }
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "picture_name": {
+            "type": "string",
+            "title": "Picture Name"
+          }
         },
         "type": "object",
-        "required": ["id", "picture_name"],
+        "required": [
+          "id",
+          "picture_name"
+        ],
         "title": "DeletePicture"
       },
       "GeoobjectModel": {
         "properties": {
-          "id": { "type": "string", "format": "uuid4", "title": "Id" },
-          "name": { "type": "string", "title": "Name" },
-          "description": { "type": "string", "title": "Description" },
-          "longitude": { "type": "number", "title": "Longitude" },
-          "latitude": { "type": "number", "title": "Latitude" },
-          "type": { "type": "string", "title": "Type" },
-          "geoparkId": { "type": "string", "title": "Geoparkid" }
+          "id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "geoparkId": {
+            "type": "string",
+            "title": "Geoparkid"
+          },
+          "commonType": {
+            "type": "string",
+            "title": "Commontype"
+          }
         },
         "type": "object",
         "required": [
@@ -608,21 +1082,50 @@
           "longitude",
           "latitude",
           "type",
-          "geoparkId"
+          "geoparkId",
+          "commonType"
         ],
         "title": "GeoobjectModel"
       },
       "GeoobjectModelDetail": {
         "properties": {
-          "id": { "type": "string", "format": "uuid4", "title": "Id" },
-          "name": { "type": "string", "title": "Name" },
-          "description": { "type": "string", "title": "Description" },
-          "longitude": { "type": "number", "title": "Longitude" },
-          "latitude": { "type": "number", "title": "Latitude" },
-          "type": { "type": "string", "title": "Type" },
-          "geoparkId": { "type": "string", "title": "Geoparkid" },
+          "id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "geoparkId": {
+            "type": "string",
+            "title": "Geoparkid"
+          },
+          "commonType": {
+            "type": "string",
+            "title": "Commontype"
+          },
           "photoPaths": {
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "type": "array",
             "title": "Photopaths"
           }
@@ -636,26 +1139,51 @@
           "latitude",
           "type",
           "geoparkId",
+          "commonType",
           "photoPaths"
         ],
         "title": "GeoobjectModelDetail"
       },
       "GeoparkModel": {
         "properties": {
-          "id": { "type": "string", "format": "uuid4", "title": "Id" },
-          "name": { "type": "string", "title": "Name" },
-          "description": { "type": "string", "title": "Description" },
-          "latitude": { "type": "number", "title": "Latitude" },
-          "longitude": { "type": "number", "title": "Longitude" }
+          "id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          }
         },
         "type": "object",
-        "required": ["id", "name", "description", "latitude", "longitude"],
+        "required": [
+          "id",
+          "name",
+          "description",
+          "latitude",
+          "longitude"
+        ],
         "title": "GeoparkModel"
       },
       "HTTPValidationError": {
         "properties": {
           "detail": {
-            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
             "type": "array",
             "title": "Detail"
           }
@@ -666,27 +1194,69 @@
       "UpdateGeoobjectModel": {
         "properties": {
           "name": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Name"
           },
           "description": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Description"
           },
           "longitude": {
-            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Longitude"
           },
           "latitude": {
-            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Latitude"
           },
           "type": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Type"
           },
           "geoparkId": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Geoparkid"
           }
         },
@@ -695,34 +1265,204 @@
       },
       "User": {
         "properties": {
-          "id": { "type": "integer", "title": "Id" },
-          "username": { "type": "string", "title": "Username" },
-          "password": { "type": "string", "title": "Password" },
-          "role": { "type": "string", "title": "Role" }
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          }
         },
         "type": "object",
-        "required": ["id", "username", "password", "role"],
+        "required": [
+          "id",
+          "username",
+          "password",
+          "role"
+        ],
         "title": "User"
       },
       "ValidationError": {
         "properties": {
           "loc": {
-            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
             "type": "array",
             "title": "Location"
           },
-          "msg": { "type": "string", "title": "Message" },
-          "type": { "type": "string", "title": "Error Type" }
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
         },
         "type": "object",
-        "required": ["loc", "msg", "type"],
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
         "title": "ValidationError"
+      },
+      "routeDTO": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "route_points": {
+            "items": {
+              "$ref": "#/components/schemas/routePointDTO"
+            },
+            "type": "array",
+            "title": "Route Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "route_points"
+        ],
+        "title": "routeDTO"
+      },
+      "routePointDTO": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Id"
+          },
+          "route_id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Route Id"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "geoobject_id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Geoobject Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "route_id",
+          "order",
+          "geoobject_id"
+        ],
+        "title": "routePointDTO"
+      },
+      "routesDTO": {
+        "properties": {
+          "routes": {
+            "items": {
+              "$ref": "#/components/schemas/routeDTO"
+            },
+            "type": "array",
+            "title": "Routes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "routes"
+        ],
+        "title": "routesDTO"
       }
     },
     "securitySchemes": {
       "OAuth2PasswordBearer": {
         "type": "oauth2",
-        "flows": { "password": { "scopes": {}, "tokenUrl": "token" } }
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "token"
+          }
+        }
       }
     }
   }

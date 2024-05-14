@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { CoordinatesType, IGeoObjectFilterFields, IPointGeoObject } from '@core';
-import { MarkerInfoModalComponent, TypeIconMap } from '@shared';
+import { CoordinatesType, IGeoObjectFilterFields, IGeopark, IPointGeoObject } from '@core';
+import { CommonTypeIconMap, LayerByIdMap, MarkerInfoModalComponent, TypeIconMap } from '@shared';
 import Map from 'ol/Map';
 import View, { ViewOptions } from 'ol/View';
 import { Point } from 'ol/geom';
@@ -15,10 +15,15 @@ import { Subject, debounceTime, takeUntil } from 'rxjs';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { MatDialog } from '@angular/material/dialog';
 import { fromLonLat } from 'ol/proj';
+import { GeoobjectModel, GeoparkModel } from '@api';
+import GeoJSON from 'ol/format/GeoJSON';
+import Stroke from 'ol/style/Stroke';
+import Fill from 'ol/style/Fill';
+
 
 const DEFAULT_EXTENT: ViewOptions = {
   center: fromLonLat([58.155889, 55.179724]),
-  zoom: 11,
+  zoom: 9,
 }
 @Component({
   selector: 'geo-main-view-map',
@@ -32,7 +37,10 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   public setSearch$: Subject<string> | undefined = undefined;
   @Input()
   public points: IPointGeoObject[] = [];
+  @Input()
+  public geopark: GeoparkModel | undefined = undefined;
   public map: Map | undefined = undefined;
+  public isLegendShowed: boolean = false;
   public destroy$: Subject<void> = new Subject<void>();
   public hidden: boolean = false;
   private markerLayer: VectorLayer<any> | undefined = undefined;
@@ -41,7 +49,37 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   constructor(private dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
+    if (changes['geopark']) {
+      if (changes['geopark'].currentValue) {
+        const style = new Style({
+          stroke: new Stroke({
+            color: 'red',
+            width: 1,
+          }),
+          fill: new Fill({
+            color: 'rgba(0, 0, 0, 0)',
+          }),
+        });
+        const layer: any = LayerByIdMap.get(changes['geopark'].currentValue.id);
+        if (layer) {
+          const source = new VectorSource({
+            features: new GeoJSON().readFeatures(layer, { featureProjection: 'EPSG:3857' }),
+          });
+          const mapLayer = new VectorLayer({
+            source: source,
+            style,
+          });
+          this.map?.addLayer(mapLayer);
+        }
+        if (this.setView$) {
+          this.map?.setView(new View({
+            center: fromLonLat([changes['geopark'].currentValue.longitude, changes['geopark'].currentValue.latitude]),
+            zoom: 9,
+          }));
+        }
+
+      }
+    }
     if (changes['points']) {
       if (changes['points'].currentValue?.length !== changes['points'].previousValue?.length) {
         const features: Feature<Point>[] = this.getFeatures(this.points);
@@ -59,6 +97,7 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
 
   public ngOnInit(): void {
     if (this.setView$) {
+      console.log(this.points);
       this.setView$.pipe(takeUntil(this.destroy$)).subscribe((coordinates: CoordinatesType) => {
         this.map?.setView(new View({
           center: fromLonLat([coordinates.longitude, coordinates.latitude]),
@@ -76,32 +115,35 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
 
 
   public ngAfterViewInit(): void {
-    this.map = new Map({
-      layers: [
-        new Tile({
-          source: new OSM(),
+    setTimeout(() => {
+      this.map = new Map({
+        layers: [
+          new Tile({
+            source: new OSM(),
+          }),
+        ],
+        target: 'map',
+        view: new View({ 
+          ...DEFAULT_EXTENT
         }),
-      ],
-      target: 'map',
-      view: new View({ 
-        ...DEFAULT_EXTENT
-      }),
+      });
+      if (this.points.length) {
+        const features: Feature<Point>[] = this.getFeatures(this.points);
+      const markerLayer: VectorLayer<any> = new VectorLayer<any>({
+        source: new VectorSource({
+          features,
+        }),
+      });
+      this.markerLayer = markerLayer;
+      this.map.addLayer(markerLayer);
+      this.addMarkerClickListener();
+      }
     });
-    if (this.points.length) {
-      const features: Feature<Point>[] = this.getFeatures(this.points);
-    const markerLayer: VectorLayer<any> = new VectorLayer<any>({
-      source: new VectorSource({
-        features,
-      }),
-    });
-    this.markerLayer = markerLayer;
-    this.map.addLayer(markerLayer);
-    this.addMarkerClickListener();
-    }
   }
 
   public setFullExtent(): void {
-    this.map?.setView(new View({...DEFAULT_EXTENT}));
+    const extent: ViewOptions = this.geopark && this.geopark?.longitude && this.geopark.latitude ? { center: fromLonLat([this.geopark?.longitude, this.geopark?.latitude]), zoom: 9 } : DEFAULT_EXTENT;
+    this.map?.setView(new View({...extent}));
   }
 
   private addMarkerClickListener(): void {
@@ -139,20 +181,24 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
       });
       feature.setId(point.id);
       feature.setStyle(new Style({
-           image: new Icon({src: `../../../../assets/icons/${TypeIconMap.get(point.type)}`, scale: [0.5, 0.5]}),
+           image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get((point as GeoobjectModel).commonType)}`, scale: [0.45, 0.45]}),
       }));
       return feature;
     });
     return features;
   }
 
-  private getStyle({ name, type, description }: IGeoObjectFilterFields, search: string): Style {
-    if (name.toLowerCase().includes(search.toLowerCase()) || type.toLowerCase().includes(search.toLowerCase())) {
+  private getStyle({ name, commonType, description }: IGeoObjectFilterFields, search: string): Style {
+    if (name.toLowerCase().includes(search.toLowerCase()) || commonType.toLowerCase().includes(search.toLowerCase())) {
       return new Style({
-        image: new Icon({src: `../../../../assets/icons/${TypeIconMap.get(type)}`, scale: [0.5, 0.5]}),
+        image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get(commonType)}`, scale: [0.45, 0.45]}),
       });
     }
     return new Style({})
+  }
+
+  public toggleLegend(): void {
+    this.isLegendShowed = !this.isLegendShowed;
   }
 
   public ngOnDestroy(): void {

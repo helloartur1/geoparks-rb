@@ -11,10 +11,36 @@
 
 .map-custom-controls {
     position: absolute;
+    display: flex;
     top: 15px;
     right: 15px;
+    button {
+        margin-right: 8px;
+
+    }
 }
 
-.full-button {
+.full-button, .legend-button {
     --mdc-fab-container-color: var(--base-green-dark-color);
+}
+
+.legend {
+    background-color: #fff;
+    position: absolute;
+    bottom: 100px;
+    width: 350px;
+    right: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    &-title {
+        margin: 0;
+        margin-bottom: 16px;
+    }
+    &-item {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 8px;
+    }
 }

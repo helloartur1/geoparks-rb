@@ -13,6 +13,7 @@ import { BASE_STATIC_URL } from './deps/base-static-url';
 import { LoginFormModule } from 'src/view/login-form/login-form.module';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { GeoobjectFormModule } from 'src/view/geoobject-form/geoobject-form.module';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { GeoobjectFormModule } from 'src/view/geoobject-form/geoobject-form.modu
     LoginFormModule,
     PageWrapperModule,
     MainViewModule,
+    MatIconModule,
     HttpClientModule,
     ApiModule.forRoot(() => new Configuration({ basePath: "http://localhost:8000"})),
   ],

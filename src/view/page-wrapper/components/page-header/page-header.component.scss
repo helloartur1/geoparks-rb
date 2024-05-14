@@ -4,7 +4,18 @@
     align-items: center;
     width: 100%;
     padding: 12px;
-    background-color: var(--base-green-dark-color);
+    background-color: var(--new-green-color);
+    &__title {
+        font-family: 'Monserat', Arial, sans-serif;
+        margin: 0;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #fff;
+        font-size: 28px;
+        line-height: 36px;
+        padding-top: 4px;
+        padding-left: 10px;
+    }
 }
 .auth-banner {
     width: 200px;
@@ -21,6 +32,9 @@
 }
 .page-header__link {
     cursor: pointer;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .logout-button {

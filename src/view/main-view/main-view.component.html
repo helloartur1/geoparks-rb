@@ -1,6 +1,10 @@
 <ng-container *ngIf="(model$ | async) as model; else spinner">
     <ng-container *ngIf="model.state$ | async as state; else spinner">
         <div class="sidebar">
+            <ng-container *ngIf="state === 'SUCCESS'">
+                <h4 class="geopark-title">{{ model.geopark?.name }}</h4>
+            </ng-container>
+            
             <div class="search">
                 <mat-form-field>
                     <mat-label>Поиск</mat-label>
@@ -15,7 +19,7 @@
                 </geo-main-view-manager>
             </ng-container>
         </div>
-        <geo-main-view-map [setView$]="setView$" [setSearch$]="setSearch$" [points]="model.rawPoints">
+        <geo-main-view-map [setView$]="setView$" [setSearch$]="setSearch$" [points]="model.rawPoints" [geopark]="model.geopark">
         </geo-main-view-map>
         <ng-container *ngIf="state === 'PENDING'">
             <ng-container *ngTemplateOutlet="spinner"></ng-container>

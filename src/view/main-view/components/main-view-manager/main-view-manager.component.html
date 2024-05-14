@@ -1,6 +1,38 @@
 <div class="manager-wrapper">
     <div class="manager-list">
-        <ng-container *ngFor="let item of items">
+      <ng-container *ngFor="let categoryItem of categoryItems; trackBy: trackByCategory">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>{{ categoryItem.name }}</mat-panel-title>            
+          </mat-expansion-panel-header>
+          <mat-list>
+            <ng-container *ngFor="let item of categoryItem.items; trackBy: trackByItem">
+              <mat-list-item class="item">
+                  <div class="content">
+                      <h5 matListItemTitle class="item__title">{{ item.name }}</h5>
+                      <!-- <p matListItemLine class="item__description">{{ item.type }}</p> -->
+                  </div>
+                  <button mat-icon-button aria-label="Посмотреть меню геообъекта" class="item__control-button" [matMenuTriggerFor]="menu">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      <button mat-menu-item (click)="navigateToDetailPage(item.id)">
+                        <mat-icon>call_made</mat-icon>
+                        <span>Перейти к странице геообъекта</span>
+                      </button>
+                      <button mat-menu-item (click)="zoomToObject(item.latitude, item.longitude)">
+                        <mat-icon>search</mat-icon>
+                        <span>Приблизить на карте</span>
+                      </button>
+                    </mat-menu>
+                </mat-list-item>
+          </ng-container>
+          </mat-list>
+
+        </mat-expansion-panel>
+
+      </ng-container>
+        <!-- <ng-container *ngFor="let item of items">
             <mat-list-item class="item">
                 <div class="content">
                     <h5 matListItemTitle class="item__title">{{ item.name }}</h5>
@@ -20,6 +52,6 @@
                     </button>
                   </mat-menu>
               </mat-list-item>
-        </ng-container>
+        </ng-container> -->
     </div>
 </div>

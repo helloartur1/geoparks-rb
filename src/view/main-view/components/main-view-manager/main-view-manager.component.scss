@@ -1,5 +1,5 @@
 :host {
-    background-color: var(--base-green-light-color);
+    background-color: var(--new-green-dark-color);
     display: block;
     height: 100%;
     padding-top: 15px;
@@ -18,15 +18,16 @@
 .item {
     display: block;
     padding: 10px 15px;
-    background-color: var(--base-green-middle-color);
+    background-color: var(--new-green-dark-color);
     border-radius: 3px;
-
     &:not(:last-child) {
         margin-bottom: 10px;
     }
 
     &:hover {
-        background-color: var(--base-green-color);
+        background-color: var(--new-green-dark-color);
+        opacity: 0.7;
+        color: #fff;
         .item__control-button {
             visibility: visible;
         }
@@ -40,7 +41,7 @@
         .mat-mdc-list-item-unscoped-content {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             min-height: 48px;
         }
     }
@@ -49,7 +50,11 @@
         font-size: 14px;
         line-height: 16px;
         font-weight: 500;
-        color: var(--sub-black-color);
+        text-align: left;
+        color:#fff !important;
+        &:hover {
+            color: #fff !important;
+        }
     }
 
     &__description {
@@ -62,4 +67,21 @@
     &__control-button {
         visibility: hidden;
     }
+}
+
+mat-expansion-panel {
+    background-color: var(--new-green-dark-color);
+    color: #fff;
+}
+
+mat-panel-title {
+    color: #fff
+}
+
+::ng-deep .mat-expansion-indicator::after {
+    color: #fff;
+}
+
+::ng-deep .mat-mdc-icon-button {
+    color: #fff !important;
 }

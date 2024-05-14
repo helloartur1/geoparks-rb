@@ -3,4 +3,5 @@ export interface IBaseGeoObject {
     name: string;
     description?: string;
     type: string;
+    commonType?: string;
 }

@@ -24,7 +24,7 @@ export class GeoobjectDetailModelService {
   constructor(private geoobjectService: GeoobjectService, private photoService: PhotoService) { }
 
   public init(uid: string): void {
-    forkJoin([this.geoobjectService.getGeoobjectGeoobjectIdGet(uid), this.photoService.photosByGeoobjectPhotosGeoobjectGeoobjectIdGet(uid).pipe(catchError(() => of([])))]).pipe(
+    forkJoin([this.geoobjectService.getGeoobjectGeoobjectIdGet(uid), this.photoService.photosByGeoobjectPhotoGeoobjectGeoobjectIdGet(uid).pipe(catchError(() => of([])))]).pipe(
       tap(() => {
       this.state$.next('PENDING');
     }), 
