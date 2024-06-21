@@ -15,7 +15,7 @@ import { Subject, debounceTime, takeUntil } from 'rxjs';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { MatDialog } from '@angular/material/dialog';
 import { fromLonLat } from 'ol/proj';
-import { GeoobjectModel, GeoparkModel } from '@api';
+import { GeoobjectModel } from '@api';
 import GeoJSON from 'ol/format/GeoJSON';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
@@ -38,7 +38,7 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   @Input()
   public points: IPointGeoObject[] = [];
   @Input()
-  public geopark: GeoparkModel | undefined = undefined;
+  public geopark: any | undefined = undefined;
   public map: Map | undefined = undefined;
   public isLegendShowed: boolean = false;
   public destroy$: Subject<void> = new Subject<void>();
@@ -88,6 +88,9 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
           features,
         }),
       });
+      if (this.markerLayer) {
+        this.map?.removeLayer(this.markerLayer);
+      }
       this.markerLayer = markerLayer;
       this.map?.addLayer(markerLayer);
       this.addMarkerClickListener();
@@ -142,6 +145,7 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   }
 
   public setFullExtent(): void {
+    console.log(this.geopark);
     const extent: ViewOptions = this.geopark && this.geopark?.longitude && this.geopark.latitude ? { center: fromLonLat([this.geopark?.longitude, this.geopark?.latitude]), zoom: 9 } : DEFAULT_EXTENT;
     this.map?.setView(new View({...extent}));
   }

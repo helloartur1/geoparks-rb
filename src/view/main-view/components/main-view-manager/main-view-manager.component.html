@@ -1,7 +1,7 @@
 <div class="manager-wrapper">
     <div class="manager-list">
       <ng-container *ngFor="let categoryItem of categoryItems; trackBy: trackByCategory">
-        <mat-expansion-panel>
+        <mat-expansion-panel *ngIf="categoryItem.items.length" [expanded]="search === '' ? false : true">
           <mat-expansion-panel-header>
             <mat-panel-title>{{ categoryItem.name }}</mat-panel-title>            
           </mat-expansion-panel-header>
@@ -16,13 +16,17 @@
                       <mat-icon>more_vert</mat-icon>
                     </button>
                     <mat-menu #menu="matMenu">
-                      <button mat-menu-item (click)="navigateToDetailPage(item.id)">
+                      <!-- <button mat-menu-item (click)="navigateToDetailPage(item.id)">
                         <mat-icon>call_made</mat-icon>
                         <span>Перейти к странице геообъекта</span>
-                      </button>
+                      </button> -->
                       <button mat-menu-item (click)="zoomToObject(item.latitude, item.longitude)">
                         <mat-icon>search</mat-icon>
                         <span>Приблизить на карте</span>
+                      </button>
+                      <button mat-menu-item *ngIf="isAdmin" (click)="onEditObject(item.id)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Редактировать</span>
                       </button>
                     </mat-menu>
                 </mat-list-item>

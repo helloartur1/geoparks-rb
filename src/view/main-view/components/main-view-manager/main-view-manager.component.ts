@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { CoordinatesType, IPointGeoObject } from '@core';
+import { Subject } from 'rxjs';
 
 export interface ICategoryItem {
   name: string;
@@ -35,6 +36,15 @@ export class MainViewManagerComponent {
   @Input()
   public items: IPointGeoObject[] = [];
 
+  @Input()
+  public search: string = '';
+
+  @Input()
+  public isAdmin: boolean = false;
+
+  @Output()
+  public editObject: EventEmitter<string> = new EventEmitter<string>();
+
   @Output()
   public setView: EventEmitter<CoordinatesType> = new EventEmitter<CoordinatesType>();
 
@@ -43,7 +53,7 @@ export class MainViewManagerComponent {
   constructor(private router: Router) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
-    if (changes['items'].currentValue) {
+    if (changes['items']?.currentValue) {
       this.initListByCategories(changes['items'].currentValue);
     }
   }
@@ -66,6 +76,10 @@ export class MainViewManagerComponent {
 
   public trackByItem(index: number, item: IPointGeoObject): string {
     return item.id;
+  }
+
+  public onEditObject(id: string): void {
+    this.editObject.emit(id);
   }
 
   public initListByCategories(items: IPointGeoObject[]): void {

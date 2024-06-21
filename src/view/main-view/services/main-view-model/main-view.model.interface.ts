@@ -2,7 +2,6 @@ import { IPointGeoObject } from "@core";
 import { IMainViewModelFilters } from "./main-view.model.filters.interface";
 import { Observable } from "rxjs";
 import { LoadingStatusType } from "src/core/types/loading-status.type";
-import { GeoparkModel } from "@api";
 
 export interface IMainViewModel {
     state$: Observable<LoadingStatusType>
@@ -10,5 +9,5 @@ export interface IMainViewModel {
     filters: IMainViewModelFilters;
     points: IPointGeoObject[];
     rawPoints: IPointGeoObject[],
-    geopark?: GeoparkModel,
+    geopark?: any,
 }

@@ -10,12 +10,15 @@
                     <mat-label>Поиск</mat-label>
                     <input matInput placeholder="Поиск геообъектов" [formControl]="searchControl">
                 </mat-form-field>
+                <div class="buttons-wrapper">
+                    <button class="route-button" mat-raised-button color="primary" (click)="navigateToRoutes()">Построить маршрут</button>
                 <div *ngIf="isAdmin">
                     <button class="add-button" mat-raised-button color="primary" (click)="moveToCreateObject()">Добавить геообъект</button>
                 </div>
+              </div>
             </div>
             <ng-container *ngIf="state === 'SUCCESS'">
-                <geo-main-view-manager [items]="model.points" (setView)="onSetMapView($event)">
+                <geo-main-view-manager [items]="model.points" [isAdmin]="isAdmin" [search]="searchControl.value || ''" (setView)="onSetMapView($event)" (editObject)="onEditObject($event)">
                 </geo-main-view-manager>
             </ng-container>
         </div>

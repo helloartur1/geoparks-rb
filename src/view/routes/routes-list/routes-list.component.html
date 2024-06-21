@@ -1,0 +1,40 @@
+<div class="search-point">
+    <ng-container *ngIf="items.length">
+        <mat-form-field appearence="fill">
+            <mat-label>Поиск объекта</mat-label>
+        <input type="text"
+               matInput
+               [formControl]="pointControl"
+               [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let item of filteredOptions | async" [value]="item">
+              {{ item.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+    </ng-container>
+      <button mat-raised-button color="primary" [disabled]="!pointControl.value" (click)="addPointToRoute()">Добавить в маршрут</button>
+</div>
+<div class="points-list">
+    
+</div>
+<mat-list>
+    <ng-container *ngFor="let point of currentPoints; let i = index">
+        <mat-list-item class="item" (contextmenu)="openContextMenu($event, i)">
+            <div class="content" (click)="cancelContextMenu($event)">
+                <h5 matListItemTitle class="item__title">{{ point.name }}</h5>
+            </div>
+            <div [matMenuTriggerFor]="menu"></div>
+            
+             <mat-menu #menu="matMenu" #matMenu>
+                <button mat-menu-item (click)="deletePointFromRoute(point.id)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Удалить из маршрута</span>
+                </button>
+              </mat-menu>
+             
+        </mat-list-item>
+       
+
+    </ng-container>
+</mat-list>

@@ -37,9 +37,6 @@ export class GeoobjectDetailViewComponent implements OnInit, AfterViewInit {
   public ngOnInit(): void {
     const geoobjectUid = this.activatedRoute.snapshot.params['geoobjectUid'] || '';
     this.geoobjectDetailModelService.init(geoobjectUid);
-    if (this.geoobjectUid) {
-      this.geoobject = POINTS.find((item: IPointGeoObject) => item.id === this.geoobjectUid);
-    }
   }
 
   public ngAfterViewInit(): void {

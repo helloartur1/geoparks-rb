@@ -1,6 +1,6 @@
 :host {
     display: block;
-    width: 512px;
+    width: 800px;
     padding: 16px;
     box-sizing: border-box;
     background-color: var(--base-green-color);
@@ -56,3 +56,28 @@
     justify-content: space-between;
 }
 
+.galery {
+    width: 100%;
+    min-height: 400px;
+    background-color: var(--new-dark-green-color);
+    box-sizing: border-box;
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    .arrow-prev {
+      position: absolute;
+      top: calc(50% - 32px);
+      left: 5px;
+      cursor: pointer;
+    }
+
+    .arrow-next {
+      position: absolute;
+      top: calc(50% - 32px);
+      right: 5px;
+      cursor: pointer;
+    }
+ }

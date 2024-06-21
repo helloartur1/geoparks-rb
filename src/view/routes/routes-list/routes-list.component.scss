@@ -1,19 +1,8 @@
 :host {
-    background-color: var(--new-green-dark-color);
-    display: block;
-    height: 100%;
-    padding-top: 15px;
-    overflow: hidden;
+    background-color: var(--base-green-dark-color);
+    padding: 20px;
 }
 
-.manager-wrapper {
-    height: 100%;
-}
-
-.manager-list {
-    height: calc(100% - 190px);
-    overflow-y: auto;
-}
 
 .item {
     display: block;
@@ -40,7 +29,7 @@
 
         .mat-mdc-list-item-unscoped-content {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: flex-start;
             min-height: 48px;
         }
@@ -48,7 +37,7 @@
     &__title {
         margin: 0;
         font-size: 14px;
-        line-height: 18px;
+        line-height: 16px;
         font-weight: 500;
         text-align: left;
         color:#fff !important;
@@ -68,20 +57,13 @@
         visibility: hidden;
     }
 }
-
-mat-expansion-panel {
-    background-color: var(--new-green-dark-color);
-    color: #fff;
-}
-
-mat-panel-title {
-    color: #fff
-}
-
-::ng-deep .mat-expansion-indicator::after {
-    color: #fff;
-}
-
 ::ng-deep .mat-mdc-icon-button {
     color: #fff !important;
+}
+.search-point {
+    ::ng-deep {
+        mat-form-field {
+            width: 100%;
+        }
+    }
 }

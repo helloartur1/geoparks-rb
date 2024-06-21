@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { AppRoutes, IUserData, decodeTokenPayload, isTokenExpired } from '@core';
 import { LocalStorageService } from './local-storage.service';
 import { Router } from '@angular/router';
-import { AuthService } from '@api';
-import { Observable } from 'rxjs';
+import { AuthService, TokenInfo } from '@api';
+import { Observable, map } from 'rxjs';
 import { IJwtTokenPayload } from 'src/core/interfaces/token-payload.interface';
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,7 @@ export class AuthAdminService {
 
   public login(authBody: { userName: string, password: string }): Observable<{ token: string}> {
     const { userName, password } = authBody;
-    return this.authApiService.authLoginPost(userName, password);
+    return this.authApiService.authAuthSignInPost(userName, password).pipe(map((tokenInfo: TokenInfo) => ({ token: tokenInfo.access_token})));
   }
 
   public fillAuthDataByToken(): void {

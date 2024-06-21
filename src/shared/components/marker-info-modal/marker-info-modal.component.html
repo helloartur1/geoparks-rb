@@ -1,8 +1,16 @@
 <h4 class="modal-title">{{ data.name }}</h4>
 <div class="wrapper">
-  <!-- <div class="image">
-    <img src="../../../assets/img/image.png" alt="Изображение геообъекта" width="450" height="300">
-  </div> -->
+  <div *ngIf="imagePaths.length" class="galery">
+    <a class="arrow-prev" (click)="togglePrevPhoto($event)">
+        <img src="../../assets/img/arrow_left_white.png" alt="Вперед" width="32" height="32">
+    </a>
+    <div class="active-image">
+        <img [src]="getPath(imagePaths[activeImageIndex])" alt="Изображение геопарка" width="700" height="370">
+    </div>
+    <a class="arrow-next" (click)="toggleNextPhoto($event)">
+        <img src="../../assets/img/arrow_right_white.png" alt="Назад" width="32" height="32">
+    </a>
+</div>
   <ul class="modal-list">
     <li class="modal-item">
         <span class="modal-item-key">Координаты:</span>

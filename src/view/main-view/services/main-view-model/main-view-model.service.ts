@@ -5,7 +5,7 @@ import { IMainViewModel } from './main-view.model.interface';
 import { LoadingStatusType } from 'src/core/types/loading-status.type';
 import { IMainViewModelFilters } from './main-view.model.filters.interface';
 import { IPointGeoObject } from '@core';
-import { GeoobjectModel, GeoobjectService, GeoparkModel, GeoparkService } from '@api';
+import { GeoobjectModel, GeoobjectService, GeoparksService } from '@api';
 
 const DEFAULT_GEOPARK_UID = '41f271c8-e8ba-4225-b21d-403f9751e5a7';
 export const DEFAULT_MODEL: IMainViewModel = {
@@ -27,7 +27,7 @@ export class MainViewModelService {
     state$: this.state$.asObservable()
   });
 
-  constructor(private pointMarksService: PointMarksService, private geoobjectService: GeoobjectService, private geoparkrsService: GeoparkService) {
+  constructor(private pointMarksService: PointMarksService, private geoobjectService: GeoobjectService, private geoparkrsService: GeoparksService) {
     this.search$.pipe(debounceTime(400)).subscribe((search: string) => {
       this.state$.next('PENDING');
 
@@ -45,9 +45,8 @@ export class MainViewModelService {
   public init(geoparkId: string
     ): void {
     this.state$.next('PENDING');
-    console.log(geoparkId);
-    forkJoin([this.geoobjectService.getGeoobjectsByGeoparkGeoobjectGeoparkGeoparkIdGet(geoparkId), this.geoparkrsService.getGeoparkByIdGeoparkIdGet(geoparkId)]).subscribe({
-      next: ([geeoobjects, geopark]: [GeoobjectModel[], GeoparkModel]) => {
+    forkJoin([this.geoobjectService.getGeoobjectsByGeoparkGeoobjectGeoparkGeoparkIdGet(geoparkId), this.geoparkrsService.getGeoparkByIdGeoparksGeoparkIdGet(geoparkId)]).subscribe({
+      next: ([geeoobjects, geopark]: [GeoobjectModel[], any]) => {
         this.state$.next('SUCCESS');
         this.model$.next({
           ...this.model$.value,

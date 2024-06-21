@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RoutesComponent } from './routes.component';
+import { RoutesListModule } from './routes-list/routes-list.module';
 
 
 
@@ -9,7 +10,8 @@ import { RoutesComponent } from './routes.component';
     RoutesComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    RoutesListModule,
   ],
   exports: [
     RoutesComponent,

@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { GeoobjectService } from '@api';
-import { v4 as uuidv4 } from 'uuid';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { GeoobjectModel, GeoobjectService, PhotoService } from '@api';
 import Feature from 'ol/Feature';
 import { Point } from 'ol/geom';
 import VectorLayer from 'ol/layer/Vector';
@@ -12,17 +11,38 @@ import Icon from 'ol/style/Icon';
 import Style from 'ol/style/Style';
 import Tile from 'ol/layer/Tile';
 import View from 'ol/View';
-import { Subject, debounceTime, take, takeUntil } from 'rxjs';
+import { Subject, debounceTime, forkJoin, of, switchMap, take, takeUntil } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppRoutes } from '@core';
+import { LAYER_TOROTAU, YA_LAYER } from '@shared';
+import GeoJSON from 'ol/format/GeoJSON';
+import Stroke from 'ol/style/Stroke';
+import Fill from 'ol/style/Fill';
+import { Observable } from 'rxjs';
+import { FileUploader } from 'ng2-file-upload';
+
+export const GeoparksCoordsMap: {[key: string]: { latitude:number, longitude: number, layer: any }} = {
+  '41f271c8-e8ba-4225-b21d-403f9751e5a7': {
+    latitude: 55.2455,
+    longitude: 58.2935,
+    layer: YA_LAYER,
+  },
+  '07599ea7-76aa-4bbf-8335-86e2436b0254': {
+    latitude: 53.554764,
+    longitude: 56.096764,
+    layer: LAYER_TOROTAU,
+  }
+
+};
 @Component({
   selector: 'geo-geoobject-form',
   templateUrl: './geoobject-form.component.html',
   styleUrls: ['./geoobject-form.component.scss']
 })
 export class GeoobjectFormComponent implements OnInit, AfterViewInit {
+  @ViewChild('fileUpload') public fileUpload: ElementRef<HTMLInputElement> | undefined = undefined;
   public map: Map | undefined = undefined;
   private destroy$: Subject<void> = new Subject<void>();
   public form: FormGroup = new FormGroup({
@@ -31,49 +51,53 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
     longitude: new FormControl(null, [Validators.required]),
     latitude: new FormControl(null, [Validators.required]),
     type: new FormControl(null, [Validators.required]),
-    geopark: new FormControl('41f271c8-e8ba-4225-b21d-403f9751e5a7', [Validators.required])
+    geopark: new FormControl('', [Validators.required])
   });
   public error: boolean = false;
   public markerLayer: VectorLayer<any> | null = null;
   public categories: Array<{ name: string, value: string }> = [
     {
-      name: 'Туробъекты',
-      value: 'Туробъекты'
+      name: 'Культура, история и образование',
+      value: 'Культура, история и образование'
     },
     {
-      name: 'Пещера',
-      value: 'Пещера'
+      name: 'Рекрация, отдых и развлечения',
+      value: 'Рекрация, отдых и развлечения'
     },
     {
       name: 'Горы/Скалы',
       value: 'Горы/Скалы'
     },
     {
-      name: 'Болота',
-      value: 'Болота'
+      name: 'Природа и геология',
+      value: 'Природа и геология'
     },
     {
-      name: 'Родники и источники',
-      value: 'Родники и источники'
-    },
-    {
-      name: 'Музеи',
-      value: 'Музеи'
-    },
-    {
-      name: 'Исторические места',
-      value: 'Исторические места',
-    },
-    {
-      name: 'Геологические объекты',
-      value: 'Геологические объекты',
+      name: 'Общая инфраструктура',
+      value: 'Общая инфраструктура'
     },
   ];
 
-  constructor(private geoobjectService: GeoobjectService, private router: Router) {}
+  constructor(private geoobjectService: GeoobjectService, private router: Router, private activatedRoute: ActivatedRoute, private photoService: PhotoService) {}
 
 
   public ngOnInit(): void {
+    this.form.patchValue({ geopark: this.activatedRoute.snapshot.params['geoparkId']});
+    const geoobjectId: string | undefined = this.activatedRoute.snapshot.params['geoobjectId'];
+    if (geoobjectId) {
+      this.geoobjectService.getGeoobjectByIdGeoobjectIdGet(geoobjectId).pipe(take(1)).subscribe((data: GeoobjectModel) => {
+        this.form.patchValue({
+          description: data.description,
+          longitude: data.longitude,
+          latitude: data.latitude,
+          type: data.commonType,
+          name: data.name,
+          geopark: this.activatedRoute.snapshot.params['geoparkId']
+        });
+
+      });
+
+    }
     this.form.get('latitude')?.valueChanges.pipe(debounceTime(400), takeUntil(this.destroy$)).subscribe((latitude: number| null) => {
       if (this.form.value.longitude && latitude) {
         console.log('Refresh')
@@ -83,7 +107,6 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
     this.form.get('longitude')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((longitude: number| null) => {
 
       if (this.form.value.latitude && longitude) {
-        console.log('Refresh')
         this.refreshMarkerByCoords(longitude, this.form.value.latitude)
       }
     });
@@ -91,16 +114,33 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
+    const vectorSource = new VectorSource({
+      features: new GeoJSON().readFeatures(GeoparksCoordsMap[this.form.value.geopark].layer, { featureProjection: 'EPSG:3857' }),
+    });
+    const vectorLayer = new VectorLayer({
+      source: vectorSource,
+      style: new Style({
+        stroke: new Stroke({
+          color: 'red',
+          width: 1,
+        }),
+        fill: new Fill({
+          color: 'blue',
+        }),
+      }),
+    });
+    const geoparkCoords: { latitude: number, longitude: number } = GeoparksCoordsMap[this.form.value.geopark];
     this.map = new Map({
       target: "form-map",
       view: new View({
-        center: fromLonLat([58.155889, 55.179724]),
+        center: fromLonLat([geoparkCoords.longitude, geoparkCoords.latitude]),
         zoom: 10,
       }),
       layers: [
         new Tile({
           source: new OSM()
-        })
+        }),
+        vectorLayer,
       ]
     });
     this.map.on('dblclick', (evt: MapBrowserEvent<any>) => {
@@ -108,8 +148,6 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
       const [longitude, latitude] = toLonLat(evt.coordinate);
       this.form.get('longitude')?.patchValue(longitude, { emitEvent: false});
       this.form.get('latitude')?.patchValue(latitude, { emitEvent: false})
-      console.log(longitude);
-      console.log(latitude);
       this.refreshMarkerByCoords(longitude, latitude)
       
     });
@@ -137,17 +175,48 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
 
   public save(): void {
     const { name, description, latitude, longitude, type, geopark } = this.form.value;
-    this.geoobjectService.createGeoobjectGeoobjectPost({
-      id: uuidv4(),
+    const save$: Observable<any> = this.activatedRoute.snapshot.params['geoobjectId'] ? this.geoobjectService.updateGeoobjectGeoobjectPut(this.activatedRoute.snapshot.params['geoobjectId'], {
       name,
       description,
       type,
       latitude,
       longitude,
-      geoparkId: geopark,
+      geopark_id: geopark,
       commonType: type,
-    }).pipe(take(1)).subscribe({
+    }) :
+    this.geoobjectService.createGeoobjectGeoobjectPost({
+      name,
+      description,
+      type,
+      latitude,
+      longitude,
+      geopark_id: geopark,
+      commonType: type,
+    });
+    save$.pipe(
+      switchMap((res: any) => {
+        let geoobjectId: string = this.activatedRoute.snapshot.params['geoobjectId'];
+        if (res.id) {
+          geoobjectId = res.id;
+        }
+        const files: FileList | null | undefined = this.fileUpload?.nativeElement?.files;
+        console.log(this.fileUpload);
+        console.log(files);
+        const filesArrStreams: Array<Observable<unknown>> = [];
+        if (files && files.length) {
+          for (let i = 0; i < files?.length; i++) {
+            filesArrStreams.push(this.photoService.addPhotoPhotoPost(geoobjectId, false, [files[i]]))
+          }
+        }
+        if (filesArrStreams.length) {
+          return forkJoin(filesArrStreams);
+        }
+        return of([]);
+        
+    }))
+    .subscribe({
       next: () => {
+        console.log('Navigate');
         this.router.navigate([AppRoutes.MAIN]);
       },
       error: () => {

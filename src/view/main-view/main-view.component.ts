@@ -44,12 +44,19 @@ export class MainViewComponent {
   }
 
   public moveToCreateObject(): void {
-    this.router.navigate([AppRoutes.CREATE_FORM]);
+    this.router.navigate([`${AppRoutes.CREATE_FORM}/${this.activatedRoute.snapshot.params['id']}`]);
+  }
 
+  public onEditObject(id: string): void {
+    this.router.navigate([`${AppRoutes.CREATE_FORM}/${this.activatedRoute.snapshot.params['id']}/${id}`]);
   }
 
   public ngOnDestroy(): void {
     this.destroy$.next();
+  }
+
+  public navigateToRoutes(): void {
+    this.router.navigate([`${AppRoutes.ROUTES}/${this.activatedRoute.snapshot.params['id']}`]);
   }
 
 }

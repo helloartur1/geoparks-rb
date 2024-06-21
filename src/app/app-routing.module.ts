@@ -34,12 +34,17 @@ const routes: Routes = [
     canActivate: [MainGuard],
   },
   {
-    path: AppRoutes.CREATE_FORM,
+    path: `${AppRoutes.CREATE_FORM}/:geoparkId`,
     component: GeoobjectFormComponent,
     canActivate: [MainGuard],
   },
   {
-    path: AppRoutes.ROUTES,
+    path: `${AppRoutes.CREATE_FORM}/:geoparkId/:geoobjectId`,
+    component: GeoobjectFormComponent,
+    canActivate: [MainGuard],
+  },
+  {
+    path: `${AppRoutes.ROUTES}/:geoparkId`,
     component: RoutesComponent
   }
 ];

@@ -26,10 +26,16 @@
     <mat-form-field class="form-field">
         <mat-label>Геопарк</mat-label>
         <mat-select [disabled]="true" formControlName="geopark">
-            <mat-option [value]="'41f271c8-e8ba-4225-b21d-403f9751e5a7'">Геопарк Янган-Тау</mat-option>   
+            <mat-option [value]="'41f271c8-e8ba-4225-b21d-403f9751e5a7'">Геопарк Янган-Тау</mat-option>
+            <mat-option [value]="'07599ea7-76aa-4bbf-8335-86e2436b0254'">Геопарк Торатау</mat-option>   
         </mat-select>
     </mat-form-field>
-    <button mat-raised-button [disabled]="!form.valid" (click)="save()">Сохранить</button>
+    <!-- <button class="file-button" mat-raised-button>Добавить файл</button> -->
+    <div class="file-upload">
+        <input type="file" multiple="true" accept="image/*" #fileUpload>
+    </div>
+    <button class="save-button" mat-raised-button [disabled]="!form.valid" (click)="save()">Сохранить</button>
+   
     <div class="error" *ngIf="error">
         Произошла ошибка при сохранении данных
     </div>

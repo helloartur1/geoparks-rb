@@ -14,6 +14,8 @@ import { LoginFormModule } from 'src/view/login-form/login-form.module';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { GeoobjectFormModule } from 'src/view/geoobject-form/geoobject-form.module';
 import { MatIconModule } from '@angular/material/icon';
+import { RoutesModule } from 'src/view/routes/routes.module';
+import { RoutesListModule } from 'src/view/routes/routes-list/routes-list.module';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,8 @@ import { MatIconModule } from '@angular/material/icon';
     AppRoutingModule,
     GeoobjectDetailViewModule,
     GeoobjectFormModule,
+    RoutesModule,
+    RoutesListModule,
     LoginFormModule,
     PageWrapperModule,
     MainViewModule,

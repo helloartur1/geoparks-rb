@@ -26,11 +26,24 @@
     justify-content: center;
 }
 
+.buttons-wrapper {
+    display: flex;
+    justify-content: flex-start;
+}
+
 .add-button {
     &.mat-mdc-raised-button:not(:disabled) {
         background-color: var(--base-green-dark-color);
     }
 }
+
+.route-button {
+    margin-right: 20px;
+    &.mat-mdc-raised-button:not(:disabled) {
+        background-color: var(--base-green-dark-color);
+    }
+}
+
 
 .search {
     padding: 10px;
