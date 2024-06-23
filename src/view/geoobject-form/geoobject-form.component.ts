@@ -65,10 +65,6 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
       value: 'Рекрация, отдых и развлечения'
     },
     {
-      name: 'Горы/Скалы',
-      value: 'Горы/Скалы'
-    },
-    {
       name: 'Природа и геология',
       value: 'Природа и геология'
     },
