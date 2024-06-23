@@ -16,6 +16,8 @@ import { GeoobjectFormModule } from 'src/view/geoobject-form/geoobject-form.modu
 import { MatIconModule } from '@angular/material/icon';
 import { RoutesModule } from 'src/view/routes/routes.module';
 import { RoutesListModule } from 'src/view/routes/routes-list/routes-list.module';
+import { UserRoutesListModule } from 'src/view/user-routes/components/user-routes-list/user-routes-list.module';
+import { UserRoutesModule } from 'src/view/user-routes/user-routes.module';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,8 @@ import { RoutesListModule } from 'src/view/routes/routes-list/routes-list.module
     GeoobjectFormModule,
     RoutesModule,
     RoutesListModule,
+    UserRoutesListModule,
+    UserRoutesModule,
     LoginFormModule,
     PageWrapperModule,
     MainViewModule,

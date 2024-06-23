@@ -1,3 +1,9 @@
-<geo-routes-list [items]="items" (addPoint)="onAddPoint($event)" (deletePoint)="onDeletePoint($event)"></geo-routes-list>
+<geo-routes-list 
+   [items]="items" 
+   (addPoint)="onAddPoint($event)" 
+   (deletePoint)="onDeletePoint($event)"
+   (saveRoute)="onSaveRoute()"
+>
+</geo-routes-list>
 <div class="map" id="map"></div>
 

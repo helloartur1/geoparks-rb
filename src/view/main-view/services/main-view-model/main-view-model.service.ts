@@ -35,7 +35,7 @@ export class MainViewModelService {
         const points: IPointGeoObject[] = [...this.model$.value.rawPoints];
         this.model$.next({ ...this.model$.value, points: points.filter((point: IPointGeoObject) => {
           return point.name.toLowerCase().includes(search.toLowerCase()) ||
-          point.type.toLowerCase().includes(search.toLowerCase());
+          point.commonType?.toLowerCase().includes(search.toLowerCase());
         })})
         this.state$.next('SUCCESS');
       })

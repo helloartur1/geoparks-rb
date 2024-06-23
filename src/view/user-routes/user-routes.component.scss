@@ -1,0 +1,14 @@
+:host {
+    display: flex;
+    justify-content: flex-start;
+    height: 100%;
+}
+
+.map {
+    width: 75%;
+    height: 100%;
+}
+
+geo-user-routes-list {
+    width: 25%;
+}

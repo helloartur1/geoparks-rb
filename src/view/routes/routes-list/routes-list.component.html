@@ -13,7 +13,10 @@
           </mat-autocomplete>
         </mat-form-field>
     </ng-container>
-      <button mat-raised-button color="primary" [disabled]="!pointControl.value" (click)="addPointToRoute()">Добавить в маршрут</button>
+      <div class="route-buttons">
+        <button mat-raised-button color="primary" [disabled]="!pointControl.value" (click)="addPointToRoute()">Добавить в маршрут</button>
+        <button *ngIf="isAdmin()" mat-raised-button color="primary" [disabled]="currentPoints.length < 2" (click)="onSaveRoute()">Сохранить маршрут</button>
+      </div>
 </div>
 <div class="points-list">
     
@@ -32,9 +35,6 @@
                   <span>Удалить из маршрута</span>
                 </button>
               </mat-menu>
-             
         </mat-list-item>
-       
-
     </ng-container>
 </mat-list>

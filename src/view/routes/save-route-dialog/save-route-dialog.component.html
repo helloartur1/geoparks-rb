@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Сохранить маршрут</h1>
+<div mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Название маршрута</mat-label>
+    <input matInput [formControl]="routeNameControl"/>
+  </mat-form-field>
+</div>
+<div class="actions" mat-dialog-actions>
+  <button mat-button (click)="close()">Закрыть</button>
+  <button mat-button [disabled]="!routeNameControl.value" (click)="save()">Сохранить</button>
+</div>

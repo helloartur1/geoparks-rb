@@ -12,19 +12,22 @@ import {
 import { OSM } from 'ol/source';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
-import { CommonTypeIconMap, HISTORY_CULTURE_GAF, LAYER_TOROTAU, PROM_ROUTE, YA_LAYER } from '@shared';
+import { AuthAdminService, CommonTypeIconMap, HISTORY_CULTURE_GAF, LAYER_TOROTAU, PROM_ROUTE, YA_LAYER } from '@shared';
 import VectorLayer from 'ol/layer/Vector';
 import { OpenRouteService } from './services/open-route.service';
 import LineString from 'ol/geom/LineString';
 import { Feature } from 'ol';
-import { GeoobjectModel, GeoobjectService } from '@api';
-import { ActivatedRoute } from '@angular/router';
+import { GeoobjectModel, GeoobjectService, RoutePointPost, RouteService } from '@api';
+import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
-import { IPointGeoObject } from '@core';
+import { AppRoutes, IPointGeoObject } from '@core';
 import { Point } from 'ol/geom';
 import Icon from 'ol/style/Icon';
 import { TRouteCoordinates } from './interfaces/route-config.interface';
 import Text from 'ol/style/Text.js';
+import { AuthInterceptor } from 'src/app/interceptors/auth.interceptor';
+import { MatDialog } from '@angular/material/dialog';
+import { SaveRouteDialogComponent } from './save-route-dialog/save-route-dialog.component';
 export const GeoparksCoordsMap: {[key: string]: { latitude:number, longitude: number, layer: any }} = {
   '41f271c8-e8ba-4225-b21d-403f9751e5a7': {
     latitude: 55.2455,
@@ -56,7 +59,14 @@ export class RoutesComponent {
   public markerLayer: VectorLayer<any> | undefined = undefined;
   public points: IPointGeoObject[] = [];
 
-  constructor(private openRouteService: OpenRouteService, private geoobjectService: GeoobjectService, private activatedRoute: ActivatedRoute) {}
+  constructor(
+    private openRouteService: OpenRouteService,
+    private geoobjectService: GeoobjectService,
+    private activatedRoute: ActivatedRoute,
+    private routeService: RouteService,
+    private router: Router,
+    private dialog: MatDialog,
+    ) {}
 
   public ngOnInit(): void {
     const geoparkId: string = this.activatedRoute.snapshot.params['geoparkId'];
@@ -70,10 +80,37 @@ export class RoutesComponent {
     this.calculateRoute();
   }
 
+  public onSaveRoute(): void {
+    this.dialog.open(SaveRouteDialogComponent, {
+      width: '300px',
+      data: {}
+    }).afterClosed().pipe(take(1)).subscribe((routeName: string | undefined | null) => {
+      if (routeName) {
+        const points: Array<RoutePointPost> = this.points.map((point: IPointGeoObject, index: number) => {
+          return {
+            latitude: point.latitude,
+            longitude: point.longitude,
+            order: index,
+            geoobject_id: point.id,
+          }
+        });
+        this.routeService.postRouteRoutePost({
+          route: {
+            name: routeName,
+          },
+          points,
+        }).pipe(take(1)).subscribe(() => {
+          this.router.navigate([`${AppRoutes.MAIN}`]);
+        });
+      }
+    })
+  }
+
   public onDeletePoint(id: string): void {
     this.points = [...this.points].filter((item: IPointGeoObject) => item.id !== id);
     this.calculateRoute();
   }
+
 
   public calculateRoute(): void {
     if (this.markerLayer) {
@@ -92,10 +129,9 @@ export class RoutesComponent {
       this.points.forEach((point: IPointGeoObject) => {
         coordinates.push([point.longitude, point.latitude]);
       });
-      this.openRouteService.getRoute$({ coordinates, profile: 'cycling-regular'}).pipe(take(1)).subscribe((res: Array<[number, number]>) => {
+      this.openRouteService.getRoute$({ coordinates, profile: 'foot-walking'}).pipe(take(1)).subscribe((res: Array<[number, number]>) => {
         const lineStr: LineString = new LineString(res as any);
         lineStr.transform('EPSG:4326', 'EPSG:3857');
-        console.log(lineStr);
         const lineLayerSource = new VectorSource({
           features: [new Feature({
             geometry: lineStr

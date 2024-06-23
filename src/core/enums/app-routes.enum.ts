@@ -5,4 +5,5 @@ export enum AppRoutes {
     CREATE_FORM = 'create-form',
     EDIT_FORM = 'login',
     ROUTES = 'routes',
+    USER_ROUTES = 'user-routes',
 }

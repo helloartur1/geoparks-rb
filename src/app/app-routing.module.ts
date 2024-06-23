@@ -10,6 +10,7 @@ import { MainGuard } from './guards/main.guard';
 import { GeoparksComponent } from 'src/view/geoparks/geoparks.component';
 import { MatIconModule } from '@angular/material/icon';
 import { RoutesComponent } from 'src/view/routes/routes.component';
+import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
 
 const routes: Routes = [
   {
@@ -46,6 +47,10 @@ const routes: Routes = [
   {
     path: `${AppRoutes.ROUTES}/:geoparkId`,
     component: RoutesComponent
+  },
+  {
+    path: `${AppRoutes.USER_ROUTES}`,
+    component: UserRoutesComponent,
   }
 ];
 

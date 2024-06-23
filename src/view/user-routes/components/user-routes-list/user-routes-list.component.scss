@@ -1,8 +1,15 @@
 :host {
-    background-color: var(--base-green-dark-color);
-    padding: 20px;
+    background-color: var(--new-dark-green-color);
+    height: 100%;
 }
 
+.search-route {
+    padding: 20px;
+    mat-form-field {
+        width: 100%
+
+    }
+}
 
 .item {
     display: block;
@@ -55,23 +62,5 @@
 
     &__control-button {
         visibility: hidden;
-    }
-}
-
-::ng-deep .mat-mdc-icon-button {
-    color: #fff !important;
-}
-
-.search-point {
-    ::ng-deep {
-        mat-form-field {
-            width: 100%;
-        }
-    }
-}
-
-.route-buttons {
-    button {
-        margin-right: 10px;
     }
 }
