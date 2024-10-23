@@ -22,7 +22,7 @@ import Fill from 'ol/style/Fill';
 
 
 const DEFAULT_EXTENT: ViewOptions = {
-  center: fromLonLat([58.155889, 55.179724]),
+  center: fromLonLat([ 58.155889, 55.179724 ]),
   zoom: 9,
 }
 @Component({
@@ -185,17 +185,17 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
       });
       feature.setId(point.id);
       feature.setStyle(new Style({
-           image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get((point as GeoobjectModel).commonType)}`, scale: [0.45, 0.45]}),
+           image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get((point as GeoobjectModel).common_type)}`, scale: [0.45, 0.45]}),
       }));
       return feature;
     });
     return features;
   }
 
-  private getStyle({ name, commonType, description }: IGeoObjectFilterFields, search: string): Style {
-    if (name.toLowerCase().includes(search.toLowerCase()) || commonType.toLowerCase().includes(search.toLowerCase())) {
+  private getStyle({ name, common_type, description }: IGeoObjectFilterFields, search: string): Style {
+    if (name.toLowerCase().includes(search.toLowerCase()) || common_type.toLowerCase().includes(search.toLowerCase())) {
       return new Style({
-        image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get(commonType)}`, scale: [0.45, 0.45]}),
+        image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get(common_type)}`, scale: [0.45, 0.45]}),
       });
     }
     return new Style({})

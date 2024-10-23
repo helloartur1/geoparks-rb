@@ -3,7 +3,11 @@
    (addPoint)="onAddPoint($event)" 
    (deletePoint)="onDeletePoint($event)"
    (saveRoute)="onSaveRoute()"
->
-</geo-routes-list>
-<div class="map" id="map"></div>
+></geo-routes-list>
 
+<!-- Step 3: Display the distance -->
+<div *ngIf="formattedDistance" class="distance-display">
+    <strong>Distance:</strong> {{ formattedDistance }}
+</div>
+
+<div class="map" id="map"></div>

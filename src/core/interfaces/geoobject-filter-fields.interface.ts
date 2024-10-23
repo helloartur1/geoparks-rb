@@ -2,5 +2,5 @@ export interface IGeoObjectFilterFields {
      name: string,
      type: string,
      description: string,
-     commonType: string,
+     common_type: string,
 }

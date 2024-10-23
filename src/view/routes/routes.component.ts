@@ -6,9 +6,7 @@ import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import View, { ViewOptions } from 'ol/View';
 import { fromLonLat } from 'ol/proj';
-import {
-  get as getProjection,
-} from 'ol/proj.js';
+import { get as getProjection } from 'ol/proj.js';
 import { OSM } from 'ol/source';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -25,9 +23,9 @@ import { Point } from 'ol/geom';
 import Icon from 'ol/style/Icon';
 import { TRouteCoordinates } from './interfaces/route-config.interface';
 import Text from 'ol/style/Text.js';
-import { AuthInterceptor } from 'src/app/interceptors/auth.interceptor';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveRouteDialogComponent } from './save-route-dialog/save-route-dialog.component';
+
 export const GeoparksCoordsMap: {[key: string]: { latitude:number, longitude: number, layer: any }} = {
   '41f271c8-e8ba-4225-b21d-403f9751e5a7': {
     latitude: 55.2455,
@@ -39,13 +37,14 @@ export const GeoparksCoordsMap: {[key: string]: { latitude:number, longitude: nu
     longitude: 56.096764,
     layer: LAYER_TOROTAU,
   }
-
 };
+
 const DEFAULT_EXTENT: ViewOptions = {
   center: fromLonLat([55.958596, 54.735148]),
-  zoom: 7,
+  zoom: 9,
   projection: getProjection('EPSG:3857')!,
 }
+
 @Component({
   selector: 'geo-routes',
   templateUrl: './routes.component.html',
@@ -59,6 +58,9 @@ export class RoutesComponent {
   public markerLayer: VectorLayer<any> | undefined = undefined;
   public points: IPointGeoObject[] = [];
 
+  public distance: number | undefined = undefined;
+  public duration: number | undefined = undefined;
+
   constructor(
     private openRouteService: OpenRouteService,
     private geoobjectService: GeoobjectService,
@@ -66,7 +68,7 @@ export class RoutesComponent {
     private routeService: RouteService,
     private router: Router,
     private dialog: MatDialog,
-    ) {}
+  ) {}
 
   public ngOnInit(): void {
     const geoparkId: string = this.activatedRoute.snapshot.params['geoparkId'];
@@ -79,6 +81,8 @@ export class RoutesComponent {
     this.points.push(point);
     this.calculateRoute();
   }
+
+
 
   public onSaveRoute(): void {
     this.dialog.open(SaveRouteDialogComponent, {
@@ -110,8 +114,7 @@ export class RoutesComponent {
     this.points = [...this.points].filter((item: IPointGeoObject) => item.id !== id);
     this.calculateRoute();
   }
-
-
+  public formattedDistance: string | undefined = undefined; // Step 1
   public calculateRoute(): void {
     if (this.markerLayer) {
       this.map?.removeLayer(this.markerLayer);
@@ -129,36 +132,103 @@ export class RoutesComponent {
       this.points.forEach((point: IPointGeoObject) => {
         coordinates.push([point.longitude, point.latitude]);
       });
-      this.openRouteService.getRoute$({ coordinates, profile: 'foot-walking'}).pipe(take(1)).subscribe((res: Array<[number, number]>) => {
-        const lineStr: LineString = new LineString(res as any);
-        lineStr.transform('EPSG:4326', 'EPSG:3857');
-        const lineLayerSource = new VectorSource({
-          features: [new Feature({
-            geometry: lineStr
-            ,
-          }),]
-        })
-        const lineLayer: VectorLayer<any> = new VectorLayer({
-          source: lineLayerSource,
-          style: new Style({
-            stroke: new Stroke({
-              color: 'red',
-              width: 3,
-            }),
-          })
-        });
-        this.lineLayer = lineLayer;
-        this.markerLayer = this.createMarkerLayer();
-        this.map?.addLayer(this.lineLayer);
-        this.map?.addLayer(this.markerLayer);
-      });
-    }
 
+      this.openRouteService.getRoute$({ coordinates, profile: 'cycling-regular' })
+        .pipe(take(1))
+        .subscribe((res) => {
+          const { coordinates: routeCoordinates, distance, duration } = res; // Деструктурируем ответ
+          const lineStr: LineString = new LineString(routeCoordinates as any);
+          lineStr.transform('EPSG:4326', 'EPSG:3857');
+
+          const lineLayerSource = new VectorSource({
+            features: [new Feature({
+              geometry: lineStr,
+            })]
+          });
+
+          const lineLayer: VectorLayer<any> = new VectorLayer({
+            source: lineLayerSource,
+            style: new Style({
+              stroke: new Stroke({
+                color: 'red',
+                width: 3,
+              }),
+            }),
+          });
+
+          // Создаем отдельный источник и слой для меток расстояния и времени
+          const labelSource = new VectorSource();
+          const labelLayer = new VectorLayer({
+            source: labelSource,
+          });
+
+          // Получаем среднюю точку маршрута для отображения меток
+          const middlePointCoord = lineStr.getCoordinateAt(0.5); // Получаем середину линии
+
+          if (middlePointCoord) {
+            // Метка расстояния
+            const distanceFeature = new Feature({
+              geometry: new Point(middlePointCoord),
+            });
+
+            const distanceInKm = (distance / 1000).toFixed(2); // Конвертируем в километры
+            distanceFeature.setStyle(new Style({
+              text: new Text({
+                text: `${distanceInKm} km`,
+                font: '12px Arial',
+                fill: new Fill({
+                  color: '#000',
+                }),
+                stroke: new Stroke({
+                  color: '#fff',
+                  width: 3,
+                }),
+                offsetY: -15, // Перемещаем метку над линией
+              })
+            }));
+
+            labelSource.addFeature(distanceFeature);
+
+            // Метка продолжительности
+            this.distance = distance; 
+            this.formattedDistance = (distance / 1000).toFixed(2) + ' km'; 
+            const durationInMinutes = (duration / 60).toFixed(0); // Конвертируем в минуты
+            const durationFeature = new Feature({
+              geometry: new Point(middlePointCoord), // Используем ту же среднюю точку для времени
+            });
+
+            durationFeature.setStyle(new Style({
+              text: new Text({
+                text: `${durationInMinutes} min`,
+                font: '12px Arial',
+                fill: new Fill({
+                  color: '#000',
+                }),
+                stroke: new Stroke({
+                  color: '#fff',
+                  width: 3,
+                }),
+                offsetY: -30, // Перемещаем метку над линией
+              })
+            }));
+
+            labelSource.addFeature(durationFeature);
+          }
+
+          this.lineLayer = lineLayer;
+          this.markerLayer = this.createMarkerLayer();
+
+          // Добавляем слои линии и меток на карту
+          this.map?.addLayer(this.lineLayer);
+          this.map?.addLayer(this.markerLayer);
+          this.map?.addLayer(labelLayer);
+        });
+    }
   }
 
   public ngAfterViewInit(): void {
     setTimeout(() => {
-      const { latitude, longitude, layer } = GeoparksCoordsMap[ this.activatedRoute.snapshot.params['geoparkId']];
+      const { latitude, longitude, layer } = GeoparksCoordsMap[this.activatedRoute.snapshot.params['geoparkId']];
       const vectorSource = new VectorSource({
         features: new GeoJSON().readFeatures(layer, { featureProjection: 'EPSG:3857' }),
       });
@@ -192,12 +262,12 @@ export class RoutesComponent {
 
   public createMarkerLayer(): VectorLayer<any> {
     const features: Feature<Point>[] = this.getFeatures(this.points);
-      const markerLayer: VectorLayer<any> = new VectorLayer<any>({
-        source: new VectorSource({
-          features,
-        }),
-      });
-      return markerLayer;
+    const markerLayer: VectorLayer<any> = new VectorLayer<any>({
+      source: new VectorSource({
+        features,
+      }),
+    });
+    return markerLayer;
   }
 
   private getFeatures(points: IPointGeoObject[]): Feature<Point>[] {
@@ -208,16 +278,15 @@ export class RoutesComponent {
       });
       feature.setId(point.id);
       feature.setStyle(new Style({
-           text: new Text({
-             text: (index + 1) + '.' + point.name,
-             offsetY: 20,
-             font: '10px sans-serif'
-           }),
-           image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get((point as GeoobjectModel).commonType)}`, scale: [0.45, 0.45]}),
+        text: new Text({
+          text: (index + 1) + '.' + point.name,
+          offsetY: 20,
+          font: '10px sans-serif'
+        }),
+        image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get((point as GeoobjectModel).common_type)}`, scale: [0.45, 0.45]}),
       }));
       return feature;
     });
     return features;
   }
-
 }

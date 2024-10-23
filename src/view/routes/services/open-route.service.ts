@@ -8,6 +8,13 @@ import { Observable } from 'rxjs';
 import { IRouteConfig } from '../interfaces/route-config.interface';
 import { from, map } from 'rxjs';
 
+// Define a new interface for the route result
+interface IRouteResult {
+  coordinates: Array<[number, number]>;
+  distance: number; // distance in meters
+  duration: number; // duration in seconds
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -15,8 +22,9 @@ export class OpenRouteService {
 
   constructor() { }
 
-  public getRoute$({ coordinates, profile }: IRouteConfig): Observable<Array<[number, number]>> {
-    let orsDirections = new Openrouteservice.Directions({ api_key: '5b3ce3597851110001cf6248f0d961a50bc04e17b315f4ccec8fe8de'});
+  public getRoute$({ coordinates, profile }: IRouteConfig): Observable<IRouteResult> {
+    let orsDirections = new Openrouteservice.Directions({ api_key: '5b3ce3597851110001cf6248f0d961a50bc04e17b315f4ccec8fe8de' });
+    
     return from(orsDirections.calculate({
       coordinates: coordinates,
       profile,
@@ -26,8 +34,16 @@ export class OpenRouteService {
       const line: LineString = new LineString(polyline.decode(res.routes[0].geometry));
       console.log(polyline.decode(res.routes[0].geometry));
       line.transform('EPSG:4326', 'EPSG:3857');
-      return polyline.decode(res.routes[0].geometry).map((item: [number, number]) => item.reverse());
-    }));
 
+      // Extracting distance and duration from the response
+      const distance = res.routes[0].summary.distance; // distance in meters
+      const duration = res.routes[0].summary.duration; // duration in seconds
+
+      return {
+        coordinates: polyline.decode(res.routes[0].geometry).map((item: [number, number]) => item.reverse()),
+        distance,
+        duration
+      };
+    }));
   }
 }

@@ -4,15 +4,16 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { IPointGeoObject } from '@core';
 import { AuthAdminService } from '@shared';
 import { Observable, map, of, startWith } from 'rxjs';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'; // Import drag-and-drop functionality
 
 @Component({
   selector: 'geo-routes-list',
   templateUrl: './routes-list.component.html',
   styleUrls: ['./routes-list.component.scss']
 })
-export class RoutesListComponent {
+export class RoutesListComponent implements OnInit {
   @Input()
-  public items: IPointGeoObject[] = []
+  public items: IPointGeoObject[] = [];
 
   @Output()
   public addPoint: EventEmitter<IPointGeoObject> = new EventEmitter<IPointGeoObject>();
@@ -26,14 +27,10 @@ export class RoutesListComponent {
   @ViewChildren(MatMenuTrigger) public triggers: QueryList<MatMenuTrigger> | undefined = undefined;
   
   public currentPoints: IPointGeoObject[] = [];
-
   public pointControl: FormControl = new FormControl('');
-
   filteredOptions: Observable<IPointGeoObject[]> = of([]);
 
-  constructor(private authService: AuthAdminService,) {
-    
-  }
+  constructor(private authService: AuthAdminService) {}
 
   ngOnInit() {
     this.filteredOptions = this.pointControl.valueChanges.pipe(
@@ -45,7 +42,6 @@ export class RoutesListComponent {
     );
   }
 
-
   public addPointToRoute(): void {
     const point: IPointGeoObject | undefined = this.pointControl.value;
     if (point) {
@@ -56,7 +52,7 @@ export class RoutesListComponent {
   }
 
   public deletePointFromRoute(id: string): void {
-    this.currentPoints = [...this.currentPoints].filter((item: IPointGeoObject) => item.id !== id);
+    this.currentPoints = this.currentPoints.filter((item: IPointGeoObject) => item.id !== id);
     this.deletePoint.emit(id);
   } 
 
@@ -72,20 +68,24 @@ export class RoutesListComponent {
   }
 
   public isAdmin(): boolean {
-    return this.authService.getAuthData()?.role === 'admin'
+    return this.authService.getAuthData()?.role === 'admin';
   }
 
   public cancelContextMenu(evt: MouseEvent): void {
-    evt.stopPropagation()
+    evt.stopPropagation();
   }
 
   public onSaveRoute(): void {
-    this.saveRoute.emit()
+    this.saveRoute.emit();
   }
 
   private _filter(name: string): IPointGeoObject[] {
     const filterValue = name.toLowerCase();
-
     return this.items.filter((item: IPointGeoObject) => item.name.toLowerCase().includes(filterValue));
+  }
+
+  // Handle the drop event for reordering items
+  public drop(event: CdkDragDrop<IPointGeoObject[]>): void {
+    moveItemInArray(this.currentPoints, event.previousIndex, event.currentIndex);
   }
 }

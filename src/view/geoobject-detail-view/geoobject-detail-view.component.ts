@@ -43,7 +43,7 @@ export class GeoobjectDetailViewComponent implements OnInit, AfterViewInit {
     this.map1 = new Map({
       target: "map1",
       view: new View({
-        center: fromLonLat([58.155889, 55.179724]),
+        center: fromLonLat([ 58.155889,55.179724]),
         zoom: 10,
       }),
       layers: [

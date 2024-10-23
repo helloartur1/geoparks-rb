@@ -25,8 +25,8 @@ import { FileUploader } from 'ng2-file-upload';
 
 export const GeoparksCoordsMap: {[key: string]: { latitude:number, longitude: number, layer: any }} = {
   '41f271c8-e8ba-4225-b21d-403f9751e5a7': {
-    latitude: 55.2455,
-    longitude: 58.2935,
+    latitude: 58.2935,
+    longitude: 55.2455,
     layer: YA_LAYER,
   },
   '07599ea7-76aa-4bbf-8335-86e2436b0254': {
@@ -86,7 +86,7 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
           description: data.description,
           longitude: data.longitude,
           latitude: data.latitude,
-          type: data.commonType,
+          type: data.common_type,
           name: data.name,
           geopark: this.activatedRoute.snapshot.params['geoparkId']
         });
@@ -178,7 +178,7 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
       latitude,
       longitude,
       geopark_id: geopark,
-      commonType: type,
+      common_type: type,
     }) :
     this.geoobjectService.createGeoobjectGeoobjectPost({
       name,
@@ -187,7 +187,7 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
       latitude,
       longitude,
       geopark_id: geopark,
-      commonType: type,
+      common_type: type,
     });
     save$.pipe(
       switchMap((res: any) => {

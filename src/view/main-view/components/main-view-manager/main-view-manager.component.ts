@@ -90,7 +90,7 @@ export class MainViewManagerComponent {
       }
     });
     items.forEach((item: IPointGeoObject) => {
-      let categoryIndex: number = this.categoryItems.findIndex((categoryItem: ICategoryItem) => categoryItem.name === item.commonType);
+      let categoryIndex: number = this.categoryItems.findIndex((categoryItem: ICategoryItem) => categoryItem.name === item.common_type);
       if (categoryIndex >= 0) {
         this.categoryItems[categoryIndex].items = [...this.categoryItems[categoryIndex].items, item]
       }

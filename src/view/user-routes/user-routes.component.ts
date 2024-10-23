@@ -86,24 +86,28 @@ export class UserRoutesComponent implements OnInit {
     if (this.markerLayer) {
       this.map?.removeLayer(this.markerLayer);
     }
-
+  
     if (this.lineLayer) {
       this.map?.removeLayer(this.lineLayer);
     }
-
+  
     const coordinates: TRouteCoordinates[] = [];
-      route.route_points.forEach((point: IRoutePoint) => {
-        coordinates.push([point.longitude, point.latitude]);
-      });
-      this.openRouteService.getRoute$({ coordinates, profile: 'foot-walking'}).pipe(take(1)).subscribe((res: Array<[number, number]>) => {
-        const lineStr: LineString = new LineString(res as any);
+    route.route_points.forEach((point: IRoutePoint) => {
+      coordinates.push([point.longitude, point.latitude]);
+    });
+  
+    this.openRouteService.getRoute$({ coordinates, profile: 'foot-walking' })
+      .pipe(take(1))
+      .subscribe((res) => {
+        const { coordinates: routeCoordinates, distance, duration } = res; // Destructure the response
+  
+        const lineStr: LineString = new LineString(routeCoordinates as any);
         lineStr.transform('EPSG:4326', 'EPSG:3857');
+  
         const lineLayerSource = new VectorSource({
-          features: [new Feature({
-            geometry: lineStr
-            ,
-          }),]
-        })
+          features: [new Feature({ geometry: lineStr })],
+        });
+  
         const lineLayer: VectorLayer<any> = new VectorLayer({
           source: lineLayerSource,
           style: new Style({
@@ -111,25 +115,64 @@ export class UserRoutesComponent implements OnInit {
               color: 'red',
               width: 3,
             }),
-          })
-        });
-        this.lineLayer = lineLayer;
-        this.map?.addLayer(this.lineLayer);
-      });
-      const geeoobjectsStreams$: Array<Observable<GeoobjectModel>> = route.route_points.map((point: IRoutePoint) => {
-        return this.geoobjectService.getGeoobjectByIdGeoobjectIdGet(point.geoobject_id);
-      });
-      forkJoin(geeoobjectsStreams$).pipe(take(1)).subscribe((points: IPointGeoObject[]) => {
-        const features: Feature<Point>[] = this.getFeatures(points);
-        const markerLayer: VectorLayer<any> = new VectorLayer<any>({
-          source: new VectorSource({
-            features,
           }),
         });
-        this.markerLayer = markerLayer;
-        this.map?.addLayer(markerLayer);
+  
+        // Create a separate source and layer for the distance and duration labels
+        const labelSource = new VectorSource();
+        const labelLayer = new VectorLayer({
+          source: labelSource,
+        });
+  
+        // Get the middle point of the route to display distance and duration labels
+        const middlePointCoord = lineStr.getCoordinateAt(0.5); // Get the middle of the line
+  
+        if (middlePointCoord) {
+          // Distance label
+          const distanceInKm = (distance / 1000).toFixed(2); // Convert to kilometers
+          const distanceFeature = new Feature({
+            geometry: new Point(middlePointCoord),
+          });
+  
+          distanceFeature.setStyle(new Style({
+            text: new Text({
+              text: `${distanceInKm} km`,
+              font: '12px Arial',
+              fill: new Fill({ color: '#000' }),
+              stroke: new Stroke({ color: '#fff', width: 3 }),
+              offsetY: -15, // Move the label above the line
+            }),
+          }));
+  
+          labelSource.addFeature(distanceFeature);
+  
+          // Duration label
+          const durationInMinutes = (duration / 60).toFixed(0); // Convert to minutes
+          
+        }
+  
+        this.lineLayer = lineLayer;
+        this.map?.addLayer(this.lineLayer);
+        this.map?.addLayer(labelLayer); // Add label layer for distance and duration
+  
+        // Fetch geoobjects to create markers
+        const geeoobjectsStreams$: Array<Observable<GeoobjectModel>> = route.route_points.map((point: IRoutePoint) => {
+          return this.geoobjectService.getGeoobjectByIdGeoobjectIdGet(point.geoobject_id);
+        });
+  
+        forkJoin(geeoobjectsStreams$)
+          .pipe(take(1))
+          .subscribe((points: IPointGeoObject[]) => {
+            const features: Feature<Point>[] = this.getFeatures(points);
+            const markerLayer: VectorLayer<any> = new VectorLayer<any>({
+              source: new VectorSource({ features }),
+            });
+            this.markerLayer = markerLayer;
+            this.map?.addLayer(markerLayer);
+          });
       });
   }
+  
 
   private getFeatures(points: IPointGeoObject[]): Feature<Point>[] {
     const features: Feature<Point>[] = points.map((point: IPointGeoObject, index: number) => {
@@ -144,7 +187,7 @@ export class UserRoutesComponent implements OnInit {
              offsetY: 20,
              font: '10px sans-serif'
            }),
-           image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get((point as GeoobjectModel).commonType)}`, scale: [0.45, 0.45]}),
+           image: new Icon({src: `../../../../assets/icons/${CommonTypeIconMap.get((point as GeoobjectModel).common_type)}`, scale: [0.45, 0.45]}),
       }));
       return feature;
     });
