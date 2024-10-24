@@ -133,7 +133,7 @@ export class RoutesComponent {
         coordinates.push([point.longitude, point.latitude]);
       });
 
-      this.openRouteService.getRoute$({ coordinates, profile: 'cycling-regular' })
+      this.openRouteService.getRoute$({ coordinates, profile: 'foot-walking' })
         .pipe(take(1))
         .subscribe((res) => {
           const { coordinates: routeCoordinates, distance, duration } = res; // Деструктурируем ответ
@@ -162,59 +162,46 @@ export class RoutesComponent {
             source: labelSource,
           });
 
-          // Получаем среднюю точку маршрута для отображения меток
           const middlePointCoord = lineStr.getCoordinateAt(0.5); // Получаем середину линии
 
+          
           if (middlePointCoord) {
-            // Метка расстояния
-            const distanceFeature = new Feature({
-              geometry: new Point(middlePointCoord),
-            });
-            this.formattedDistance = (distance / 1000).toFixed(2) + ' km';
-            this.formattedDuration = Math.round(duration / 60) + ' min';
-            const distanceInKm = (distance / 1000).toFixed(2); // Конвертируем в километры
-            distanceFeature.setStyle(new Style({
-              text: new Text({
-                text: `${distanceInKm} km`,
-                font: '12px Arial',
-                fill: new Fill({
-                  color: '#000',
-                }),
-                stroke: new Stroke({
-                  color: '#fff',
-                  width: 3,
-                }),
-                offsetY: -15, // Перемещаем метку над линией
-              })
-            }));
 
-            labelSource.addFeature(distanceFeature);
+            let kilometers = Math.floor(distance / 1000); 
+            let meters = Math.round((distance % 1000)); 
+        
 
-            // Метка продолжительности
-            this.distance = distance; 
-            this.formattedDistance = (distance / 1000).toFixed(2) + ' km'; 
-            const durationInMinutes = (duration / 60).toFixed(0); // Конвертируем в минуты
-            const durationFeature = new Feature({
-              geometry: new Point(middlePointCoord), // Используем ту же среднюю точку для времени
-            });
+            if (kilometers > 0) {
+                this.formattedDistance = kilometers + ' км';
+                if (meters > 0) {
+                    this.formattedDistance += ' ' + meters + ' м';
+                }
+            } else if (meters > 0) {
+                this.formattedDistance = meters + ' м';
+            } else {
+                this.formattedDistance = '0 м'; 
+            }
+        
 
-            durationFeature.setStyle(new Style({
-              text: new Text({
-                text: `${durationInMinutes} min`,
-                font: '12px Arial',
-                fill: new Fill({
-                  color: '#000',
-                }),
-                stroke: new Stroke({
-                  color: '#fff',
-                  width: 3,
-                }),
-                offsetY: -30, // Перемещаем метку над линией
-              })
-            }));
+            let totalMinutes = Math.round(duration / 60);
+            let hours = Math.floor(totalMinutes / 60);
+            let minutes = totalMinutes % 60;
+        
+            if (hours > 0) {
+                this.formattedDuration = hours + ' ч';
+                if (minutes > 0) {
+                    this.formattedDuration += ' ' + minutes + ' мин';
+                }
+            } else if (minutes > 0) {
+                this.formattedDuration = minutes + ' мин';
+            } else {
+                this.formattedDuration = '0 мин';
+            }
+        
+            this.distance = distance;
+        }
+        
 
-            labelSource.addFeature(durationFeature);
-          }
 
           this.lineLayer = lineLayer;
           this.markerLayer = this.createMarkerLayer();

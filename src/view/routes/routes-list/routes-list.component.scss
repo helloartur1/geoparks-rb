@@ -3,7 +3,6 @@
     padding: 20px;
 }
 
-
 .item {
     display: block;
     padding: 10px 15px;
@@ -34,13 +33,14 @@
             min-height: 48px;
         }
     }
+
     &__title {
         margin: 0;
         font-size: 14px;
         line-height: 16px;
         font-weight: 500;
         text-align: left;
-        color:#fff !important;
+        color: #fff !important;
         &:hover {
             color: #fff !important;
         }
@@ -74,4 +74,28 @@
     button {
         margin-right: 10px;
     }
+}
+
+/* Добавлено для оформления информации о маршруте */
+.route-info {
+    margin-top: 20px; /* Опускаем блок с маршрутом */
+}
+
+.info-box {
+    display: flex;
+    flex-direction: column; /* Вертикальное расположение элементов */
+    gap: 10px; /* Расстояние между строками (иконка + текст) */
+}
+
+.route-stat {
+    display: flex;
+    align-items: center; /* Центрирование иконки и текста по вертикали */
+    margin-bottom: 10px; /* Дополнительное пространство между элементами */
+    color: #fff !important;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.route-stat mat-icon {
+    margin-right: 10px; /* Отступ между иконкой и текстом */
 }
