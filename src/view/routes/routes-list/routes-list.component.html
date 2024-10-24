@@ -1,34 +1,64 @@
+
 <div class="search-point">
   <ng-container *ngIf="items.length">
-      <mat-form-field appearance="fill">
-          <mat-label>Поиск объекта</mat-label>
-          <input type="text"
-                 matInput
-                 [formControl]="pointControl"
-                 [matAutocomplete]="auto">
-          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-              <mat-option *ngFor="let item of filteredOptions | async" [value]="item">
-                  {{ item.name }}
-              </mat-option>
-          </mat-autocomplete>
-      </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Поиск объекта</mat-label>
+      <input type="text"
+             matInput
+             [formControl]="pointControl"
+             [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+        <mat-option *ngFor="let item of filteredOptions | async" [value]="item">
+          {{ item.name }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
   </ng-container>
+
+  
+
   <div class="route-buttons">
-      <button mat-raised-button color="primary" [disabled]="!pointControl.value" (click)="addPointToRoute()">Добавить в маршрут</button>
-      <button *ngIf="isAdmin()" mat-raised-button color="primary" [disabled]="currentPoints.length < 2" (click)="onSaveRoute()">Сохранить маршрут</button>
+    <button mat-raised-button 
+            color="primary" 
+            [disabled]="!pointControl.value" 
+            (click)="addPointToRoute()">
+      Добавить в маршрут
+    </button>
+    <button *ngIf="isAdmin()" 
+            mat-raised-button 
+            color="primary" 
+            [disabled]="currentPoints.length < 2" 
+            (click)="onSaveRoute()">
+      Сохранить маршрут
+    </button>
   </div>
 </div>
+<!-- Route Info Section with simple div instead of mat-card -->
+<div class="route-info" *ngIf="distance || duration">
+    <div class="info-box">
+      <div *ngIf="distance" class="route-stat">
+        <mat-icon>directions_bike</mat-icon>
+        <span>Расстояние: {{ distance }}</span>
+      </div>
+      <div *ngIf="duration" class="route-stat">
+        <mat-icon>schedule</mat-icon>
+        <span>Время в пути: {{ duration }}</span>
+      </div>
+    </div>
+  </div>
 <div class="points-list">
-</div>
-<mat-list>
-  <ng-container *ngFor="let point of currentPoints; let i = index">
+  <mat-list>
+    <ng-container *ngFor="let point of currentPoints; let i = index">
       <mat-list-item class="item">
-          <div class="content" style="flex: 1;">
-              <h5 matListItemTitle class="item__title">{{ point.name }}</h5>
-          </div>
-          <button mat-icon-button (click)="deletePointFromRoute(point.id)" aria-label="Удалить">
-              <mat-icon>delete</mat-icon>
-          </button>
+        <div class="content" style="flex: 1;">
+          <h5 matListItemTitle class="item__title">{{ point.name }}</h5>
+        </div>
+        <button mat-icon-button 
+                (click)="deletePointFromRoute(point.id)" 
+                aria-label="Удалить">
+          <mat-icon>delete</mat-icon>
+        </button>
       </mat-list-item>
-  </ng-container>
-</mat-list>
+    </ng-container>
+  </mat-list>
+</div>

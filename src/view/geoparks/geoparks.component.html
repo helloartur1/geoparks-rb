@@ -1,4 +1,3 @@
-
 <section class="geoparks-intro">
     <h2 class="geoparks-intro__title">Геопарки ЮНЕСКО: Сокровища Земли в ваших руках</h2>
     <div class="geoparks-intro-content intro-content">
@@ -7,20 +6,22 @@
                 <div class="intro-content-definition">
                     <p class="intro-content-definition__text"><span class="intro-content-definition__text-main">Геопарк</span> &mdash; территория, объединяющая геологические объекты международного значения, природные и историко-культурные объекты. Место, где человек может встретиться с первозданной природой и познакомиться с вековыми традициями башкирской земли.</p> 
                 </div>
-                <div class="intro-content-galery">
-                    <a class="arrow-prev" (click)="togglePrevPhoto($event)">
-                        <img src="../../assets/img/arrow_left_white.png" alt="Вперед" width="32" height="32">
-                    </a>
-                    <div class="active-image">
-                        <img [src]="imagePaths[activeImageIndex]" alt="Изображение геопарка" width="700" height="370">
-                    </div>
-                    <a class="arrow-next" (click)="toggleNextPhoto($event)">
-                        <img src="../../assets/img/arrow_right_white.png" alt="Назад" width="32" height="32">
-                    </a>
+                <div class="intro-content-video">
+                    <video 
+                        #videoPlayer
+                        muted
+                        autoplay
+                        loop
+                        width="750"
+                        height="400"
+                        class="main-video"
+                        >
+                        <source [src]="videoPath" type="video/mp4">
+                        Ваш браузер не поддерживает видео элемент.
+                    </video>
                 </div>
             </div>
         </div>
-        
     </div>
 </section>
 <section class="select">
