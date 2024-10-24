@@ -14,6 +14,8 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'; // Import
 export class RoutesListComponent implements OnInit {
   @Input()
   public items: IPointGeoObject[] = [];
+  @Input() distance?: string;  // Add this
+  @Input() duration?: string;  // Add this
 
   @Output()
   public addPoint: EventEmitter<IPointGeoObject> = new EventEmitter<IPointGeoObject>();

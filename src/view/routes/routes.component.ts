@@ -57,7 +57,8 @@ export class RoutesComponent {
   public lineLayer: VectorLayer<any> | undefined = undefined;
   public markerLayer: VectorLayer<any> | undefined = undefined;
   public points: IPointGeoObject[] = [];
-
+  public formattedDistance?: string;
+  public formattedDuration?: string;
   public distance: number | undefined = undefined;
   public duration: number | undefined = undefined;
 
@@ -114,7 +115,6 @@ export class RoutesComponent {
     this.points = [...this.points].filter((item: IPointGeoObject) => item.id !== id);
     this.calculateRoute();
   }
-  public formattedDistance: string | undefined = undefined; // Step 1
   public calculateRoute(): void {
     if (this.markerLayer) {
       this.map?.removeLayer(this.markerLayer);
@@ -170,7 +170,8 @@ export class RoutesComponent {
             const distanceFeature = new Feature({
               geometry: new Point(middlePointCoord),
             });
-
+            this.formattedDistance = (distance / 1000).toFixed(2) + ' km';
+            this.formattedDuration = Math.round(duration / 60) + ' min';
             const distanceInKm = (distance / 1000).toFixed(2); // Конвертируем в километры
             distanceFeature.setStyle(new Style({
               text: new Text({

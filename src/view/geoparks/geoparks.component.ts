@@ -35,7 +35,6 @@ const DEFAULT_EXTENT: ViewOptions = {
 export class GeoparksComponent {
   public map: Map | undefined = undefined;
   private markerListenerCallBack: ((evt: MapBrowserEvent<any>) => void) | undefined = undefined;
-
   public imagePaths: string[] = [
     '../../assets/img/424689e3266131a6648d94fa64ca7eb6.png',
     '../../assets/img/e91b0d26b17a9c87421a26c24e01274e.png',
@@ -45,12 +44,21 @@ export class GeoparksComponent {
   ];
   public activeImageIndex: number = 0;
   constructor(private dialog: MatDialog, private router: Router) {}
-
+  videoPath: string = '../../assets/img/X2Download.com-Геопарк «Торатау».mp4';
   public setFullExtent(): void {
     this.map?.setView(new View({...DEFAULT_EXTENT}));
   }
 
   public ngAfterViewInit(): void {
+    const video = document.querySelector('video');
+  if (video) {
+    video.volume = 0;
+    
+    // Обработчик на случай, если пользователь попытается включить звук
+    video.addEventListener('volumechange', () => {
+      video.volume = 0;
+    });
+  }
     setTimeout(() => {
       const style = new Style({
         stroke: new Stroke({
