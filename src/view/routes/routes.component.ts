@@ -21,10 +21,11 @@ import { take } from 'rxjs';
 import { AppRoutes, IPointGeoObject } from '@core';
 import { Point } from 'ol/geom';
 import Icon from 'ol/style/Icon';
-import { TRouteCoordinates } from './interfaces/route-config.interface';
+import { TRouteCoordinates, TRouteProfile } from './interfaces/route-config.interface';
 import Text from 'ol/style/Text.js';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveRouteDialogComponent } from './save-route-dialog/save-route-dialog.component';
+import { FormControl } from '@angular/forms';
 
 export const GeoparksCoordsMap: {[key: string]: { latitude:number, longitude: number, layer: any }} = {
   '41f271c8-e8ba-4225-b21d-403f9751e5a7': {
@@ -57,11 +58,14 @@ export class RoutesComponent {
   public lineLayer: VectorLayer<any> | undefined = undefined;
   public markerLayer: VectorLayer<any> | undefined = undefined;
   public points: IPointGeoObject[] = [];
+  public currentPoints: IPointGeoObject[] = [];  // Для отображения в списке точек
   public formattedDistance?: string;
   public formattedDuration?: string;
   public distance: number | undefined = undefined;
   public duration: number | undefined = undefined;
-
+  public selectedProfile: TRouteProfile = 'foot-walking';
+  public pointControl = new FormControl();
+  
   constructor(
     private openRouteService: OpenRouteService,
     private geoobjectService: GeoobjectService,
@@ -69,6 +73,7 @@ export class RoutesComponent {
     private routeService: RouteService,
     private router: Router,
     private dialog: MatDialog,
+    private authAdminService: AuthAdminService
   ) {}
 
   public ngOnInit(): void {
@@ -80,10 +85,29 @@ export class RoutesComponent {
 
   public onAddPoint(point: IPointGeoObject): void {
     this.points.push(point);
+    this.currentPoints = [...this.points];  // Обновляем список точек
     this.calculateRoute();
   }
 
+  public selectProfile(profile: TRouteProfile): void {
+    if (this.selectedProfile !== profile) {
+      this.selectedProfile = profile;
+      this.calculateRoute();
+    }
+  }
 
+  
+
+  public addPointToRoute(): void {
+    if (this.pointControl.value) {
+      this.onAddPoint(this.pointControl.value);
+      this.pointControl.reset();
+    }
+  }
+
+  public deletePointFromRoute(id: string): void {
+    this.onDeletePoint(id);
+  }
 
   public onSaveRoute(): void {
     this.dialog.open(SaveRouteDialogComponent, {
@@ -113,8 +137,11 @@ export class RoutesComponent {
 
   public onDeletePoint(id: string): void {
     this.points = [...this.points].filter((item: IPointGeoObject) => item.id !== id);
+    this.currentPoints = [...this.points];  // Обновляем список точек
     this.calculateRoute();
   }
+
+  // Остальные методы calculateRoute, ngAfterViewInit, createMarkerLayer и getFeatures остаются без изменений
   public calculateRoute(): void {
     if (this.markerLayer) {
       this.map?.removeLayer(this.markerLayer);
@@ -132,11 +159,11 @@ export class RoutesComponent {
       this.points.forEach((point: IPointGeoObject) => {
         coordinates.push([point.longitude, point.latitude]);
       });
-
-      this.openRouteService.getRoute$({ coordinates, profile: 'foot-walking' })
+      
+      this.openRouteService.getRoute$({ coordinates, profile: this.selectedProfile})
         .pipe(take(1))
         .subscribe((res) => {
-          const { coordinates: routeCoordinates, distance, duration } = res; // Деструктурируем ответ
+          const { coordinates: routeCoordinates, distance, duration } = res;
           const lineStr: LineString = new LineString(routeCoordinates as any);
           lineStr.transform('EPSG:4326', 'EPSG:3857');
 
@@ -156,20 +183,16 @@ export class RoutesComponent {
             }),
           });
 
-          // Создаем отдельный источник и слой для меток расстояния и времени
           const labelSource = new VectorSource();
           const labelLayer = new VectorLayer({
             source: labelSource,
           });
 
-          const middlePointCoord = lineStr.getCoordinateAt(0.5); // Получаем середину линии
-
+          const middlePointCoord = lineStr.getCoordinateAt(0.5);
           
           if (middlePointCoord) {
-
             let kilometers = Math.floor(distance / 1000); 
             let meters = Math.round((distance % 1000)); 
-        
 
             if (kilometers > 0) {
                 this.formattedDistance = kilometers + ' км';
@@ -181,7 +204,6 @@ export class RoutesComponent {
             } else {
                 this.formattedDistance = '0 м'; 
             }
-        
 
             let totalMinutes = Math.round(duration / 60);
             let hours = Math.floor(totalMinutes / 60);
@@ -199,14 +221,12 @@ export class RoutesComponent {
             }
         
             this.distance = distance;
-        }
-        
-
+            this.duration = duration;
+          }
 
           this.lineLayer = lineLayer;
           this.markerLayer = this.createMarkerLayer();
 
-          // Добавляем слои линии и меток на карту
           this.map?.addLayer(this.lineLayer);
           this.map?.addLayer(this.markerLayer);
           this.map?.addLayer(labelLayer);

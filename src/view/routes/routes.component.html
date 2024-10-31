@@ -1,10 +1,19 @@
 <geo-routes-list 
+   [selectedProfile]="selectedProfile"
+   (profileChanged)="selectProfile($event)"
    [items]="items" 
    [distance]="formattedDistance"
    [duration]="formattedDuration"
    (addPoint)="onAddPoint($event)" 
    (deletePoint)="onDeletePoint($event)"
    (saveRoute)="onSaveRoute()"
-></geo-routes-list>
-
-<div class="map" id="map"></div>
+>
+</geo-routes-list>
+<!-- <select id="profileSelect" [(ngModel)]="selectedProfile" (change)="onProfileChange()">
+   <option value="foot-walking">Пеший</option>
+   <option value="driving-car">Автомобиль</option>
+   <option value="cycling-regular">Велосипед</option>
+ </select> -->
+<div class="map" id="map">
+   
+</div>

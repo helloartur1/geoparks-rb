@@ -1,65 +1,95 @@
 <div class="search-point">
     <ng-container *ngIf="items.length">
-      <mat-form-field appearance="fill">
-        <mat-label>Поиск объекта</mat-label>
-        <input type="text"
-               matInput
-               [formControl]="pointControl"
-               [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-          <mat-option *ngFor="let item of filteredOptions | async" [value]="item">
-            {{ item.name }}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Поиск объекта</mat-label>
+            <input type="text"
+                   matInput
+                   [formControl]="pointControl"
+                   [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                <mat-option *ngFor="let item of filteredOptions | async" [value]="item">
+                    {{ item.name }}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
     </ng-container>
-  
-    <div class="route-buttons">
-      <button mat-raised-button 
-              color="primary" 
-              [disabled]="!pointControl.value" 
-              (click)="addPointToRoute()">
-        Добавить в маршрут
-      </button>
-      <button *ngIf="isAdmin()" 
-              mat-raised-button 
-              color="primary" 
-              [disabled]="currentPoints.length < 2" 
-              (click)="onSaveRoute()">
-        Сохранить маршрут
-      </button>
+    <div class="profile-buttons">
+        <button mat-button
+                [ngClass]="{'active': selectedProfile === 'foot-walking'}"
+                (click)="selectProfile('foot-walking')">
+            <mat-icon>directions_walk</mat-icon>
+            Пеший
+        </button>
+        <button mat-button
+                [ngClass]="{'active': selectedProfile === 'driving-car'}"
+                (click)="selectProfile('driving-car')">
+            <mat-icon>directions_car</mat-icon>
+            Автомобиль
+        </button>
+        <button mat-button
+                [ngClass]="{'active': selectedProfile === 'cycling-regular'}"
+                (click)="selectProfile('cycling-regular')">
+            <mat-icon>directions_bike</mat-icon>
+            Велосипед
+        </button>
     </div>
-  </div>
-  
+    <div class="route-buttons">
+        <button mat-raised-button 
+                color="primary" 
+                [disabled]="!pointControl.value" 
+                (click)="addPointToRoute()">
+            Добавить в маршрут
+        </button>
+        <button *ngIf="isAdmin()" 
+                mat-raised-button 
+                color="primary" 
+                [disabled]="currentPoints.length < 2" 
+                (click)="onSaveRoute()">
+            Сохранить маршрут
+        </button>
+    </div>
+</div>
 
-  <div class="route-info" *ngIf="distance || duration">
-      <div class="info-box">
-        <div *ngIf="distance" class="route-stat">
-          <mat-icon>directions_walk</mat-icon>
-          <span>Расстояние: {{ distance }}</span>
-        </div>
-        <div *ngIf="duration" class="route-stat">
-          <mat-icon>schedule</mat-icon>
-          <span>Время в пути: {{ duration }}</span>
-        </div>
-      </div>
-  </div>
-  
+<div class="route-info" *ngIf="distance || duration">  
+    <div class="info-box">  
+        <div *ngIf="distance" class="route-stat">  
+            <mat-icon>  
+                <ng-container [ngSwitch]="selectedProfile">  
+                    <ng-container *ngSwitchCase="'foot-walking'">directions_walk</ng-container>  
+                    <ng-container *ngSwitchCase="'driving-car'">directions_car</ng-container>  
+                    <ng-container *ngSwitchCase="'cycling-regular'">directions_bike</ng-container>  
+                    <ng-container *ngSwitchDefault>directions_walk</ng-container> <!-- Значение по умолчанию -->  
+                </ng-container>  
+            </mat-icon>  
+            <span>Расстояние: {{ distance }}</span>  
+        </div>  
+        <div *ngIf="duration" class="route-stat">  
+            <mat-icon>  
+                <ng-container [ngSwitch]="selectedProfile">  
+                    <ng-container *ngSwitchCase="'foot-walking'">schedule</ng-container>  
+                    <ng-container *ngSwitchCase="'driving-car'">schedule</ng-container>  
+                    <ng-container *ngSwitchCase="'cycling-regular'">schedule</ng-container>  
+                    <ng-container *ngSwitchDefault>schedule</ng-container> <!-- Значение по умолчанию -->  
+                </ng-container>  
+            </mat-icon>  
+            <span>Время в пути: {{ duration }}</span>  
+        </div>  
+    </div>  
+</div>  
 
-  <div class="points-list">
+<div class="points-list">
     <mat-list>
-      <ng-container *ngFor="let point of currentPoints; let i = index">
-        <mat-list-item class="item">
-          <div class="content" style="flex: 1;">
-            <h5 matListItemTitle class="item__title">{{ point.name }}</h5>
-          </div>
-          <button mat-icon-button 
-                  (click)="deletePointFromRoute(point.id)" 
-                  aria-label="Удалить">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </mat-list-item>
-      </ng-container>
+        <ng-container *ngFor="let point of currentPoints; let i = index">
+            <mat-list-item class="item">
+                <div class="content" style="flex: 1;">
+                    <h5 matListItemTitle class="item__title">{{ point.name }}</h5>
+                </div>
+                <button mat-icon-button 
+                        (click)="deletePointFromRoute(point.id)" 
+                        aria-label="Удалить">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </mat-list-item>
+        </ng-container>
     </mat-list>
-  </div>
-  
+</div>

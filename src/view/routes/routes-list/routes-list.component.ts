@@ -5,6 +5,7 @@ import { IPointGeoObject } from '@core';
 import { AuthAdminService } from '@shared';
 import { Observable, map, of, startWith } from 'rxjs';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'; // Import drag-and-drop functionality
+import { TRouteProfile } from '../interfaces/route-config.interface';
 
 @Component({
   selector: 'geo-routes-list',
@@ -16,9 +17,12 @@ export class RoutesListComponent implements OnInit {
   public items: IPointGeoObject[] = [];
   @Input() distance?: string;  // Add this
   @Input() duration?: string;  // Add this
+  @Input() selectedProfile: TRouteProfile = 'foot-walking'; 
 
   @Output()
   public addPoint: EventEmitter<IPointGeoObject> = new EventEmitter<IPointGeoObject>();
+
+  @Output() profileChanged = new EventEmitter<TRouteProfile>();
 
   @Output()
   public deletePoint: EventEmitter<string> = new EventEmitter<string>();
@@ -27,13 +31,10 @@ export class RoutesListComponent implements OnInit {
   public saveRoute: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChildren(MatMenuTrigger) public triggers: QueryList<MatMenuTrigger> | undefined = undefined;
-  
   public currentPoints: IPointGeoObject[] = [];
   public pointControl: FormControl = new FormControl('');
   filteredOptions: Observable<IPointGeoObject[]> = of([]);
-
   constructor(private authService: AuthAdminService) {}
-
   ngOnInit() {
     this.filteredOptions = this.pointControl.valueChanges.pipe(
       startWith(''),
@@ -57,7 +58,12 @@ export class RoutesListComponent implements OnInit {
     this.currentPoints = this.currentPoints.filter((item: IPointGeoObject) => item.id !== id);
     this.deletePoint.emit(id);
   } 
-
+  public selectProfile(profile: TRouteProfile): void {
+    if (this.selectedProfile !== profile) {
+      this.selectedProfile = profile;
+      this.profileChanged.emit(profile);
+    }
+  }
   public displayFn(point: IPointGeoObject): string {
     return point && point.name ? point.name : '';
   }

@@ -21,7 +21,9 @@ export class LoginFormComponent {
   constructor(private authAdminService: AuthAdminService, private localStorageService: LocalStorageService, private router: Router) {}
 
   public loginSubmit(): void {
+    
     const { userName, password } = this.form.value;
+
     this.authAdminService.login({ userName, password } ).pipe(take(1)).subscribe(
       { 
         next: ({ token }: { token: string }) => {

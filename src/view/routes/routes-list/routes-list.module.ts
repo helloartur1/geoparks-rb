@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
-
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -28,6 +28,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatListModule,
     MatMenuModule,
     MatIconModule,
+    FormsModule,
   ],
   exports: [
     RoutesListComponent,

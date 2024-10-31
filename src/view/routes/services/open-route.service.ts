@@ -38,7 +38,6 @@ export class OpenRouteService {
       // Extracting distance and duration from the response
       const distance = res.routes[0].summary.distance; // distance in meters
       const duration = res.routes[0].summary.duration; // duration in seconds
-
       return {
         coordinates: polyline.decode(res.routes[0].geometry).map((item: [number, number]) => item.reverse()),
         distance,
