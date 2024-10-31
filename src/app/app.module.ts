@@ -18,7 +18,7 @@ import { RoutesModule } from 'src/view/routes/routes.module';
 import { RoutesListModule } from 'src/view/routes/routes-list/routes-list.module';
 import { UserRoutesListModule } from 'src/view/user-routes/components/user-routes-list/user-routes-list.module';
 import { UserRoutesModule } from 'src/view/user-routes/user-routes.module';
-
+import { FormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
     AppComponent
@@ -38,6 +38,7 @@ import { UserRoutesModule } from 'src/view/user-routes/user-routes.module';
     MainViewModule,
     MatIconModule,
     HttpClientModule,
+    FormsModule,
     ApiModule.forRoot(() => new Configuration({ basePath: "http://localhost:8000"})),
   ],
   providers: [

@@ -8,6 +8,7 @@
     padding: 10px 15px;
     background-color: var(--new-green-dark-color);
     border-radius: 3px;
+    
     &:not(:last-child) {
         margin-bottom: 10px;
     }
@@ -24,23 +25,31 @@
     ::ng-deep {
         .mdc-list-item__content {
             display: block;
+            overflow: hidden; // Добавлено для контроля переполнения
         }
 
         .mat-mdc-list-item-unscoped-content {
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between; // Изменено для правильного расположения кнопки
             align-items: flex-start;
             min-height: 48px;
+            width: 100%; // Добавлено для контроля ширины
         }
     }
 
     &__title {
         margin: 0;
         font-size: 14px;
-        line-height: 16px;
+        line-height: 1.4; // Увеличен line-height для лучшей читаемости
         font-weight: 500;
         text-align: left;
         color: #fff !important;
+        white-space: normal !important; // Добавлено для переноса
+        word-wrap: break-word; // Добавлено для переноса длинных слов
+        overflow-wrap: break-word; // Дополнительная поддержка переноса
+        flex: 1; // Добавлено для правильного расположения
+        padding-right: 16px; // Отступ от кнопки
+        
         &:hover {
             color: #fff !important;
         }
@@ -55,6 +64,7 @@
 
     &__control-button {
         visibility: hidden;
+        flex-shrink: 0; // Предотвращаем сжатие кнопки
     }
 }
 
@@ -76,26 +86,57 @@
     }
 }
 
-/* Добавлено для оформления информации о маршруте */
 .route-info {
-    margin-top: 20px; /* Опускаем блок с маршрутом */
+    margin-top: 20px;
 }
 
 .info-box {
     display: flex;
-    flex-direction: column; /* Вертикальное расположение элементов */
-    gap: 10px; /* Расстояние между строками (иконка + текст) */
+    flex-direction: column;
+    gap: 10px;
 }
 
 .route-stat {
     display: flex;
-    align-items: center; /* Центрирование иконки и текста по вертикали */
-    margin-bottom: 10px; /* Дополнительное пространство между элементами */
+    align-items: center;
+    margin-bottom: 10px;
     color: #fff !important;
     font-size: 14px;
     margin-left: 10px;
+
+    mat-icon {
+        margin-right: 10px;
+    }
 }
 
-.route-stat mat-icon {
-    margin-right: 10px; /* Отступ между иконкой и текстом */
+// Добавляем дополнительные стили для корректной работы Material List
+::ng-deep .mat-mdc-list {
+    .mat-mdc-list-item {
+        height: auto !important; // Разрешаем элементу расширяться
+        
+        &.item {
+            .content {
+                flex: 1;
+                min-width: 0; // Важно для работы text-overflow
+                overflow: hidden; // Контролируем переполнение
+            }
+        }
+    }
 }
+.profile-buttons button {  
+    margin-bottom: 20px;
+    background-color: white; /* Установка фона на белый */  
+    color: black; /* Установка текста на черный для видимости */  
+    border: 1px solid black; /* Добавление черной границы (по желанию) */ 
+    margin-left: 3px; 
+}  
+
+.profile-buttons button.active {  
+    background-color: white; /* Установка фона на белый для активной кнопки */  
+    color: black; /* Установка текста на черный для активной кнопки */  
+}  
+
+/* Можно добавить hover эффект */  
+.profile-buttons button:hover {  
+    background-color: rgba(255, 255, 255, 0.8); /* Немного прозрачный белый при наведении */  
+}  
