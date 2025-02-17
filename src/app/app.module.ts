@@ -19,9 +19,12 @@ import { RoutesListModule } from 'src/view/routes/routes-list/routes-list.module
 import { UserRoutesListModule } from 'src/view/user-routes/components/user-routes-list/user-routes-list.module';
 import { UserRoutesModule } from 'src/view/user-routes/user-routes.module';
 import { FormsModule } from '@angular/forms';
+import { SystemRoutesComponent } from '../view/system-routes/system-routes.component';
+import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SystemRoutesComponent
   ],
   imports: [
     BrowserModule,

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, QueryList, ViewChildren } from 
 import { FormControl } from '@angular/forms';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { IRoute } from '@core';
+import { TRouteProfile } from 'src/view/routes/interfaces/route-config.interface';
 
 @Component({
   selector: 'geo-user-routes-list',
@@ -11,7 +12,10 @@ import { IRoute } from '@core';
 export class UserRoutesListComponent {
   @Input()
   public routes: IRoute[] = [];
-
+  @Input() selectedProfile: TRouteProfile = 'foot-walking'; 
+  @Input() distance?: string;
+  @Input() duration?: string; 
+  @Output() profileChanged = new EventEmitter<TRouteProfile>();
   @Output()
   public showRoute: EventEmitter<IRoute> = new EventEmitter();
 
@@ -25,7 +29,12 @@ export class UserRoutesListComponent {
       this.triggers.get(index)?.openMenu();
     }
   }
-
+  public selectProfile(profile: TRouteProfile): void {
+    if (this.selectedProfile !== profile) {
+      this.selectedProfile = profile;
+      this.profileChanged.emit(profile);
+    }
+  }
   public cancelContextMenu(evt: MouseEvent): void {
     evt.stopPropagation()
   }

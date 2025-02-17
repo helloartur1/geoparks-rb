@@ -4,6 +4,7 @@ export interface IRoutePoint {
     latitude: number;
     longitude: number;
     order: number;
+    route_id: string;
 }
 
 export interface IRoute {

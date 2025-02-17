@@ -109,7 +109,6 @@
     }
 }
 
-// Добавляем дополнительные стили для корректной работы Material List
 ::ng-deep .mat-mdc-list {
     .mat-mdc-list-item {
         height: auto !important; // Разрешаем элементу расширяться

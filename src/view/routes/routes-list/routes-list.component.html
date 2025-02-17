@@ -35,7 +35,7 @@
             Велосипед
         </button>
     </div>
-    <div class="route-buttons">
+    <div class="route-buttons" *ngIf="showRouteButtons">
         <button mat-raised-button 
                 color="primary" 
                 [disabled]="!pointControl.value" 
@@ -73,7 +73,7 @@
                     <ng-container *ngSwitchCase="'cycling-regular'">schedule</ng-container>  
                     <ng-container *ngSwitchDefault>schedule</ng-container> <!-- Значение по умолчанию -->  
                 </ng-container>  
-            </mat-icon>  
+            </mat-icon> 
             <span>Время в пути: {{ duration }}</span>  
         </div>  
     </div>  

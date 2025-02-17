@@ -12,10 +12,11 @@
                 </mat-form-field>
                 <div class="buttons-wrapper">
                     <button class="route-button" mat-raised-button color="primary" (click)="navigateToRoutes()">Построить маршрут</button>
+                    <button class="existing-route" mat-raised-button color="primary" (click)="navigateToSystemRoutes()">Маршруты по геопарку</button>
                 <div *ngIf="isAdmin">
                     <button class="add-button" mat-raised-button color="primary" (click)="moveToCreateObject()">Добавить геообъект</button>
                 </div>
-              </div>
+              </div>   
             </div>
             <ng-container *ngIf="state === 'SUCCESS'">
                 <geo-main-view-manager [items]="model.points" [isAdmin]="isAdmin" [search]="searchControl.value || ''" (setView)="onSetMapView($event)" (editObject)="onEditObject($event)">

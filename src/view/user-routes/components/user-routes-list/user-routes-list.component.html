@@ -3,22 +3,59 @@
         <mat-label>Поиск маршрута</mat-label>
         <input type="text" matInput [formControl]="searchControl"/>
     </mat-form-field>
+    <div class="profile-buttons">
+        <button mat-button
+                [ngClass]="{'active': selectedProfile === 'foot-walking'}"
+                (click)="selectProfile('foot-walking')">
+            <mat-icon>directions_walk</mat-icon>
+            Пеший
+        </button>
+        <button mat-button
+                [ngClass]="{'active': selectedProfile === 'driving-car'}"
+                (click)="selectProfile('driving-car')">
+            <mat-icon>directions_car</mat-icon>
+            Автомобиль
+        </button>
+        <button mat-button
+                [ngClass]="{'active': selectedProfile === 'cycling-regular'}"
+                (click)="selectProfile('cycling-regular')">
+            <mat-icon>directions_bike</mat-icon>
+            Велосипед
+        </button>
+    </div>
 </div>
-<mat-list>
-    <ng-container *ngFor="let route of routes; let i = index">
-        <mat-list-item class="item" (contextmenu)="openContextMenu($event, i)">
-            <div class="content" (click)="cancelContextMenu($event)">
-                <h5 matListItemTitle class="item__title">{{ route.name }}</h5>
-            </div>
-            <div [matMenuTriggerFor]="menu"></div>
-            
-             <mat-menu #menu="matMenu" #matMenu>
-                <button mat-menu-item (click)="onShowRoute(route)">
-                  <mat-icon>visibility</mat-icon>
-                  <span>Отобразить на карте</span>
+
+<div class="route-info" *ngIf="distance || duration">  
+    <div class="info-box">  
+        <div *ngIf="distance" class="route-stat">  
+            <mat-icon>  
+                <ng-container [ngSwitch]="selectedProfile">  
+                    <ng-container *ngSwitchCase="'foot-walking'">directions_walk</ng-container>  
+                    <ng-container *ngSwitchCase="'driving-car'">directions_car</ng-container>  
+                    <ng-container *ngSwitchCase="'cycling-regular'">directions_bike</ng-container>  
+                    <ng-container *ngSwitchDefault>directions_walk</ng-container> <!-- Значение по умолчанию -->  
+                </ng-container>  
+            </mat-icon>  
+            <span>Расстояние: {{ distance }}</span>  
+        </div>  
+        <div *ngIf="duration" class="route-stat">  
+            <mat-icon>schedule</mat-icon> <!-- Иконка для времени -->  
+            <span>Время в пути: {{ duration }}</span>  
+        </div>  
+    </div>  
+</div>  
+
+<div class="scrollable-list">
+    <mat-list>
+        <ng-container *ngFor="let route of routes; let i = index">
+            <mat-list-item class="item">
+                <div class="content" (click)="cancelContextMenu($event)">
+                    <h5 matListItemTitle class="item__title">{{ route.name }}</h5>
+                </div>
+                <button mat-icon-button (click)="onShowRoute(route)" aria-label="Отобразить на карте" class="show-route-button">
+                    <mat-icon>visibility</mat-icon>
                 </button>
-              </mat-menu>
-             
-        </mat-list-item>
-    </ng-container>
-</mat-list>
+            </mat-list-item>
+        </ng-container>
+    </mat-list>
+</div>
