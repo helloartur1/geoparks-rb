@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { NgxIndexedDBModule, DBConfig } from 'ngx-indexed-db';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -21,12 +21,32 @@ import { UserRoutesModule } from 'src/view/user-routes/user-routes.module';
 import { FormsModule } from '@angular/forms';
 import { SystemRoutesComponent } from '../view/system-routes/system-routes.component';
 import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
+
+const dbConfig: DBConfig = {
+  name: 'RoutesDB',
+  version: 1,
+  objectStoresMeta: [{
+    store: 'routes',
+    storeConfig: { keyPath: 'id', autoIncrement: true },
+    storeSchema: [
+      { name: 'routeId', keypath: 'routeId', options: { unique: true } },
+      { name: 'name', keypath: 'name', options: { unique: false } },
+      { name: 'coordinates', keypath: 'coordinates', options: { unique: false } },
+      { name: 'distance', keypath: 'distance', options: { unique: false } },
+      { name: 'duration', keypath: 'duration', options: { unique: false } }
+    ]
+  }]
+};
+
+
+
 @NgModule({
   declarations: [
     AppComponent,
     SystemRoutesComponent
   ],
   imports: [
+    NgxIndexedDBModule.forRoot(dbConfig),
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,

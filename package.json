@@ -24,6 +24,7 @@
     "@mapbox/polyline": "^1.2.1",
     "chart.js": "^4.4.6",
     "ng2-file-upload": "^4.0.0",
+    "ngx-indexed-db": "^19.3.3",
     "normalize.css": "^8.0.1",
     "ol": "^7.3.0",
     "openrouteservice-js": "^0.3.2",
