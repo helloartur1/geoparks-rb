@@ -1080,6 +1080,47 @@
                     }
                 }
             }
+        },
+        "/route/system_routes/{geopark_id}": {
+            "get": {
+                "tags": [
+                    "route"
+                ],
+                "summary": "Get Route By Geopark",
+                "operationId": "get_route_by_geopark_route_system_routes__geopark_id__get",
+                "parameters": [
+                    {
+                        "name": "geopark_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid4",
+                            "title": "Geopark Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import Map from 'ol/Map';
 import Fill from 'ol/style/Fill';
 import Tile from 'ol/layer/Tile';
@@ -65,7 +65,8 @@ export class RoutesComponent {
   public duration: number | undefined = undefined;
   public selectedProfile: TRouteProfile = 'foot-walking';
   public pointControl = new FormControl();
-  
+  @Input() showRouteButtons: boolean = true;
+
   constructor(
     private openRouteService: OpenRouteService,
     private geoobjectService: GeoobjectService,
@@ -85,7 +86,7 @@ export class RoutesComponent {
 
   public onAddPoint(point: IPointGeoObject): void {
     this.points.push(point);
-    this.currentPoints = [...this.points];  // Обновляем список точек
+    this.currentPoints = [...this.points];
     this.calculateRoute();
   }
 
@@ -141,7 +142,7 @@ export class RoutesComponent {
     this.calculateRoute();
   }
 
-  // Остальные методы calculateRoute, ngAfterViewInit, createMarkerLayer и getFeatures остаются без изменений
+
   public calculateRoute(): void {
     if (this.markerLayer) {
       this.map?.removeLayer(this.markerLayer);

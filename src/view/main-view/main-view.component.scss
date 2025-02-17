@@ -31,6 +31,8 @@
     justify-content: flex-start;
 }
 
+
+
 .add-button {
     &.mat-mdc-raised-button:not(:disabled) {
         background-color: var(--base-green-dark-color);
@@ -45,6 +47,7 @@
 }
 
 .existing-route {
+    margin-right: 20px;
     &.mat-mdc-raised-button:not(:disabled) {
         background-color: var(--base-green-dark-color);
     }

@@ -11,6 +11,8 @@ import { GeoparksComponent } from 'src/view/geoparks/geoparks.component';
 import { MatIconModule } from '@angular/material/icon';
 import { RoutesComponent } from 'src/view/routes/routes.component';
 import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
+import { SystemRoutesComponent } from 'src/view/system-routes/system-routes.component';
+import { RoutesListComponent } from 'src/view/routes/routes-list/routes-list.component';
 
 const routes: Routes = [
   {
@@ -49,8 +51,12 @@ const routes: Routes = [
     component: RoutesComponent
   },
   {
-    path: `${AppRoutes.USER_ROUTES}`,
+    path: `${AppRoutes.USER_ROUTES}/:geoparkId`,
     component: UserRoutesComponent,
+  },
+  {
+    path: `${AppRoutes.SYSTEM_ROUTES}/:geoparkId`, 
+    component: SystemRoutesComponent,
   }
 ];
 

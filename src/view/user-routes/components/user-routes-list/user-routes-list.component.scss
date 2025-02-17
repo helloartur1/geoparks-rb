@@ -1,21 +1,34 @@
 :host {
-    background-color: var(--new-dark-green-color);
-    height: 100%;
+    background-color: var(--base-green-dark-color);
+    padding: 20px;
 }
 
 .search-route {
-    padding: 20px;
     mat-form-field {
-        width: 100%
-
+        width: 100%;
     }
 }
+.route-info {
+    margin-top: 20px;
+}
+.route-stat {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #fff !important;
+    font-size: 14px;
+    margin-left: 10px;
 
+    mat-icon {
+        margin-right: 10px;
+    }
+}
 .item {
     display: block;
     padding: 10px 15px;
     background-color: var(--new-green-dark-color);
     border-radius: 3px;
+
     &:not(:last-child) {
         margin-bottom: 10px;
     }
@@ -24,6 +37,7 @@
         background-color: var(--new-green-dark-color);
         opacity: 0.7;
         color: #fff;
+
         .item__control-button {
             visibility: visible;
         }
@@ -41,13 +55,21 @@
             min-height: 48px;
         }
     }
+    
     &__title {
         margin: 0;
         font-size: 14px;
         line-height: 16px;
-        font-weight: 500;
+        font-weight: 450;
         text-align: left;
-        color:#fff !important;
+        color: #fff !important;
+        
+        white-space: normal !important;
+        overflow-wrap: break-word;
+        word-wrap: break-word; 
+        width: 100%;
+        flex: 1;
+        padding-right: 16px;
         &:hover {
             color: #fff !important;
         }
@@ -56,11 +78,63 @@
     &__description {
         margin: 0;
         font-size: 12px;
-        line-height: 14px;
+        line-height: 12px;
         color: var(--sub-black-color);
     }
 
     &__control-button {
         visibility: hidden;
+        flex-shrink: 0; 
     }
 }
+
+.show-route-button {
+    color: white; /* Устанавливаем цвет текста и иконки кнопки в белый */
+    background-color: transparent; /* Фон кнопки остается прозрачным */
+    border: none; /* Удаляем границу, если она есть */
+    margin-right: 5px;
+    margin-left: auto;
+}
+
+.profile-buttons button {  
+    margin-bottom: 20px;
+    background-color: white; /* Установка фона на белый */  
+    color: black; /* Установка текста на черный для видимости */  
+    border: 1px solid black; /* Добавление черной границы (по желанию) */ 
+    margin-left: 3px; 
+}  
+
+.profile-buttons button.active {  
+    background-color: white; /* Установка фона на белый для активной кнопки */  
+    color: black; /* Установка текста на черный для активной кнопки */  
+}  
+  
+.profile-buttons button:hover {  
+    background-color: rgba(255, 255, 255, 0.8); /* Немного прозрачный белый при наведении */  
+}  
+
+.scrollable-list {
+    max-height: 490px; 
+    overflow-y: auto; 
+    padding-right: 10px; 
+
+    &::-webkit-scrollbar {
+        width: 8px; 
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--base-green-dark-color); 
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--new-green-light-color);
+        border-radius: 4px; /* Скругление */
+        border: 2px solid var(--base-green-dark-color); 
+    }
+
+}
+
+.scrollable-list mat-list {
+    display: block; 
+}
+

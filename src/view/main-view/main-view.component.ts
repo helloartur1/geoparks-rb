@@ -58,4 +58,8 @@ export class MainViewComponent {
   public navigateToRoutes(): void {
     this.router.navigate([`${AppRoutes.ROUTES}/${this.activatedRoute.snapshot.params['id']}`]);
   }
+  public navigateToSystemRoutes(): void {
+    this.router.navigate([`${AppRoutes.USER_ROUTES}/${this.activatedRoute.snapshot.params['id']}`]);
+  }
+
 }
