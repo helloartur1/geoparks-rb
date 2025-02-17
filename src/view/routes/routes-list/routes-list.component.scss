@@ -87,7 +87,7 @@
 }
 
 .route-info {
-    margin-top: 20px;
+    margin-top: 5px;
 }
 
 .info-box {
@@ -139,3 +139,45 @@
 .profile-buttons button:hover {  
     background-color: rgba(255, 255, 255, 0.8); /* Немного прозрачный белый при наведении */  
 }  
+
+
+.elevation-chart-toggle {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: white !important;
+    color: black !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 10px;
+    
+    mat-icon {
+        font-size: 20px;
+        height: 20px;
+        width: 20px;
+        line-height: 20px;
+    }
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+    }
+}
+
+.elevation-chart {
+    width: 85%;
+    max-height: 300px;
+    background-color: white;
+    margin-top: 10px;
+    margin-left: 10px;
+    border-radius: 4px;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-bottom: 30px;
+}
+
+.scroll {
+    max-height: 450px;
+    overflow-y: auto; 
+    padding-right: 10px; 
+
+}

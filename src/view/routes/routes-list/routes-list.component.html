@@ -13,6 +13,8 @@
             </mat-autocomplete>
         </mat-form-field>
     </ng-container>
+   
+
     <div class="profile-buttons">
         <button mat-button
                 [ngClass]="{'active': selectedProfile === 'foot-walking'}"
@@ -76,20 +78,31 @@
         </div>  
     </div>  
 </div>  
-
-<div class="points-list">
-    <mat-list>
-        <ng-container *ngFor="let point of currentPoints; let i = index">
-            <mat-list-item class="item">
-                <div class="content" style="flex: 1;">
-                    <h5 matListItemTitle class="item__title">{{ point.name }}</h5>
-                </div>
-                <button mat-icon-button 
-                        (click)="deletePointFromRoute(point.id)" 
-                        aria-label="Удалить">
-                    <mat-icon>delete</mat-icon>
-                </button>
-            </mat-list-item>
-        </ng-container>
-    </mat-list>
+<div class="scroll">
+    <div class="points-list">
+        <mat-list>
+            <ng-container *ngFor="let point of currentPoints; let i = index">
+                <mat-list-item class="item">
+                    <div class="content" style="flex: 1;">
+                        <h5 matListItemTitle class="item__title">{{ point.name }}</h5>
+                    </div>
+                    <button mat-icon-button 
+                            (click)="deletePointFromRoute(point.id)" 
+                            aria-label="Удалить">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </mat-list-item>
+            </ng-container>
+        </mat-list>
+    </div>
+    <button mat-button
+                (click)="toggleElevationChart()"
+                class="elevation-chart-toggle">
+            <mat-icon>{{ showElevationChart ? 'expand_less' : 'expand_more' }}</mat-icon>
+            {{ showElevationChart ? 'Скрыть график высот' : 'Показать график высот' }}
+        </button>
+    <canvas *ngIf="duration && showElevationChart" 
+        id="elevationChart" 
+        class="elevation-chart">
+    </canvas>
 </div>
