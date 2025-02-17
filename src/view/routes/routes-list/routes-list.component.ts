@@ -18,7 +18,9 @@ export class RoutesListComponent implements OnInit {
   @Input() distance?: string;  // Add this
   @Input() duration?: string;  // Add this
   @Input() selectedProfile: TRouteProfile = 'foot-walking'; 
-
+  public showElevationChart = false;
+  @Output()
+  public toggleChart: EventEmitter<void> = new EventEmitter<void>();
   @Output()
   public addPoint: EventEmitter<IPointGeoObject> = new EventEmitter<IPointGeoObject>();
 
@@ -44,6 +46,16 @@ export class RoutesListComponent implements OnInit {
       }),
     );
   }
+  public toggleElevationChart(): void { 
+    if(this.showElevationChart){
+      this.showElevationChart=false;
+    }else{
+      this.showElevationChart=true;
+    }
+    this.toggleChart.emit();
+  }
+
+  
 
   public addPointToRoute(): void {
     const point: IPointGeoObject | undefined = this.pointControl.value;

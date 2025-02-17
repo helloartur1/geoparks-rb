@@ -65,7 +65,9 @@ export class UserRoutesComponent implements OnInit {
     
     
   }
+  
   public ngAfterViewInit(): void {
+    
     setTimeout(() => {
       this.map = new Map({
         layers: [
@@ -126,7 +128,9 @@ export class UserRoutesComponent implements OnInit {
   
         // Get the middle point of the route to display distance and duration labels
         const middlePointCoord = lineStr.getCoordinateAt(0.5); // Get the middle of the line
-  
+        
+        
+
         if (middlePointCoord) {
           // Distance label
           const distanceInKm = (distance / 1000).toFixed(2); // Convert to kilometers
@@ -175,6 +179,7 @@ export class UserRoutesComponent implements OnInit {
   
 
   private getFeatures(points: IPointGeoObject[]): Feature<Point>[] {
+    
     const features: Feature<Point>[] = points.map((point: IPointGeoObject, index: number) => {
       const feature: Feature<Point> = new Feature<Point>({ 
         geometry: new Point(fromLonLat([point.longitude, point.latitude])), 
