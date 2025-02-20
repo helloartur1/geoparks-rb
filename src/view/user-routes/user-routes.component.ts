@@ -15,12 +15,14 @@ import Text from 'ol/style/Text';
 import Icon from 'ol/style/Icon';
 import { ActivatedRoute } from '@angular/router';
 import { GeoobjectModel, GeoobjectService, RouteService } from '@api';
-import { take, forkJoin, Observable } from 'rxjs';
-import { IPointGeoObject, IRoute, IRoutePoint } from '@core';
+import { take, forkJoin } from 'rxjs';
+import { IRoute, IRoutePoint, IRouteCache } from '@core';
 import { OpenRouteService } from '../routes/services/open-route.service';
-import { TRouteCoordinates, TRouteProfile } from '../routes/interfaces/route-config.interface';
 import { Feature } from 'ol';
 import { LineString, Point } from 'ol/geom';
+import { openDB, IDBPDatabase } from 'idb';
+import { TRouteCoordinates, TRouteProfile } from '../routes/interfaces/route-config.interface';
+
 
 
 export const GeoparksCoordsMap: { [key: string]: { latitude: number, longitude: number, layer: any } } = {
@@ -37,11 +39,12 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
   public map: Map | undefined;
   public lineLayer: VectorLayer<any> | undefined;
   public markerLayer: VectorLayer<any> | undefined;
-  public routes: Array<IRoute> = [];
+  public routes: IRoute[] = [];
   public formattedDistance?: string;
   public formattedDuration?: string;
   public selectedProfile: TRouteProfile = 'foot-walking';
   public selectedRoute: IRoute | undefined;
+  private profiles: TRouteProfile[] = ['foot-walking', 'cycling-regular', 'driving-car'];
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -51,55 +54,116 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
     private geoobjectService: GeoobjectService
   ) {}
 
-  ngOnInit(): void {
-    const geoparkId: string = this.activatedRoute.snapshot.params['geoparkId'];
+  async ngOnInit(): Promise<void> {
+    const geoparkId = this.activatedRoute.snapshot.params['geoparkId'];
+    
     this.routeService.getRouteByGeoparkRouteSystemRoutesGeoparkIdGet(geoparkId)
       .pipe(take(1))
-      .subscribe((routes: any) => {
+      .subscribe(async (routes: IRoute[]) => {
         this.routes = routes;
+        await this.precacheRoutes(routes);
       });
-    console.log(geoparkId);
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.map = new Map({
-        layers: [new Tile({ source: new OSM() })],
-        target: 'map',
-        view: new View({
-          center: fromLonLat([55.958596, 54.735148]),
-          zoom: 7,
-        }),
-      });
-      this.showExtentForGeopark();
+    this.initMap();
+    this.showExtentForGeopark();
+  }
+
+  private initMap(): void {
+    this.map = new Map({
+      layers: [new Tile({ source: new OSM() })],
+      target: 'map',
+      view: new View({
+        center: fromLonLat([55.958596, 54.735148]),
+        zoom: 7,
+      }),
     });
   }
 
-  showExtentForGeopark(): void {
-    const geoparkId = this.activatedRoute.snapshot.params['geoparkId'];
-    const geoparkData = GeoparksCoordsMap[geoparkId];
-
-    if (geoparkData) {
-      const { latitude, longitude, layer } = geoparkData;
-
-      const vectorSource = new VectorSource({
-        features: new GeoJSON().readFeatures(layer, { featureProjection: 'EPSG:3857' }),
+  private async precacheRoutes(routes: IRoute[]): Promise<void> {
+    const db = await this.getDb();
+    
+    routes.forEach(route => {
+      this.profiles.forEach(async profile => {
+        const existingCache = await db.get('routeCache', [route.id, profile]);
+        if (!existingCache) {
+          this.cacheRouteData(route, profile);
+        }
       });
+    });
+  }
 
-      const vectorLayer = new VectorLayer({
-        source: vectorSource,
-        style: new Style({
-          stroke: new Stroke({ color: 'red', width: 1 }),
-          fill: new Fill({ color: 'rgba(0, 0, 255, 0.1)' }),
-        }),
+  private async cacheRouteData(route: IRoute, profile: TRouteProfile): Promise<void> {
+    const coordinates: TRouteCoordinates[] = route.route_points.map(p => 
+      [p.longitude, p.latitude] as TRouteCoordinates
+    );
+    
+    this.openRouteService.getRoute$({ coordinates, profile })
+      .pipe(take(1))
+      .subscribe(async res => {
+        const db = await this.getDb();
+        const cacheData: IRouteCache = {
+          routeId: route.id,
+          profile,
+          coordinates: res.coordinates,
+          distance: res.distance,
+          duration: res.duration
+        };
+        await db.put('routeCache', cacheData);
       });
+  }
 
-      this.map?.getView().setCenter(fromLonLat([longitude, latitude]));
-      this.map?.getView().setZoom(9);
-      this.map?.addLayer(vectorLayer);
+  public async showRoute(route: IRoute): Promise<void> {
+    this.selectedRoute = route;
+    this.clearMapLayers();
+
+    const db = await this.getDb();
+    const cache = await db.get('routeCache', [route.id, this.selectedProfile]);
+
+    if (cache) {
+      this.processRouteData(cache.coordinates, cache.distance, cache.duration);
+      this.loadGeoObjects(route.route_points);
+    } else {
+      this.fetchAndCacheRoute(route);
     }
   }
 
+  private async fetchAndCacheRoute(route: IRoute): Promise<void> {
+    const coordinates: TRouteCoordinates[] = route.route_points.map(p => 
+      [p.longitude, p.latitude] as TRouteCoordinates
+    );
+    
+    this.openRouteService.getRoute$({ 
+      coordinates, 
+      profile: this.selectedProfile 
+    }).pipe(take(1)).subscribe(async res => {
+      const db = await this.getDb();
+      const cacheData: IRouteCache = {
+        routeId: route.id,
+        profile: this.selectedProfile,
+        coordinates: res.coordinates,
+        distance: res.distance,
+        duration: res.duration
+      };
+      await db.put('routeCache', cacheData);
+      this.processRouteData(res.coordinates, res.distance, res.duration);
+      this.loadGeoObjects(route.route_points);
+    });
+  }
+
+  private processRouteData(coordinates: TRouteCoordinates[], distance: number, duration: number): void {
+    const lineString = new LineString(coordinates).transform('EPSG:4326', 'EPSG:3857');
+    
+    this.lineLayer = new VectorLayer({
+      source: new VectorSource({ features: [new Feature({ geometry: lineString })] }),
+      style: new Style({ stroke: new Stroke({ color: 'red', width: 3 }) }),
+    });
+
+    this.map?.addLayer(this.lineLayer);
+    this.formatDistance(distance);
+    this.formatDuration(duration);
+  }
   public selectProfile(profile: TRouteProfile): void {
     if (this.selectedProfile !== profile) {
       this.selectedProfile = profile;
@@ -108,94 +172,96 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
       }
     }
   }
-
-  public showRoute(route: IRoute): void {
-    this.selectedRoute = route;
-
-    if (this.markerLayer) this.map?.removeLayer(this.markerLayer);
-    if (this.lineLayer) this.map?.removeLayer(this.lineLayer);
-
-    const coordinates: TRouteCoordinates[] = route.route_points.map(point => [point.longitude, point.latitude]);
-
-    this.openRouteService.getRoute$({ coordinates, profile: this.selectedProfile })
-      .pipe(take(1))
-      .subscribe((res) => {
-        const { coordinates: routeCoordinates, distance, duration } = res;
-
-        const lineStr = new LineString(routeCoordinates as any).transform('EPSG:4326', 'EPSG:3857') as LineString;
-
-        this.lineLayer = new VectorLayer({
-          source: new VectorSource({ features: [new Feature({ geometry: lineStr })] }),
-          style: new Style({ stroke: new Stroke({ color: 'red', width: 3 }) }),
-        });
-
-        const labelSource = new VectorSource();
-        const labelLayer = new VectorLayer({ source: labelSource });
-        const middlePointCoord = lineStr.getCoordinateAt(0.5);
-        // this.formattedDistance = (distance / 1000).toFixed(2);
-
-        this.map?.addLayer(this.lineLayer);
-        this.map?.addLayer(labelLayer);
-
-        let kilometers = Math.floor(distance / 1000); 
-            let meters = Math.round((distance % 1000)); 
-
-            if (kilometers > 0) {
-                this.formattedDistance = kilometers + ' км';
-                if (meters > 0) {
-                    this.formattedDistance += ' ' + meters + ' м';
-                }
-            } else if (meters > 0) {
-                this.formattedDistance = meters + ' м';
-            } else {
-                this.formattedDistance = '0 м'; 
-            }
-
-        let totalMinutes = Math.round(duration / 60);
-        let hours = Math.floor(totalMinutes / 60);
-        let minutes = totalMinutes % 60;
-
-        if (hours > 0) {
-          this.formattedDuration = hours + ' ч';
-          if (minutes > 0) {
-            this.formattedDuration += ' ' + minutes + ' мин';
-          }
-        } else if (minutes > 0) {
-          this.formattedDuration = minutes + ' мин';
-        } else {
-          this.formattedDuration = '0 мин';
-        }
-
-        const geeoobjectsStreams$: Array<Observable<GeoobjectModel>> = route.route_points.map(point =>
-          this.geoobjectService.getGeoobjectByIdGeoobjectIdGet(point.geoobject_id)
-        );
-
-        forkJoin(geeoobjectsStreams$)
-          .pipe(take(1))
-          .subscribe((points: IPointGeoObject[]) => {
-            const features = this.getFeatures(points);
-            this.markerLayer = new VectorLayer({ source: new VectorSource({ features }) });
-            this.map?.addLayer(this.markerLayer);
-          });
-      });
+  private loadGeoObjects(routePoints: IRoutePoint[]): void {
+    forkJoin(routePoints.map(p => 
+      this.geoobjectService.getGeoobjectByIdGeoobjectIdGet(p.geoobject_id)
+    )).subscribe(points => {
+      const features = points.map((point, index) => this.createFeature(point, index));
+      this.markerLayer = new VectorLayer({ source: new VectorSource({ features }) });
+      this.map?.addLayer(this.markerLayer);
+    });
   }
 
-  private getFeatures(points: IPointGeoObject[]): Feature<Point>[] {
-    return points.map((point, index) => {
-      const feature = new Feature<Point>({
-        geometry: new Point(fromLonLat([point.longitude, point.latitude])),
-        ...point,
-      });
-      feature.setId(point.id);
-      feature.setStyle(new Style({
-        text: new Text({
-          text: (index + 1) + '.' + point.name,
-          offsetY: 20,
-          font: '10px sans-serif'
+  private createFeature(point: GeoobjectModel, index: number): Feature<Point> {
+    const feature = new Feature<Point>({
+      geometry: new Point(fromLonLat([point.longitude, point.latitude])),
+      ...point
+    });
+    
+    feature.setStyle(new Style({
+      text: new Text({
+        text: `${index + 1}. ${point.name}`,
+        offsetY: 20,
+        font: '10px sans-serif'
+      }),
+      image: new Icon({ 
+        src: `../../../../assets/icons/${CommonTypeIconMap.get(point.common_type)}`, 
+        scale: [0.45, 0.45] 
+      }),
+    }));
+    
+    return feature;
+  }
+
+  private formatDistance(distance: number): void {
+    const km = Math.floor(distance / 1000);
+    const meters = Math.round(distance % 1000);
+    this.formattedDistance = [km > 0 ? `${km} км` : '', meters > 0 ? `${meters} м` : '']
+      .filter(Boolean).join(' ') || '0 м';
+  }
+
+  private formatDuration(duration: number): void {
+    const totalMinutes = Math.round(duration / 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    this.formattedDuration = [hours > 0 ? `${hours} ч` : '', minutes > 0 ? `${minutes} мин` : '']
+      .filter(Boolean).join(' ') || '0 мин';
+  }
+
+  private clearMapLayers(): void {
+    [this.lineLayer, this.markerLayer].forEach(layer => {
+      if (layer) this.map?.removeLayer(layer);
+    });
+  }
+
+  private showExtentForGeopark(): void {
+    const geoparkId = this.activatedRoute.snapshot.params['geoparkId'];
+    const geoparkData = GeoparksCoordsMap[geoparkId];
+
+    if (geoparkData) {
+      const vectorLayer = new VectorLayer({
+        source: new VectorSource({
+          features: new GeoJSON().readFeatures(geoparkData.layer, { 
+            featureProjection: 'EPSG:3857' 
+          }),
         }),
-        image: new Icon({ src: `../../../../assets/icons/${CommonTypeIconMap.get((point as GeoobjectModel).common_type)}`, scale: [0.45, 0.45] }),
+        style: new Style({
+          stroke: new Stroke({ color: 'red', width: 1 }),
+          fill: new Fill({ color: 'rgba(0, 0, 255, 0.1)' }),
+        }),
+      });
+
+      this.map?.setView(new View({
+        center: fromLonLat([geoparkData.longitude, geoparkData.latitude]),
+        zoom: 9
       }));
-      return feature;
+      this.map?.addLayer(vectorLayer);
+    }
+  }
+
+  private async getDb(): Promise<IDBPDatabase> {
+    return openDB('RoutesDB', 3, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains('routes')) {
+          db.createObjectStore('routes', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('routeCache')) {
+          const store = db.createObjectStore('routeCache', { 
+            keyPath: ['routeId', 'profile'] 
+          });
+          store.createIndex('byRoute', 'routeId');
+        }
+      },
     });
   }
 }

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgxIndexedDBModule, DBConfig } from 'ngx-indexed-db';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,23 +21,20 @@ import { FormsModule } from '@angular/forms';
 import { SystemRoutesComponent } from '../view/system-routes/system-routes.component';
 import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
 
-const dbConfig: DBConfig = {
-  name: 'RoutesDB',
-  version: 1,
-  objectStoresMeta: [{
-    store: 'routes',
-    storeConfig: { keyPath: 'id', autoIncrement: true },
-    storeSchema: [
-      { name: 'routeId', keypath: 'routeId', options: { unique: true } },
-      { name: 'name', keypath: 'name', options: { unique: false } },
-      { name: 'coordinates', keypath: 'coordinates', options: { unique: false } },
-      { name: 'distance', keypath: 'distance', options: { unique: false } },
-      { name: 'duration', keypath: 'duration', options: { unique: false } }
-    ]
-  }]
-};
+import { openDB } from 'idb';
 
+const DB_NAME = 'RoutesDB';
+const STORE_NAME = 'routes';
 
+async function initDB() {
+  return await openDB(DB_NAME, 1, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+      }
+    },
+  });
+}
 
 @NgModule({
   declarations: [
@@ -46,7 +42,6 @@ const dbConfig: DBConfig = {
     SystemRoutesComponent
   ],
   imports: [
-    NgxIndexedDBModule.forRoot(dbConfig),
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,

@@ -1,3 +1,5 @@
+import { TRouteCoordinates, TRouteProfile } from "src/view/routes/interfaces/route-config.interface";
+
 export interface IRoutePoint {
     geoobject_id: string;
     id: string;
@@ -13,3 +15,11 @@ export interface IRoute {
     description: string;
     route_points: Array<IRoutePoint>; 
 }
+
+export interface IRouteCache {
+    routeId: string;
+    profile: TRouteProfile;
+    coordinates: TRouteCoordinates[];
+    distance: number;
+    duration: number;
+  }
