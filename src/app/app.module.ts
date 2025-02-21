@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -21,6 +20,10 @@ import { UserRoutesModule } from 'src/view/user-routes/user-routes.module';
 import { FormsModule } from '@angular/forms';
 import { SystemRoutesComponent } from '../view/system-routes/system-routes.component';
 import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
+
+
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,6 +46,7 @@ import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component'
     HttpClientModule,
     FormsModule,
     ApiModule.forRoot(() => new Configuration({ basePath: "http://localhost:8000"})),
+
   ],
   providers: [
     {
