@@ -157,7 +157,7 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
 
   private async initializeMap(restoredState?: MapState): Promise<void> {
     const viewOptions = restoredState 
-      ? { center: restoredState.center, zoom: restoredState.zoom }
+      ? { center: DEFAULT_EXTENT.center, zoom: restoredState.zoom }
       : DEFAULT_EXTENT;
       
     this.map = new Map({

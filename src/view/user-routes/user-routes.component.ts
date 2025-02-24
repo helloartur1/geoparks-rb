@@ -56,21 +56,23 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
 
   async ngOnInit(): Promise<void> {
     const geoparkId = this.activatedRoute.snapshot.params['geoparkId'];
-    
     this.routeService.getRouteByGeoparkRouteSystemRoutesGeoparkIdGet(geoparkId)
       .pipe(take(1))
       .subscribe(async (routes: IRoute[]) => {
         this.routes = routes;
         await this.precacheRoutes(routes);
+        this.initMap();
+        this.showExtentForGeopark();
       });
   }
 
-  ngAfterViewInit(): void {
-    this.initMap();
-    this.showExtentForGeopark();
+  ngAfterViewInit(): void{
+    // this.initMap();
+    // this.showExtentForGeopark();
   }
 
   private initMap(): void {
+
     this.map = new Map({
       layers: [new Tile({ source: new OSM() })],
       target: 'map',
@@ -172,6 +174,7 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
       }
     }
   }
+
   private loadGeoObjects(routePoints: IRoutePoint[]): void {
     forkJoin(routePoints.map(p => 
       this.geoobjectService.getGeoobjectByIdGeoobjectIdGet(p.geoobject_id)
