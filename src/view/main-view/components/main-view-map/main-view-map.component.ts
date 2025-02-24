@@ -25,10 +25,11 @@ interface MapState {
   center: number[];
   zoom: number;
   timestamp: number;
+  geoparkId: string;
 }
 
 const DEFAULT_EXTENT: ViewOptions = {
-  center: fromLonLat([58.155889, 55.179724]),
+  center: fromLonLat([51.155889, 55.179724]),
   zoom: 9,
 };
 
@@ -88,7 +89,7 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
         if (this.setView$) {
           this.map?.setView(
             new View({
-              center: fromLonLat([changes['geopark'].currentValue.longitude, changes['geopark'].currentValue.latitude]),
+              center: fromLonLat([this.geopark?.longitude, this.geopark?.latitude]),
               zoom: 9,
             })
           );
@@ -142,22 +143,21 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
 
   public ngAfterViewInit(): void {
     setTimeout(() => {
-      // Try to restore cached map state first
       this.restoreMapState().then(restoredState => {
-        // Initialize map with either cached or default state
-        this.initializeMap(restoredState);
-        
-        // If the map is initialized with cached state, load cached layers
+        this.initializeMap();
+  
         if (restoredState) {
-          this.loadCachedLayers();
+          this.loadCachedLayers(); // Загружаем кешированные слои только если карта восстановлена
         }
       });
     });
   }
 
-  private async initializeMap(restoredState?: MapState): Promise<void> {
+  private async initializeMap(): Promise<void> {
+    const restoredState = await this.restoreMapState();
+
     const viewOptions = restoredState 
-      ? { center: DEFAULT_EXTENT.center, zoom: restoredState.zoom }
+      ? { center: restoredState.center, zoom: restoredState.zoom }
       : DEFAULT_EXTENT;
       
     this.map = new Map({
@@ -205,28 +205,42 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   }
 
   private async cacheMapState(): Promise<void> {
+    if (!this.geopark?.id || !this.map) return;
     const center = this.map?.getView().getCenter();
     const zoom = this.map?.getView().getZoom();
     if (center && zoom !== undefined) {
       const mapState: MapState = {
         center: center,
         zoom: zoom,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        geoparkId: this.geopark.id
       };
-      await this.mapCacheService.set('mapState', mapState);
+      await this.mapCacheService.set(`mapState_${this.geopark.id}`, mapState);
     }
   }
 
   private async restoreMapState(): Promise<MapState | undefined> {
-    const mapState = await this.mapCacheService.get<MapState>('mapState');
-    
-    // If no saved state or the cached state is too old, return undefined
-    if (!mapState || Date.now() - mapState.timestamp > CACHE_TTL) {
-      return undefined;
+    if (!this.geopark?.id) return undefined;
+  
+    try {
+      const mapState = await this.mapCacheService.get<MapState>(`mapState_${this.geopark.id}`);
+  
+      if (mapState && mapState.geoparkId === this.geopark.id && (Date.now() - mapState.timestamp < CACHE_TTL)) {
+        return mapState;
+      }
+    } catch (error) {
+      console.error("Ошибка при восстановлении состояния карты:", error);
     }
-    
-    return mapState;
+  
+    return {
+      center: DEFAULT_EXTENT.center as number[],
+      zoom: DEFAULT_EXTENT.zoom as number,
+      timestamp: Date.now(),
+      geoparkId: this.geopark?.id || "unknown",
+    };
   }
+  
+  
 
   private async cachePoints(): Promise<void> {
     if (this.points.length) {
@@ -250,6 +264,13 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   }
 
   private async cacheGeoparkLayer(id: string, layerData: any): Promise<void> {
+    // const center = this.map?.getView().getCenter();
+    // const zoom = this.map?.getView().getZoom();
+    // const mapState: MapState = {
+    //   center: center,
+    //   zoom: zoom,
+    //   timestamp: Date.now()
+    // };
     await this.mapCacheService.set(`geopark_${id}`, {
       data: layerData,
       timestamp: Date.now()
