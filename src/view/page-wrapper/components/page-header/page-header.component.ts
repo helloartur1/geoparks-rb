@@ -23,6 +23,10 @@ export class PageHeaderComponent {
     this.router.navigate([AppRoutes.LOGIN]);
   }
 
+  public moveToUsersRoutes(): void {
+    this.router.navigate([`${AppRoutes.SYSTEM_ROUTES}/${this.activatedRoute.snapshot.params['id']}`]);
+  }
+
   public logout(): void {
     this.authAdminService.logout();
   }

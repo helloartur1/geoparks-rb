@@ -26,9 +26,10 @@ import Text from 'ol/style/Text.js';
 import { MatDialog } from '@angular/material/dialog';
 import { SaveRouteDialogComponent } from './save-route-dialog/save-route-dialog.component';
 import { FormControl } from '@angular/forms';
-import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend } from 'chart.js';
-
-Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend);
+import { Chart,Filler ,LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend } from 'chart.js';
+import { RouteCacheService } from './services/RouteCacheService.service';
+import { WeatherService } from 'src/app/services/weather.service';
+Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend, Filler);
 
 export const GeoparksCoordsMap: {[key: string]: { latitude:number, longitude: number, layer: any }} = {
   '41f271c8-e8ba-4225-b21d-403f9751e5a7': {
@@ -55,6 +56,7 @@ const DEFAULT_EXTENT: ViewOptions = {
   styleUrls: ['./routes.component.scss']
 })
 export class RoutesComponent {
+  public showWeatherInfo = false; 
   public map: Map | undefined = undefined;
   public route: Array<[number, number]> | undefined = undefined;
   public items: IPointGeoObject[] = [];
@@ -75,16 +77,58 @@ export class RoutesComponent {
   public showElevationChart = false;
   public long_user: number | null = null;
   public latit_user: number | null = null;
+  public weatherData: any;
   constructor(
+    private routeCacheService: RouteCacheService,
     private openRouteService: OpenRouteService,
     private geoobjectService: GeoobjectService,
     private activatedRoute: ActivatedRoute,
     private routeService: RouteService,
     private router: Router,
     private dialog: MatDialog,
-    private authAdminService: AuthAdminService
+    private authAdminService: AuthAdminService,
+    private weatherSerivce:  WeatherService,
+    
   ) {}
 
+  private hoverMarkerLayer: VectorLayer<any> | undefined = undefined;
+  
+  
+  
+  private createHoverMarker(latitude: number, longitude: number): void {
+  
+    // Удаляем предыдущий маркер, если он есть
+    if (this.hoverMarkerLayer) {
+      this.map?.removeLayer(this.hoverMarkerLayer);
+    }
+  
+    // Создаем новую точку
+    const hoverPoint = new Point(fromLonLat([longitude, latitude]));
+  
+    const hoverFeature = new Feature({
+      geometry: hoverPoint,
+    });
+  
+    hoverFeature.setStyle(new Style({
+      image: new Icon({
+        src: 'assets/icons/pin-map.png', // Укажите путь к иконке для местоположения пользователя
+        scale: 0.05,
+      }),
+    }));
+  
+    this.hoverMarkerLayer = new VectorLayer({
+      source: new VectorSource({
+        features: [hoverFeature],
+      }),
+      zIndex: 1000, // Поднимаем слой маркера выше других слоев
+    });
+  
+    // Добавляем маркер на карту
+    this.map?.addLayer(this.hoverMarkerLayer);
+    console.log('Hover marker added to the map'); // Логируем успешное добавление
+  
+    // Временно изменяем центр карты на координаты маркера
+  }
 
   private addUserMarker(latitude: number, longitude: number): void {
     const userPoint = new Point(fromLonLat([longitude, latitude]));
@@ -114,11 +158,20 @@ export class RoutesComponent {
     this.geoobjectService.getGeoobjectsByGeoparkGeoobjectGeoparkGeoparkIdGet(geoparkId).pipe(take(1)).subscribe((items: GeoobjectModel[]) => {
       this.items = items;
     });
+    const { latitude, longitude } = GeoparksCoordsMap[this.activatedRoute.snapshot.params['geoparkId']];
+    this.weatherSerivce.getWeather$(latitude, longitude).subscribe({
+      next: (data: any) => {
+        this.weatherData = data;
+        console.log(this.weatherData);
+      },
+      error: (err: any) => {
+        console.error('Ошибка загрузки погоды:', err);
+      }
+    });
     if('geolocation' in navigator){
       navigator.geolocation.getCurrentPosition((position) => {
         this.latit_user = position.coords.latitude;
         this.long_user = position.coords.longitude;
-        alert(this.latit_user+" "+this.long_user);
         this.addUserMarker  (this.latit_user,this.long_user);
       }
       )
@@ -142,7 +195,6 @@ export class RoutesComponent {
     if (this.pointControl.value) {
       this.onAddPoint(this.pointControl.value);
       this.pointControl.reset();
-      this.openRouteService.getElevation$
     }
   }
 
@@ -184,11 +236,11 @@ export class RoutesComponent {
 
 
   public calculateRoute(): void {
-    
-    if(this.chart){
+    if (this.chart) {
       this.chart.destroy();
       this.chart = null;
     }
+  
     if (this.markerLayer) {
       this.map?.removeLayer(this.markerLayer);
     }
@@ -200,143 +252,146 @@ export class RoutesComponent {
     if (this.points.length < 2) {
       this.markerLayer = this.createMarkerLayer();
       this.map?.addLayer(this.markerLayer);
-    } else {
-      const coordinates: TRouteCoordinates[] = [];
-      this.points.forEach((point: IPointGeoObject) => {
-        coordinates.push([point.longitude, point.latitude]);
-      });
-      
-      this.openRouteService.getRoute$({ coordinates, profile: this.selectedProfile })
-        .pipe(take(1))
-        .subscribe((res) => {
-          
-          const { coordinates: routeCoordinates, distance, duration, ascent, descent } = res;
-          const lineStr: LineString = new LineString(routeCoordinates as any);
-          lineStr.transform('EPSG:4326', 'EPSG:3857');
-          const lineLayerSource = new VectorSource({
-            features: [new Feature({
-              geometry: lineStr,
-            })]
-          });
-  
-          
-
-          const lineLayer: VectorLayer<any> = new VectorLayer({
-            source: lineLayerSource,
-            style: new Style({
-              stroke: new Stroke({
-                color: 'red',
-                width: 3,
-              }),
-            }),
-          });
-  
-          const labelSource = new VectorSource();
-          const labelLayer = new VectorLayer({
-            source: labelSource,
-          });
-  
-          const middlePointCoord = lineStr.getCoordinateAt(0.5);
-          
-          if (middlePointCoord) {
-            let kilometers = Math.floor(distance / 1000); 
-            let meters = Math.round((distance % 1000)); 
-  
-            if (kilometers > 0) {
-                this.formattedDistance = kilometers + ' км';
-                if (meters > 0) {
-                    this.formattedDistance += ' ' + meters + ' м';
-                }
-            } else if (meters > 0) {
-                this.formattedDistance = meters + ' м';
-            } else {
-                this.formattedDistance = '0 м'; 
-            }
-  
-            let totalMinutes = Math.round(duration / 60);
-            let hours = Math.floor(totalMinutes / 60);
-            let minutes = totalMinutes % 60;
-        
-            if (hours > 0) {
-                this.formattedDuration = hours + ' ч';
-                if (minutes > 0) {
-                    this.formattedDuration += ' ' + minutes + ' мин';
-                }
-            } else if (minutes > 0) {
-                this.formattedDuration = minutes + ' мин';
-            } else {
-                this.formattedDuration = '0 мин';
-            }
-        
-            this.distance = distance;
-            this.duration = duration;
-          }
-  
-          this.lineLayer = lineLayer;
-          this.markerLayer = this.createMarkerLayer();
-  
-          this.map?.addLayer(this.lineLayer);
-          this.map?.addLayer(this.markerLayer);
-          this.map?.addLayer(labelLayer);
-  
-          // Fetch the elevation data after the route is drawn
-          
-        });
-        this.openRouteService.getElevation$({ coordinates, profile: this.selectedProfile })
-          .pipe(take(1))
-          .subscribe((elevationRes) => {
-            if (elevationRes?.formattedCoords?.length) {
-              // Create or update the elevation chart
-              this.createElevationChart(elevationRes.formattedCoords);
-            }
-          });
+      return;
     }
-    
-  }
+  
+    const coordinates: TRouteCoordinates[] = this.points.map(point => [point.longitude, point.latitude]);
+  
+    // Проверяем кеш перед запросом
+    const cachedRoute = this.routeCacheService.getCachedRoute(coordinates, this.selectedProfile);
+    if (cachedRoute) {
+      console.log('Маршрут найден в кеше:', cachedRoute);
+      this.renderRoute(cachedRoute);
+      this.openRouteService.getElevation$({ coordinates, profile: this.selectedProfile })
+      .pipe(take(1))
+      .subscribe((elevationRes) => {
+        if (elevationRes?.formattedCoords?.length) {
+          console.log('formattedCoords:', elevationRes.formattedCoords);
 
+          this.createElevationChart(elevationRes.formattedCoords);
+          
+        }
+      });
+      return;
+    }
+  
+    console.log('Маршрут не найден в кеше, запрашиваем API...');
+  
+    this.openRouteService.getRoute$({ coordinates, profile: this.selectedProfile })
+      .pipe(take(1))
+      .subscribe((res) => {
+        if (res) {
+          this.createElevationChart(res.coordinates);
+          console.log('Маршрут получен, добавляем в кеш:', res);
+          this.routeCacheService.cacheRoute(coordinates, this.selectedProfile, res);
+          this.renderRoute(res);
+        } else {
+          console.warn('Не удалось получить маршрут!');
+        }
+      });
+  
+    this.openRouteService.getElevation$({ coordinates, profile: this.selectedProfile })
+      .pipe(take(1))
+      .subscribe(async (elevationRes) => {
+        if (elevationRes?.formattedCoords?.length) {
+          await this.createElevationChart(elevationRes.formattedCoords);
+          
+        }
+      });
+  }
+  
+  private renderRoute(res: any): void {
+    const { coordinates: routeCoordinates, distance, duration, ascent, descent } = res;
+  
+    const lineStr: LineString = new LineString(routeCoordinates as any);
+    lineStr.transform('EPSG:4326', 'EPSG:3857');
+  
+    const lineLayerSource = new VectorSource({
+      features: [new Feature({ geometry: lineStr })]
+    });
+  
+    const lineLayer: VectorLayer<any> = new VectorLayer({
+      source: lineLayerSource,
+      style: new Style({
+        stroke: new Stroke({ color: 'red', width: 3 }),
+      }),
+    });
+  
+    this.distance = distance;
+    this.duration = duration;
+    this.formattedDistance = this.formatDistance(distance);
+    this.formattedDuration = this.formatDuration(duration);
+  
+    this.lineLayer = lineLayer;
+    this.markerLayer = this.createMarkerLayer();
+  
+    this.map?.addLayer(this.lineLayer);
+    this.map?.addLayer(this.markerLayer);
+  }
+  
+  private formatDistance(distance: number): string {
+    const kilometers = Math.floor(distance / 1000);
+    const meters = Math.round(distance % 1000);
+  
+    return kilometers > 0 ? `${kilometers} км ${meters > 0 ? meters + ' м' : ''}` : `${meters} м`;
+  }
+  
+  private formatDuration(duration: number): string {
+    const totalMinutes = Math.round(duration / 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+  
+    return hours > 0 ? `${hours} ч ${minutes > 0 ? minutes + ' мин' : ''}` : `${minutes} мин`;
+  }
+  
   public toggleElevationChart(): void {
     this.showElevationChart = !this.showElevationChart;
     this.calculateRoute();  
   }
-  
-  private createElevationChart(formattedCoords: number[][]): void {
 
+  public toggleWeather() : void{
+    this.showWeatherInfo = !this.showWeatherInfo;
+  }
+  
+
+  private async createElevationChart(formattedCoords: number[][]): Promise<void> {
     const canvas = document.getElementById('elevationChart') as HTMLCanvasElement;
     if (!canvas) {
       console.error('Canvas element not found');
       return;
     }
-
+  
     const ctx = canvas.getContext('2d');
     if (!ctx) {
       console.error('Could not get canvas context');
       return;
     }
-
-    // Уничтожаем предыдущий график, если он существует
+  
     if (this.chart) {
       this.chart.destroy();
     }
-
-    // Готовим данные для графика
+  
     const elevations = formattedCoords.map(coord => coord[2]);
+  
+    const firstElevation = elevations[0];
+  
+    const relativeElevations = elevations.map(elevation => elevation - firstElevation);
+  
     const labels = formattedCoords.map((coord, index) => {
-      // Используем расстояние в километрах как метку
-      const jio = (index * this.distance! / formattedCoords.length / 1000).toFixed(1)
+      const jio = (index * this.distance! / formattedCoords.length / 1000).toFixed(1);
       return jio;
     });
-
-    // Создаем новый график
+  
     this.chart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels,
         datasets: [{
           label: 'Высота (м)',
-          data: elevations,
+          data: relativeElevations, 
           borderColor: "#305C3F",
-            fill: true,
-          backgroundColor: 'rgba(	48, 92, 63, 0.2)',
+          fill: true,
+          backgroundColor: 'rgba(48, 92, 63, 0.2)',
         }]
       },
       options: {
@@ -366,10 +421,29 @@ export class RoutesComponent {
               display: true,
               text: 'Высота (м)'
             },
-            beginAtZero: false
+            beginAtZero: true 
+          }
+        },
+        onHover: (event: any, chartElement: any) => {
+          if (chartElement.length > 0) {
+            const index = chartElement[0].index;
+            const coordinates = formattedCoords[index];
+            this.createHoverMarker(coordinates[0], coordinates[1]);
           }
         }
-      }
+      },
+      plugins: [{
+        id: 'hoverPlugin',
+        afterEvent: (chart: any, args: any) => {
+          const event = args.event;
+          if (event.type === 'mouseout') {
+            if (this.hoverMarkerLayer) {
+              this.map?.removeLayer(this.hoverMarkerLayer);
+              this.hoverMarkerLayer = undefined;
+            }
+          }
+        }
+      }]
     });
   }
   

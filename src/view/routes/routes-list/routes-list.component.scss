@@ -181,3 +181,45 @@
     padding-right: 10px; 
 
 }
+.weather-info {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid #305C3F; // Граница в тон основному цвету
+    border-radius: 8px;
+    background-color: #305C3F; // Темный фон
+    color: #ffffff; // Белый текст для контраста
+
+    .weather-header {
+        display: flex; // Размещаем элементы в одной строке
+        align-items: center; // Выравниваем по вертикали
+        margin-bottom: 12px;
+
+        h3 {
+            margin: 0; // Убираем отступ у заголовка
+            margin-right: 8px; // Отступ между заголовком и иконкой
+            color: #ffffff; // Белый текст для заголовка
+            font-weight: bold; // Жирный шрифт для заголовка
+        }
+    }
+
+    p {
+        margin: 4px 0;
+        color: #ffffff; // Белый текст для информации
+    }
+}
+
+.weather-icon img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; // Делаем иконку круглой
+    transition: transform 0.3s ease-in-out;
+    background-color: #ccc; // Белый фон для иконки
+    object-fit: cover; // Чтобы изображение не искажалось
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); // Более выраженная тень
+    &:hover {
+        transform: scale(1.2); // Увеличение при наведении
+    }
+}
+.weather-info {
+    background: linear-gradient(135deg, #305C3F, #1E3A29); // Градиентный фон
+}

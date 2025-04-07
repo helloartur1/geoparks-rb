@@ -5,8 +5,9 @@
     </a>
     <div class="auth-banner" *ngIf="showBanner()">
         <ng-container *ngIf="authData; else loginButton">
-            <h5 class="auth-banner__username">{{ authData.userName }}</h5>
-            <button class="logout-button" mat-icon-button (click)="logout()">
+                <button (click)="moveToUsersRoutes()"><h5 class="auth-banner__username">{{ authData.userName }}</h5>
+                </button>
+                <button class="logout-button" mat-icon-button (click)="logout()">
                 <mat-icon>input icon</mat-icon>
             </button>
         </ng-container>

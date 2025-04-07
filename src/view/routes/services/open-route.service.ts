@@ -78,7 +78,6 @@ export class OpenRouteService {
       const geometry = feature.geometry; // Get geometry from the feature  
       const coords = geometry.coordinates;
       const formattedCoords = coords.map((coord: number[]) => [coord[1], coord[0], coord[2]]); // Assuming coord is [lon, lat, elevation] 
-      
       return {  
         coordinates,  
         distance,  

@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -22,6 +22,7 @@ import { SystemRoutesComponent } from '../view/system-routes/system-routes.compo
 import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
 
 import { openDB } from 'idb';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 const DB_NAME = 'RoutesDB';
 const STORE_NAME = 'routes';
@@ -39,7 +40,7 @@ async function initDB() {
 @NgModule({
   declarations: [
     AppComponent,
-    SystemRoutesComponent
+    SystemRoutesComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,6 +59,12 @@ async function initDB() {
     HttpClientModule,
     FormsModule,
     ApiModule.forRoot(() => new Configuration({ basePath: "http://localhost:8000"})),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [
     {

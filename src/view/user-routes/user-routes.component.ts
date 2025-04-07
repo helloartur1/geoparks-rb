@@ -23,8 +23,6 @@ import { LineString, Point } from 'ol/geom';
 import { openDB, IDBPDatabase } from 'idb';
 import { TRouteCoordinates, TRouteProfile } from '../routes/interfaces/route-config.interface';
 
-
-
 export const GeoparksCoordsMap: { [key: string]: { latitude: number, longitude: number, layer: any } } = {
   '41f271c8-e8ba-4225-b21d-403f9751e5a7': { latitude: 55.2455, longitude: 58.2935, layer: YA_LAYER },
   '07599ea7-76aa-4bbf-8335-86e2436b0254': { latitude: 53.554764, longitude: 56.096764, layer: LAYER_TOROTAU },
@@ -35,16 +33,19 @@ export const GeoparksCoordsMap: { [key: string]: { latitude: number, longitude: 
   templateUrl: './user-routes.component.html',
   styleUrls: ['./user-routes.component.scss']
 })
+
 export class UserRoutesComponent implements OnInit, AfterViewInit {
   public map: Map | undefined;
   public lineLayer: VectorLayer<any> | undefined;
   public markerLayer: VectorLayer<any> | undefined;
   public routes: IRoute[] = [];
+  public routes_user: IRoute[] = [];
   public formattedDistance?: string;
   public formattedDuration?: string;
   public selectedProfile: TRouteProfile = 'foot-walking';
   public selectedRoute: IRoute | undefined;
   private profiles: TRouteProfile[] = ['foot-walking', 'cycling-regular', 'driving-car'];
+  private userId: string | null = null;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -64,15 +65,30 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
         this.initMap();
         this.showExtentForGeopark();
       });
+    this.userId = this.authAdminService.getCurrentUserId();
+    if (this.userId) {
+      this.loadUserRoutes();
+    } else {
+      console.error('User ID is not available');
+    }
   }
 
-  ngAfterViewInit(): void{
+  ngAfterViewInit(): void {
     // this.initMap();
     // this.showExtentForGeopark();
   }
-
+  
+  private clearMap(): void {
+    if (this.map) {
+      this.map.setTarget("Null"); // Удаляем карту
+      this.map = undefined;
+      console.log('Map cleared'); // Отладочный вывод
+    }
+  }
+  
   private initMap(): void {
-
+  
+    console.log('Initializing map'); // Отладочный вывод
     this.map = new Map({
       layers: [new Tile({ source: new OSM() })],
       target: 'map',
@@ -96,6 +112,29 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
     });
   }
 
+  private loadUserRoutes(): void {
+    if (this.userId) {
+      console.log(this.userId);
+      this.routeService.getRouteRouteUserUserIdGet(this.userId)
+        .pipe(take(1))
+        .subscribe(
+          (routesq: IRoute[]) => {
+            this.routes_user = routesq;
+            this.precacheRoutes(routesq);
+            this.initMap();
+            this.showExtentForGeopark();
+          },
+          (error) => {
+            console.error('Error fetching user routes:', error); // Отладочный вывод
+            if (error.status === 401) { // Ошибка авторизации
+              console.error('Unauthorized:', error);
+              // Перенаправьте пользователя на страницу авторизации
+            }
+          }
+        );
+    }
+  }
+
   private async cacheRouteData(route: IRoute, profile: TRouteProfile): Promise<void> {
     const coordinates: TRouteCoordinates[] = route.route_points.map(p => 
       [p.longitude, p.latitude] as TRouteCoordinates
@@ -112,13 +151,19 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
           distance: res.distance,
           duration: res.duration
         };
+        console.log('Caching route data:', cacheData); // Отладочный вывод
         await db.put('routeCache', cacheData);
       });
   }
-
+  private clearMapLayers(): void {
+    [this.lineLayer, this.markerLayer].forEach(layer => {
+      if (layer) this.map?.removeLayer(layer);
+    });
+  }
   public async showRoute(route: IRoute): Promise<void> {
     this.selectedRoute = route;
     this.clearMapLayers();
+    console.log("OK show")
 
     const db = await this.getDb();
     const cache = await db.get('routeCache', [route.id, this.selectedProfile]);
@@ -166,6 +211,7 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
     this.formatDistance(distance);
     this.formatDuration(duration);
   }
+  
   public selectProfile(profile: TRouteProfile): void {
     if (this.selectedProfile !== profile) {
       this.selectedProfile = profile;
@@ -176,9 +222,11 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
   }
 
   private loadGeoObjects(routePoints: IRoutePoint[]): void {
+    console.log('Loading geo objects:', routePoints); // Отладочный вывод
     forkJoin(routePoints.map(p => 
       this.geoobjectService.getGeoobjectByIdGeoobjectIdGet(p.geoobject_id)
     )).subscribe(points => {
+      console.log('Geo objects loaded:', points); // Отладочный вывод
       const features = points.map((point, index) => this.createFeature(point, index));
       this.markerLayer = new VectorLayer({ source: new VectorSource({ features }) });
       this.map?.addLayer(this.markerLayer);
@@ -221,11 +269,11 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
       .filter(Boolean).join(' ') || '0 мин';
   }
 
-  private clearMapLayers(): void {
-    [this.lineLayer, this.markerLayer].forEach(layer => {
-      if (layer) this.map?.removeLayer(layer);
-    });
-  }
+  // private clearMapLayers(): void {
+  //   [this.lineLayer, this.markerLayer].forEach(layer => {
+  //     if (layer) this.map?.removeLayer(layer);
+  //   });
+  // }
 
   private showExtentForGeopark(): void {
     const geoparkId = this.activatedRoute.snapshot.params['geoparkId'];

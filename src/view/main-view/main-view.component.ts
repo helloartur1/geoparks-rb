@@ -40,7 +40,7 @@ export class MainViewComponent {
   }
 
   public get isAdmin(): boolean {
-    return !!this.authAdminService.getAuthData();
+    return this.authAdminService.getAuthData()?.role === 'admin';
   }
 
   public moveToCreateObject(): void {
