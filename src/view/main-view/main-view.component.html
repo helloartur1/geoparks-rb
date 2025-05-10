@@ -13,18 +13,28 @@
                 <div class="buttons-wrapper">
                     <button class="route-button" mat-raised-button color="primary" (click)="navigateToRoutes()">Построить маршрут</button>
                     <button class="existing-route" mat-raised-button color="primary" (click)="navigateToSystemRoutes()">Маршруты по геопарку</button>
-                <div *ngIf="isAdmin">
+                </div>
+                <div *ngIf="isAuthenticated() && !isAdmin" class="add-marker-footer">
+                    <button mat-raised-button color="primary" class="add-marker-button" (click)="openAddMarkerDialog()">
+                        Добавить метку
+                    </button>
+                </div>
+                <div *ngIf="isAdmin" class="admin-buttons">
                     <button class="add-button" mat-raised-button color="primary" (click)="moveToCreateObject()">Добавить геообъект</button>
                 </div>
-              </div>   
+                <div *ngIf="isAdmin" class="admin-buttons">
+                    <button class="add-button" mat-raised-button color="primary" 
+                            (click)="navigateToUserPoints()">Пользовательские метки</button>
+                </div>
             </div>
             <ng-container *ngIf="state === 'SUCCESS'">
-                <geo-main-view-manager [items]="model.points" [isAdmin]="isAdmin" [search]="searchControl.value || ''" (setView)="onSetMapView($event)" (editObject)="onEditObject($event)">
+                <geo-main-view-manager [items]="model.points" 
+                [isAdmin]="isAdmin" 
+                [search]="searchControl.value || ''" (setView)="onSetMapView($event)" (editObject)="onEditObject($event)">
                 </geo-main-view-manager>
             </ng-container>
         </div>
-        <geo-main-view-map [setView$]="setView$" [setSearch$]="setSearch$" [points]="model.rawPoints" [geopark]="model.geopark">
-        </geo-main-view-map>
+        <geo-main-view-map [setView$]="setView$" [setSearch$]="setSearch$" [points]="model.rawPoints" [geopark]="model.geopark" (mapClick)="onMapClick($event)"></geo-main-view-map>
         <ng-container *ngIf="state === 'PENDING'">
             <ng-container *ngTemplateOutlet="spinner"></ng-container>
         </ng-container>

@@ -10,6 +10,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { UserPointModalModule } from 'src/shared/components/user-point-modal/user-point-modal.module';
 
 
 @NgModule({
@@ -26,6 +28,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatInputModule,
     MatIconModule,
     MatButtonModule,
+    MatDialogModule,
+    UserPointModalModule
   ],
   exports: [
     MainViewComponent,

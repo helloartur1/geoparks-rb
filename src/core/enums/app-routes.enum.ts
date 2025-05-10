@@ -7,4 +7,5 @@ export enum AppRoutes {
     ROUTES = 'routes',
     USER_ROUTES = 'user-routes',
     SYSTEM_ROUTES = 'system-routes',
+    USER_POINTS = 'user-points',
 }

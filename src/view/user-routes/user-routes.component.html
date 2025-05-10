@@ -1,3 +1,4 @@
+<!-- src/view/user-routes/components/user-routes/user-routes.component.html -->
 <geo-user-routes-list
   [routes]="routes"
   [routes_user]="routes_user"
@@ -6,7 +7,84 @@
   [distance]="formattedDistance"
   [duration]="formattedDuration"
   [selectedProfile]="selectedProfile"
+  [selectedRoute]="selectedRoute"
+  [selectedSort]="selectedSort"
   (profileChanged)="selectProfile($event)"
+  (sortChanged)="sortRoutes($event)"
 >
 </geo-user-routes-list>
+
 <div class="map" id="map"></div>
+
+<div class="map-custom-controls">
+  <button class="legend-button" mat-mini-fab color="primary" aria-label="Легенда" (click)="toggleLegend()">
+    <mat-icon>info</mat-icon>
+  </button>
+
+  <button class="objects-button" mat-mini-fab color="accent" aria-label="Объекты маршрута"
+          (click)="toggleObjects()" [disabled]="!selectedRoute">
+    <mat-icon>place</mat-icon>
+  </button>
+
+<!-- ... ваш код ... -->
+
+<button
+  mat-mini-fab
+  color="primary"
+  aria-label="Скачать GPX"
+  matTooltip="Скачать GPX"
+  matTooltipPosition="above"
+  (click)="downloadGPX()"
+  [disabled]="!selectedRoute">
+  <mat-icon>file_download</mat-icon>
+</button>
+
+<button
+  mat-mini-fab
+  color="primary"
+  aria-label="Скачать KML"
+  matTooltip="Скачать KML"
+  matTooltipPosition="above"
+  (click)="downloadKML()"
+  [disabled]="!selectedRoute">
+  <mat-icon>file_download</mat-icon>
+</button>
+
+<button
+  mat-mini-fab
+  color="accent"
+  aria-label="Открыть в Яндекс.Картах"
+  matTooltip="Открыть в Яндекс.Картах"
+  matTooltipPosition="above"
+  (click)="openInYandexMaps()"
+  [disabled]="!selectedRoute">
+  <mat-icon>map</mat-icon>
+</button>
+
+<!-- ... остальной шаблон ... -->
+
+</div>
+
+<div class="panels-container">
+  <div class="legend" [class.visible]="isLegendShowed" *ngIf="isLegendShowed">
+    <h4 class="legend-title">Условные обозначения</h4>
+    <div class="legend-item">
+      <div class="legend-steepness">
+        <div class="legend-steepness-item" *ngFor="let item of steepnessLegend">
+          <div class="legend-steepness-color" [style.background-color]="item.color"></div>
+          <span class="legend-steepness-label">{{ item.label }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="objects-panel" [class.visible]="isObjectsShowed" *ngIf="isObjectsShowed" [style.top.px]="getObjectsPanelTop()">
+    <h4 class="panel-title">Объекты маршрута</h4>
+    <div class="objects-list">
+      <div class="object-item" *ngFor="let obj of routeObjects; let i = index">
+        <span class="object-number">{{i + 1}}.</span>
+        <span class="object-name">{{obj.name}}</span>
+      </div>
+    </div>
+  </div>
+</div>

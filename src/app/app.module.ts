@@ -37,6 +37,7 @@ async function initDB() {
   });
 }
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -59,6 +60,7 @@ async function initDB() {
     MatIconModule,
     HttpClientModule,
     FormsModule,
+
     ApiModule.forRoot(() => new Configuration({ basePath: "http://192.168.1.112:8000"})),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
@@ -66,6 +68,7 @@ async function initDB() {
       // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000'
     }),
+
   ],
   providers: [
     {

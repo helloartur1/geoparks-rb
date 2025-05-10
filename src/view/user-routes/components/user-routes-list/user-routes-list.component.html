@@ -1,27 +1,109 @@
 <div class="search-route">
-    <mat-form-field class="form-field">
-      <mat-label>Поиск маршрута</mat-label>
-      <input type="text" matInput [formControl]="searchControl" />
-    </mat-form-field>
-    <div class="profile-buttons">
-      <button mat-button [ngClass]="{'active': selectedProfile === 'foot-walking'}" (click)="selectProfile('foot-walking')">
-        <mat-icon>directions_walk</mat-icon>
-        Пеший
-      </button>
-      <button mat-button [ngClass]="{'active': selectedProfile === 'driving-car'}" (click)="selectProfile('driving-car')">
-        <mat-icon>directions_car</mat-icon>
-        Автомобиль
-      </button>
-      <button mat-button [ngClass]="{'active': selectedProfile === 'cycling-regular'}" (click)="selectProfile('cycling-regular')">
-        <mat-icon>directions_bike</mat-icon>
-        Велосипед
-      </button>
-    </div>
+  <mat-form-field class="form-field">
+    <mat-label>Поиск маршрута</mat-label>
+    <input type="text" matInput [formControl]="searchControl" autocomplete="off" />
+    <button *ngIf="searchControl.value" matSuffix mat-icon-button aria-label="Очистить" (click)="onClearSearch()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <div *ngIf="filteredRoutes.length > 0 && searchControl.value" class="filtered-list">
+    <mat-nav-list>
+      <mat-list-item
+        *ngFor="let route of filteredRoutes"
+        (click)="onShowRoute(route)"
+        class="filtered-list-item"
+      >
+        <h5 matLine>{{ route.name }}</h5>
+      </mat-list-item>
+    </mat-nav-list>
   </div>
-  
-  <div class="route-info" *ngIf="distance || duration">
+
+  <div class="profile-buttons">
+    <button
+      mat-button
+      [ngClass]="{'active': selectedProfile === 'foot-walking'}"
+      (click)="selectProfile('foot-walking')"
+    >
+      <mat-icon>directions_walk</mat-icon>
+      Пеший
+    </button>
+    <button
+      mat-button
+      [ngClass]="{'active': selectedProfile === 'driving-car'}"
+      (click)="selectProfile('driving-car')"
+    >
+      <mat-icon>directions_car</mat-icon>
+      Автомобиль
+    </button>
+    <button
+      mat-button
+      [ngClass]="{'active': selectedProfile === 'cycling-regular'}"
+      (click)="selectProfile('cycling-regular')"
+    >
+      <mat-icon>directions_bike</mat-icon>
+      Велосипед
+    </button>
+  </div>
+
+  <div class="sort-container">
+    <button mat-button [matMenuTriggerFor]="sortMenu" class="sort-button">
+      <mat-icon>
+        <ng-container [ngSwitch]="selectedSort">
+          <ng-container *ngSwitchCase="'time-asc'">arrow_upward</ng-container>
+          <ng-container *ngSwitchCase="'time-desc'">arrow_downward</ng-container>
+          <ng-container *ngSwitchCase="'distance-asc'">arrow_upward</ng-container>
+          <ng-container *ngSwitchCase="'distance-desc'">arrow_downward</ng-container>
+          <ng-container *ngSwitchDefault>sort</ng-container>
+        </ng-container>
+      </mat-icon>
+      Сортировка маршрутов
+      <mat-icon *ngIf="selectedSort">
+        <ng-container [ngSwitch]="selectedSort.split('-')[0]">
+          <ng-container *ngSwitchCase="'time'">schedule</ng-container>
+          <ng-container *ngSwitchCase="'distance'">straighten</ng-container>
+        </ng-container>
+      </mat-icon>
+    </button>
+    <mat-menu #sortMenu="matMenu">
+      <button
+        mat-menu-item
+        (click)="sortRoutes('time-asc')"
+        [class.active]="selectedSort === 'time-asc'"
+      >
+        <mat-icon>arrow_upward</mat-icon>
+        По возрастанию времени
+      </button>
+      <button
+        mat-menu-item
+        (click)="sortRoutes('time-desc')"
+        [class.active]="selectedSort === 'time-desc'"
+      >
+        <mat-icon>arrow_downward</mat-icon>
+        По убыванию времени
+      </button>
+      <button
+        mat-menu-item
+        (click)="sortRoutes('distance-asc')"
+        [class.active]="selectedSort === 'distance-asc'"
+      >
+        <mat-icon>arrow_upward</mat-icon>
+        По возрастанию расстояния
+      </button>
+      <button
+        mat-menu-item
+        (click)="sortRoutes('distance-desc')"
+        [class.active]="selectedSort === 'distance-desc'"
+      >
+        <mat-icon>arrow_downward</mat-icon>
+        По убыванию расстояния
+      </button>
+    </mat-menu>
+  </div>
+
+  <div class="route-info" *ngIf="formattedDistance || formattedDuration">
     <div class="info-box">
-      <div *ngIf="distance" class="route-stat">
+      <div *ngIf="formattedDistance" class="route-stat">
         <mat-icon>
           <ng-container [ngSwitch]="selectedProfile">
             <ng-container *ngSwitchCase="'foot-walking'">directions_walk</ng-container>
@@ -30,33 +112,29 @@
             <ng-container *ngSwitchDefault>directions_walk</ng-container>
           </ng-container>
         </mat-icon>
-        <span>Расстояние: {{ distance }}</span>
+        <span>Расстояние: {{ formattedDistance }}</span>
       </div>
-      <div *ngIf="duration" class="route-stat">
+      <div *ngIf="formattedDuration" class="route-stat">
         <mat-icon>schedule</mat-icon>
-        <span>Время в пути: {{ duration }}</span>
+        <span>Время в пути: {{ formattedDuration }}</span>
       </div>
     </div>
   </div>
-  
-  <mat-accordion>
-    <ng-container *ngFor="let categoryItem of categoryItems; trackBy: trackByCategory">
-      <mat-expansion-panel *ngIf="categoryItem.items.length" [expanded]="searchControl.value === '' ? false : true">
-        <mat-expansion-panel-header>
-          <mat-panel-title>{{ categoryItem.name }}</mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-list>
-          <ng-container *ngFor="let route of categoryItem.items; trackBy: trackByItem">
-            <mat-list-item class="item">
-              <div class="content" (click)="cancelContextMenu($event)">
-                <h5 matListItemTitle class="item__title">{{ route.name }}</h5>
-              </div>
-              <button mat-icon-button (click)="onShowRoute(route)" aria-label="Отобразить на карте" class="show-route-button">
-                <mat-icon>visibility</mat-icon>
-              </button>
-            </mat-list-item>
-          </ng-container>
-        </mat-list>
-      </mat-expansion-panel>
-    </ng-container>
-  </mat-accordion>
+</div>
+
+<div class="scrollable-list-container">
+  <div class="scrollable-list">
+    <mat-list class="route-list">
+      <ng-container *ngFor="let route of routes; let i = index">
+        <mat-list-item class="item" [ngClass]="{'active-route': selectedRoute === route}">
+          <div class="content" (click)="cancelContextMenu($event)">
+            <h5 matLine class="item__title">{{ route.name }}</h5>
+          </div>
+          <button mat-icon-button (click)="onShowRoute(route)" aria-label="Отобразить на карте" class="show-route-button">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </mat-list-item>
+      </ng-container>
+    </mat-list>
+  </div>
+</div>

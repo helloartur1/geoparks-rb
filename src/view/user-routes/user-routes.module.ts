@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { UserRoutesListModule } from './components/user-routes-list/user-routes-list.module';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @NgModule({
@@ -20,6 +20,7 @@ import { UserRoutesListModule } from './components/user-routes-list/user-routes-
     MatListModule,
     MatExpansionModule,
     UserRoutesListModule,
+    MatTooltipModule,
   ],
   exports: [
     UserRoutesComponent,

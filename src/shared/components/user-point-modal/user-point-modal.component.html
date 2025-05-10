@@ -1,0 +1,52 @@
+<h4 class="modal-title">Добавление метки</h4>
+
+<div class="wrapper">
+  <div class="coordinates-info compact">
+    <p><strong>Координаты:</strong></p>
+    <p *ngIf="currentCoordinates">{{ currentCoordinates.latitude | number:'1.5-5' }}, {{ currentCoordinates.longitude | number:'1.5-5' }}</p>
+    <button mat-button color="primary" (click)="changeLocation()" class="location-button">
+      Изменить
+    </button>
+  </div>
+
+  <form class="point-form compact-form">
+    <div class="form-field">
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>Тип метки</mat-label>
+        <mat-select [(ngModel)]="pointType" name="pointType" required>
+          <mat-option value="">-- Выберите --</mat-option>
+          <mat-option value="Интересное место">Интересное место</mat-option>
+          <mat-option value="Опасный участок">Опасный участок</mat-option>
+          <mat-option value="Жалоба">Жалоба</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="form-field">
+      <mat-form-field appearance="outline" floatLabel="always">
+        <mat-label>Комментарий</mat-label>
+        <textarea matInput [(ngModel)]="comment" name="comment" rows="2"></textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="photo-upload compact">
+      <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
+      <button mat-mini-fab color="primary" class="upload-button" title="Добавить фото" (click)="fileInput.click()">
+        <mat-icon>attach_file</mat-icon>
+      </button>
+      <div class="uploaded-files">
+        <div class="file-name" *ngIf="pathphoto">
+          {{ pathphoto }}
+        </div>
+        <span class="upload-hint" *ngIf="!pathphoto">Прикрепить фото</span>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-buttons compact">
+  <button mat-button (click)="cancel()">Отмена</button>
+  <button mat-raised-button color="primary" [disabled]="!pointType" (click)="save()">
+    Сохранить
+  </button>
+</div>

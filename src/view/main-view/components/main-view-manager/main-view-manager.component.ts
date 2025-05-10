@@ -7,7 +7,7 @@ export interface ICategoryItem {
   name: string;
   items: IPointGeoObject[];
 }
-const CATEGORY_NAMES: string[] = ['Культура, история и образование', 'Рекрация, отдых и развлечения', 'Природа и геология', 'Общая инфраструктура']
+const CATEGORY_NAMES: string[] = ['Культура, история и образование', 'Рекрация, отдых и развлечения', 'Природа и геология', 'Общая инфраструктура', 'Интересное место']
 const DEFAULT_CATEGORY_LIST: ICategoryItem[] = [
   {
     name: 'Культура, история и образование',
@@ -25,6 +25,10 @@ const DEFAULT_CATEGORY_LIST: ICategoryItem[] = [
     name: 'Общая инфраструктура',
     items: [],
   },
+  {
+    name: 'Интересное место',
+    items: []
+  }
 ];
 const DETAIL_PAGE_ROUTE: string = 'detail';
 @Component({

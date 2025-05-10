@@ -1,31 +1,28 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MainViewManagerComponent } from './main-view-manager.component';
-import { MatListModule } from '@angular/material/list';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatOptionModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select'
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatExpansionModule } from '@angular/material/expansion';
-
-
+import { UsersPointsListComponent } from './users-points-list.component';
+import { MatIcon } from '@angular/material/icon';
 @NgModule({
   declarations: [
-    MainViewManagerComponent,
+    UsersPointsListComponent
   ],
   imports: [
     CommonModule,
-    MatListModule,
+    MatFormFieldModule,
     MatInputModule,
+    MatOptionModule,
+    MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatMenuModule,
     ReactiveFormsModule,
-    MatExpansionModule,
-  ],
-  exports: [
-    MainViewManagerComponent,
-  ],
+    MatIcon,
+  ]
 })
-export class MainViewManagerModule { }
+export class UsersPointsListModule { }

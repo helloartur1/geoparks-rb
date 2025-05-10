@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input,Output, OnChanges, OnDestroy, OnInit, SimpleChanges, EventEmitter } from '@angular/core';
 import { CoordinatesType, IGeoObjectFilterFields, IGeopark, IPointGeoObject } from '@core';
 import { CommonTypeIconMap, LayerByIdMap, MarkerInfoModalComponent, TypeIconMap } from '@shared';
 import Map from 'ol/Map';
@@ -14,7 +14,7 @@ import Style from 'ol/style/Style';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { MatDialog } from '@angular/material/dialog';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
 import { GeoobjectModel } from '@api';
 import GeoJSON from 'ol/format/GeoJSON';
 import Stroke from 'ol/style/Stroke';
@@ -29,7 +29,9 @@ interface MapState {
 }
 
 const DEFAULT_EXTENT: ViewOptions = {
+
   center: fromLonLat([51.155889, 55.179724]),
+
   zoom: 9,
 };
 
@@ -45,6 +47,9 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   @Input() public setSearch$: Subject<string> | undefined = undefined;
   @Input() public points: IPointGeoObject[] = [];
   @Input() public geopark: any | undefined = undefined;
+
+  @Output() mapClick = new EventEmitter<{ lat: number; lng: number }>();
+  @Input() public isSelectingPoint: boolean = false;
 
   public map: Map | undefined = undefined;
   public isLegendShowed: boolean = false;
@@ -151,7 +156,9 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
         }
       });
     });
+
   }
+
 
   private async initializeMap(): Promise<void> {
     const restoredState = await this.restoreMapState();
@@ -168,6 +175,18 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
       ],
       target: 'map',
       view: new View(viewOptions),
+    });
+
+    this.map.on('click', (evt: MapBrowserEvent<any>) => {
+      console.log('Map clicked');
+      this.isSelectingPoint = true;
+      if (this.isSelectingPoint) {
+        const [lon, lat] = toLonLat(evt.coordinate);
+        console.log('Выбор точки:', lat, lon);
+        this.mapClick.emit({ lat, lng: lon });
+      }else{
+        console.log("fdsfs");
+      }
     });
 
     if (this.points.length) {

@@ -629,6 +629,142 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "tags": [
+                    "geoparks"
+                ],
+                "summary": "Create User Point",
+                "operationId": "create_user_point_geoparks__geopark_id__post",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "geopark_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid4",
+                            "title": "Geopark Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UsersPoint"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/geoparks/by_geopark/{geopark_id}": {
+            "get": {
+                "tags": [
+                    "geoparks"
+                ],
+                "summary": "Get Users Points By Geopark Id",
+                "operationId": "get_users_points_by_geopark_id_geoparks_by_geopark__geopark_id__get",
+                "parameters": [
+                    {
+                        "name": "geopark_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid4",
+                            "title": "Geopark Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/geoparks/point/{point_id}": {
+            "delete": {
+                "tags": [
+                    "geoparks"
+                ],
+                "summary": "Delete User Point",
+                "operationId": "delete_user_point_geoparks_point__point_id__delete",
+                "parameters": [
+                    {
+                        "name": "point_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid4",
+                            "title": "Point Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/photo/{geoobject_id}": {
@@ -1449,6 +1585,51 @@
                 },
                 "type": "object",
                 "title": "UpdateGeoobjectModel"
+            },
+            "UsersPoint": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid4",
+                        "title": "Id"
+                    },
+                    "Type": {
+                        "type": "string",
+                        "title": "Type"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "title": "Latitude"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "title": "Longitude"
+                    },
+                    "Comment": {
+                        "type": "string",
+                        "title": "Comment"
+                    },
+                    "pathphoto": {
+                        "type": "string",
+                        "title": "Pathphoto",
+                        "default": ""
+                    },
+                    "geoparkid": {
+                        "type": "string",
+                        "format": "uuid4",
+                        "title": "Geoparkid"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "Type",
+                    "latitude",
+                    "longitude",
+                    "Comment",
+                    "geoparkid"
+                ],
+                "title": "UsersPoint"
             },
             "ValidationError": {
                 "properties": {
