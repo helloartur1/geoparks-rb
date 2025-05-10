@@ -1,9 +1,10 @@
 {
-  "name": "geoparks_new",
-  "short_name": "geoparks_new",
+  "name": "Геопарки РБ",
+  "short_name": "Геопарки РБ",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
+  "orientation": "portrait",
   "scope": "./",
   "start_url": "./",
   "icons": [

@@ -1,5 +1,4 @@
 {
-  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
   "assetGroups": [
     {
@@ -9,21 +8,25 @@
         "files": [
           "/favicon.ico",
           "/index.html",
-          "/manifest.webmanifest",
           "/*.css",
-          "/*.js"
+          "/*.js",
+          "/assets/**"
         ]
       }
-    },
+    }
+  ],
+  "dataGroups": [
     {
-      "name": "assets",
-      "installMode": "lazy",
-      "updateMode": "prefetch",
-      "resources": {
-        "files": [
-          "/assets/**",
-          "/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
-        ]
+      "name": "api-data",
+      "urls": [
+        "http://192.168.1.112:8000/**",
+        "https://172.20.10.2:8000/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 100,
+        "maxAge": "1d",
+        "timeout": "5s"
       }
     }
   ]

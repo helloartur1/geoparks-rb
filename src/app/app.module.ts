@@ -43,6 +43,7 @@ async function initDB() {
     SystemRoutesComponent,
   ],
   imports: [
+    HttpClientModule,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
@@ -58,7 +59,7 @@ async function initDB() {
     MatIconModule,
     HttpClientModule,
     FormsModule,
-    ApiModule.forRoot(() => new Configuration({ basePath: "http://localhost:8000"})),
+    ApiModule.forRoot(() => new Configuration({ basePath: "http://192.168.1.112:8000"})),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable

@@ -5,14 +5,14 @@
     </a>
     <div class="auth-banner" *ngIf="showBanner()">
         <ng-container *ngIf="authData; else loginButton">
-                <button (click)="moveToUsersRoutes()"><h5 class="auth-banner__username">{{ authData.userName }}</h5>
+                <button class="responsive-button" (click)="moveToUsersRoutes()"><h5 class="auth-banner__username">{{ authData.userName }}</h5>
                 </button>
-                <button class="logout-button" mat-icon-button (click)="logout()">
+                <button class="logout-button responsive-button" mat-icon-button (click)="logout()">
                 <mat-icon>input icon</mat-icon>
             </button>
         </ng-container>
     </div>
     <ng-template #loginButton>
-        <button mat-button class="login-button" (click)="moveToLoginPage()">Войти</button>
+        <button mat-button class="login-button responsive-button" (click)="moveToLoginPage()">Войти</button>
     </ng-template>
 </header>

@@ -34,6 +34,12 @@
             <mat-icon>directions_bike</mat-icon>
             Велосипед
         </button>
+        <button mat-button
+                [ngClass]="{'active': selectedProfile === 'river'}"
+                (click)="selectProfile('river')">
+            <mat-icon>directions_boat</mat-icon>
+            Речной
+        </button>
     </div>
     <div class="route-buttons" *ngIf="showRouteButtons">
         <button mat-raised-button 
@@ -81,7 +87,8 @@
                 <ng-container [ngSwitch]="selectedProfile">  
                     <ng-container *ngSwitchCase="'foot-walking'">directions_walk</ng-container>  
                     <ng-container *ngSwitchCase="'driving-car'">directions_car</ng-container>  
-                    <ng-container *ngSwitchCase="'cycling-regular'">directions_bike</ng-container>  
+                    <ng-container *ngSwitchCase="'cycling-regular'">directions_bike</ng-container>
+                      
                     <ng-container *ngSwitchDefault>directions_walk</ng-container> <!-- Значение по умолчанию -->  
                 </ng-container>  
             </mat-icon>  
@@ -93,6 +100,7 @@
                     <ng-container *ngSwitchCase="'foot-walking'">schedule</ng-container>  
                     <ng-container *ngSwitchCase="'driving-car'">schedule</ng-container>  
                     <ng-container *ngSwitchCase="'cycling-regular'">schedule</ng-container>  
+                    <ng-container *ngSwitchCase="'river'">schedule</ng-container>
                     <ng-container *ngSwitchDefault>schedule</ng-container> <!-- Значение по умолчанию -->  
                 </ng-container>  
             </mat-icon> 

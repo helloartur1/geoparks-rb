@@ -1121,6 +1121,22 @@
                     }
                 }
             }
+        },
+        "/proxy/openrouteservice": {
+            "get": {
+                "summary": "Proxy Ors",
+                "operationId": "proxy_ors_proxy_openrouteservice_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {

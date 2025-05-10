@@ -1,6 +1,16 @@
+@import './_mixins.scss';
+
 :host {
     background-color: var(--base-green-dark-color);
     padding: 20px;
+    
+    @include tablet-and-below {
+        padding: 15px;
+    }
+    
+    @include mobile {
+        padding: 10px;
+    }
 }
 
 .item {
@@ -83,6 +93,18 @@
 .route-buttons {
     button {
         margin-right: 10px;
+        
+        @include mobile {
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            padding: 0 8px;
+        }
+    }
+    
+    @include mobile {
+        display: flex;
+        flex-wrap: wrap;
     }
 }
 
