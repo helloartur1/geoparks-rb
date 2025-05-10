@@ -55,4 +55,9 @@ export class AuthAdminService {
   public removeAuthData(): void {
     this.setAuthData(null);
   }
+
+  public getCurrentUserId(): string | null {
+    return this.authData?.id || null;
+  }
+  
 }

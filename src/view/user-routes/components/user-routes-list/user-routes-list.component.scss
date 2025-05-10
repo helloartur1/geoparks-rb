@@ -67,8 +67,10 @@
         font-size: 14px;
         line-height: 16px;
         font-weight: 450;
+
         text-align:left;
         color: #fff !important;
+
         
         white-space: normal !important;
         overflow-wrap: break-word;
@@ -95,7 +97,7 @@
 }
 
 .show-route-button {
-    color: white; /* Устанавливаем цвет текста и иконки кнопки в белый */
+    color: rgb(0, 0, 0); /* Устанавливаем цвет текста и иконки кнопки в белый */
     background-color: transparent; /* Фон кнопки остается прозрачным */
     border: none; /* Удаляем границу, если она есть */
     margin-right: 5px;

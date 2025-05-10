@@ -25,7 +25,7 @@ import {
 const DEFAULT_EXTENT: ViewOptions = {
   center: fromLonLat([55.958596, 54.735148]),
   zoom: 7,
-  projection: getProjection('EPSG:2500')!,
+  projection: getProjection('EPSG:3857')!,
 }
 @Component({
   selector: 'geo-geoparks',
@@ -73,7 +73,7 @@ export class GeoparksComponent {
         features: new GeoJSON().readFeatures(YA_LAYER, { featureProjection: 'EPSG:3857' }),
       });
       const torVectorSource = new VectorSource({
-        features: new GeoJSON().readFeatures(LAYER_TOROTAU, { featureProjection: 'EPSG::4326'}),
+        features: new GeoJSON().readFeatures(LAYER_TOROTAU, { featureProjection: 'EPSG:3857'}),
       });
       const vectorLayerTor = new VectorLayer({
         source: torVectorSource,

@@ -1,13 +1,24 @@
+@import './_mixins.scss';
+
 :host {
   display: flex;
   width: 100%;
   height: 100%;
   background-color: var(--base-green-light-color);
+  
+  @include tablet-and-below {
+    flex-direction: column;
+  }
 }
 
 .detail-sidebar {
   height: 100%;
   background-color: #D6EAD8;
+  
+  @include tablet-and-below {
+    height: auto;
+    width: 100%;
+  }
 }
 
 .detail-error {
@@ -16,12 +27,20 @@
   justify-content: center;
   width: 100%;
   height: 100%;
+  
   &__title {
     margin: 0;
     font-size: 18px;
     line-height: 24px;
     font-weight: 500;
     color: #000;
+    
+    @include mobile {
+      font-size: 16px;
+      line-height: 20px;
+      padding: 0 15px;
+      text-align: center;
+    }
   }
 }
 
@@ -31,5 +50,4 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-
 }

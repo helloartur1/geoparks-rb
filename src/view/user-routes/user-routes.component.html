@@ -1,6 +1,8 @@
 <!-- src/view/user-routes/components/user-routes/user-routes.component.html -->
 <geo-user-routes-list
   [routes]="routes"
+  [routes_user]="routes_user"
+
   (showRoute)="showRoute($event)"
   [distance]="formattedDistance"
   [duration]="formattedDuration"

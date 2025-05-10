@@ -55,7 +55,9 @@ export class MainViewComponent implements OnInit, OnDestroy {
   }
 
   public get isAdmin(): boolean {
-    return this.authService.getAuthData()?.role === 'admin';
+
+    return this.authAdminService.getAuthData()?.role === 'admin';
+
   }
 
   public moveToCreateObject(): void {

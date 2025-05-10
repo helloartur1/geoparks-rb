@@ -29,7 +29,9 @@ interface MapState {
 }
 
 const DEFAULT_EXTENT: ViewOptions = {
-  center: fromLonLat([55.958596, 54.735148]),
+
+  center: fromLonLat([51.155889, 55.179724]),
+
   zoom: 9,
 };
 
@@ -45,9 +47,10 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   @Input() public setSearch$: Subject<string> | undefined = undefined;
   @Input() public points: IPointGeoObject[] = [];
   @Input() public geopark: any | undefined = undefined;
+
   @Output() mapClick = new EventEmitter<{ lat: number; lng: number }>();
   @Input() public isSelectingPoint: boolean = false;
-  
+
   public map: Map | undefined = undefined;
   public isLegendShowed: boolean = false;
   public destroy$: Subject<void> = new Subject<void>();
@@ -153,12 +156,10 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
         }
       });
     });
-    
-    
-    
+
   }
 
-  
+
   private async initializeMap(): Promise<void> {
     const restoredState = await this.restoreMapState();
 
@@ -175,6 +176,7 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
       target: 'map',
       view: new View(viewOptions),
     });
+
     this.map.on('click', (evt: MapBrowserEvent<any>) => {
       console.log('Map clicked');
       this.isSelectingPoint = true;
@@ -186,6 +188,7 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
         console.log("fdsfs");
       }
     });
+
     if (this.points.length) {
       this.renderPoints();
     }
@@ -396,5 +399,4 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
     this.destroy$.complete();
     this.mapStateChangeDebouncer.complete();
   }
-
 }

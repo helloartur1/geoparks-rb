@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Input, Output, QueryList, ViewChildren,OnChanges, SimpleChanges} from '@angular/core';
+
+import { Component, EventEmitter, Input, Output, QueryList, ViewChildren, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
+
 import { FormControl } from '@angular/forms';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { IRoute, IRouteCache } from '@core';
@@ -9,31 +11,70 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 @Component({
   selector: 'geo-user-routes-list',
   templateUrl: './user-routes-list.component.html',
-  styleUrls: ['./user-routes-list.component.scss']
+  styleUrls: ['./user-routes-list.component.scss'],
 })
 
 
 export class UserRoutesListComponent {
-  @Input()
-  public routes: IRoute[] = [];
-  @Input() selectedProfile: TRouteProfile = 'foot-walking'; 
+  @Input() selectedProfile: TRouteProfile = 'foot-walking';
   @Input() distance?: string;
+
   @Input() duration?: string; 
   @Input() selectedSort?: string;
   @Input() routeCacheMap: Map<string, IRouteCache> = new Map();
   @Input() selectedRoute: IRoute | undefined = undefined; 
-  @Output() showRoute = new EventEmitter<IRoute>();
-  @Output() profileChanged = new EventEmitter<TRouteProfile>();
+  
+  
   @Output() sortChanged = new EventEmitter<string>(); 
   @Output() clearSearch = new EventEmitter<void>();
 
-  @ViewChildren(MatMenuTrigger) public triggers: QueryList<MatMenuTrigger> | undefined = undefined;
   
+
+  @Output() profileChanged = new EventEmitter<TRouteProfile>();
+  @Output() showRoute = new EventEmitter<IRoute>();
+
+  private _routes: IRoute[] = [];
+  private _routes_user: IRoute[] = [];
+
+  @Input()
+  set routes(value: IRoute[]) {
+    this._routes = value;
+    this.updateCategoryItems();
+  }
+  get routes(): IRoute[] {
+    return this._routes;
+  }
+
+  @Input()
+  set routes_user(value: IRoute[]) {
+    console.log('routes_user:', value); // Отладочный вывод
+    this._routes_user = value;
+    this.updateCategoryItems();
+  }
+  get routes_user(): IRoute[] {
+    return this._routes_user;
+  }
+
+  public categoryItems = [
+    {
+      name: 'Маршруты геопарка',
+      items: this.routes,
+    },
+    {
+      name: 'Сохраненные маршруты',
+      items: this.routes_user,
+    },
+  ];
+
+
+  @ViewChildren(MatMenuTrigger) public triggers: QueryList<MatMenuTrigger> | undefined = undefined;
+
   public searchControl: FormControl = new FormControl('');
   public filteredRoutes: IRoute[] = []; 
   public searchText: string = '';  
   private originalRoutesOrder: Map<string, number> = new Map();
   private isInitialLoad = true;
+
 
   ngOnInit(): void {
     this.searchControl.valueChanges
@@ -62,20 +103,48 @@ export class UserRoutesListComponent {
     }
   }
   
+
+  constructor(private cdr: ChangeDetectorRef) {}
+
+  private updateCategoryItems(): void {
+    this.categoryItems = [
+      {
+        name: 'Маршруты геопарка',
+        items: this.routes,
+      },
+      {
+        name: 'Сохраненные маршруты',
+        items: this.routes_user,
+      },
+    ];
+    this.cdr.detectChanges(); // Принудительно обновляем представление
+  }
+
+  public trackByCategory(index: number, item: any): number {
+    return index;
+  }
+
+  public trackByItem(index: number, item: IRoute): string {
+    return item.id;
+  }
+
+
   public openContextMenu(evt: MouseEvent, index: number): void {
     evt.preventDefault();
     if (this.triggers) {
       this.triggers.get(index)?.openMenu();
     }
   }
+
   public selectProfile(profile: TRouteProfile): void {
     if (this.selectedProfile !== profile) {
       this.selectedProfile = profile;
       this.profileChanged.emit(profile);
     }
   }
+
   public cancelContextMenu(evt: MouseEvent): void {
-    evt.stopPropagation()
+    evt.stopPropagation();
   }
 
   public onShowRoute(route: IRoute): void {
@@ -140,5 +209,6 @@ export class UserRoutesListComponent {
     this.searchControl.setValue('');
     this.clearSearch.emit();
   }
+
 }
 

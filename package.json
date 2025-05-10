@@ -20,11 +20,17 @@
     "@angular/material": "^15.2.9",
     "@angular/platform-browser": "^15.2.0",
     "@angular/platform-browser-dynamic": "^15.2.0",
+    "@angular/pwa": "^15.2.9",
     "@angular/router": "^15.2.0",
+    "@angular/service-worker": "^15.2.9",
     "@mapbox/polyline": "^1.2.1",
-    "chart.js": "^4.4.7",
+
+    "chart.js": "^4.4.6",
+
+
     "idb": "^8.0.2",
     "ng2-file-upload": "^4.0.0",
+    "ngx-indexed-db": "^19.3.3",
     "normalize.css": "^8.0.1",
     "ol": "^7.3.0",
     "openrouteservice-js": "^0.3.2",
