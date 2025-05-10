@@ -71,7 +71,7 @@ export class GeoobjectFormComponent implements OnInit, AfterViewInit {
     {
       name: 'Общая инфраструктура',
       value: 'Общая инфраструктура'
-    },
+    }
   ];
 
   constructor(private geoobjectService: GeoobjectService, private router: Router, private activatedRoute: ActivatedRoute, private photoService: PhotoService) {}

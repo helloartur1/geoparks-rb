@@ -1,0 +1,53 @@
+<div class="container">
+    <div class="labels-container">
+        <h2 class="labels-title">Пользовательские метки</h2>
+        
+        <div *ngIf="isLoading" class="loading-spinner">
+            <mat-spinner></mat-spinner>
+        </div>
+        
+        <div *ngIf="errorLoading" class="error-message">
+            Не удалось загрузить данные. Пожалуйста, попробуйте позже.
+        </div>
+        
+        <div class="labels-list" *ngIf="!isLoading && !errorLoading">
+            <mat-card class="label-item" *ngFor="let label of labels">
+                <mat-card-header>
+                    <mat-card-title>{{label.type}}</mat-card-title>
+                    <mat-card-subtitle>
+                        <span [class.approved]="label.status === 'approved'" 
+                              [class.rejected]="label.status === 'rejected'">
+                            {{getStatusText(label.status)}}
+                        </span>
+                    </mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content (click)="onLabelClick(label)">
+                    <p class="label-comment">{{label.comment}}</p>
+                    <div class="label-photo" *ngIf="label.photoUrl">
+                        <img [src]="label.photoUrl" alt="Фото метки">
+                    </div>
+                    <div class="label-coords">
+                        Координаты: {{formatCoordinate(label.latitude)}}, {{formatCoordinate(label.longitude)}}
+                    </div>
+                </mat-card-content>
+                <mat-card-actions 
+                    *ngIf="!label.status && (label.type === 'Интересное место' || label.type === 'Опасный участок')">
+                    <button mat-button color="primary" (click)="approveLabel(label); $event.stopPropagation()">
+                        <mat-icon>check_circle</mat-icon> Одобрить
+                    </button>
+                    <button mat-button color="warn" (click)="rejectLabel(label.id); $event.stopPropagation()">
+                        <mat-icon>cancel</mat-icon> Отклонить
+                    </button>
+                    </mat-card-actions>
+            </mat-card>
+            
+            <div *ngIf="labels.length === 0" class="no-data">
+                Нет пользовательских меток для отображения
+            </div>
+        </div>
+    </div>
+
+    <div class="map-container">
+        <div class="map" id="form-map"></div>
+    </div>
+</div>

@@ -14,4 +14,5 @@ export const CommonTypeIconMap = new Map([
     ['Рекрация, отдых и развлечения', 'restore2.png'],
     ['Природа и геология', 'nature3.png'],
     ['Общая инфраструктура', 'infrastructure2.png'],
+    ['Интересное место', 'flag.png']
 ]);

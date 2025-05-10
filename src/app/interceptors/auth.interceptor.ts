@@ -15,12 +15,17 @@ export class AuthInterceptor implements HttpInterceptor {
 
   constructor(private authService: AuthAdminService, private localStorageService: LocalStorageService) {}
 
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const isAuth = this.authService.isAuthenticated();
-    if (isAuth) {
-      const token = this.localStorageService.getToken();
-      request = request.clone({ headers: request.headers.set('Authorization', 'Bearer ' + token ?? '')});
-    } 
-    return next.handle(request);
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Не добавляем токен к запросам к OpenWeatherMap
+    if (req.url.includes('api.openweathermap.org')) {
+      return next.handle(req);
+    }
+
+    // Добавляем токен к другим запросам
+    const authToken = this.localStorageService.getToken();
+    const authReq = req.clone({
+      headers: req.headers.set('Authorization', `Bearer ${authToken}`),
+    });
+    return next.handle(authReq);
   }
 }

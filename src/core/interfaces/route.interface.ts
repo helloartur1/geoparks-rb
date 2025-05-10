@@ -2,11 +2,13 @@ import { TRouteCoordinates, TRouteProfile } from "src/view/routes/interfaces/rou
 
 export interface IRoutePoint {
     geoobject_id: string;
+    geoobject_name?: string;
     id: string;
     latitude: number;
     longitude: number;
     order: number;
     route_id: string;
+    name: string;
 }
 
 export interface IRoute {
@@ -22,4 +24,5 @@ export interface IRouteCache {
     coordinates: TRouteCoordinates[];
     distance: number;
     duration: number;
+    steepness: any[];
   }

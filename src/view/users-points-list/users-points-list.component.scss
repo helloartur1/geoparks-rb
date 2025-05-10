@@ -1,0 +1,73 @@
+/* users-points-list.component.scss */
+:host {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.labels-container {
+    width: 25%;
+    padding: 20px;
+    background-color: var(--new-dark-green-color);
+    overflow-y: auto;
+    
+    .labels-title {
+        color: white;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+    }
+    
+    .labels-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .label-item {
+        cursor: pointer;
+        transition: transform 0.2s;
+        
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .label-comment {
+            margin: 10px 0;
+            color: #555;
+        }
+        
+        .label-photo {
+            margin-top: 10px;
+            
+            img {
+                width: 100%;
+                border-radius: 4px;
+                max-height: 150px;
+                object-fit: cover;
+            }
+        }
+        
+        .label-coords {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 10px;
+        }
+    }
+}
+
+.map-container {
+    width: 75%;
+    height: 100%;
+    
+    .map {
+        width: 100%;
+        height: 100%;
+    }
+}

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input,Output, OnChanges, OnDestroy, OnInit, SimpleChanges, EventEmitter } from '@angular/core';
 import { CoordinatesType, IGeoObjectFilterFields, IGeopark, IPointGeoObject } from '@core';
 import { CommonTypeIconMap, LayerByIdMap, MarkerInfoModalComponent, TypeIconMap } from '@shared';
 import Map from 'ol/Map';
@@ -14,7 +14,7 @@ import Style from 'ol/style/Style';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { MatDialog } from '@angular/material/dialog';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
 import { GeoobjectModel } from '@api';
 import GeoJSON from 'ol/format/GeoJSON';
 import Stroke from 'ol/style/Stroke';
@@ -25,10 +25,11 @@ interface MapState {
   center: number[];
   zoom: number;
   timestamp: number;
+  geoparkId: string;
 }
 
 const DEFAULT_EXTENT: ViewOptions = {
-  center: fromLonLat([58.155889, 55.179724]),
+  center: fromLonLat([55.958596, 54.735148]),
   zoom: 9,
 };
 
@@ -44,7 +45,9 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   @Input() public setSearch$: Subject<string> | undefined = undefined;
   @Input() public points: IPointGeoObject[] = [];
   @Input() public geopark: any | undefined = undefined;
-
+  @Output() mapClick = new EventEmitter<{ lat: number; lng: number }>();
+  @Input() public isSelectingPoint: boolean = false;
+  
   public map: Map | undefined = undefined;
   public isLegendShowed: boolean = false;
   public destroy$: Subject<void> = new Subject<void>();
@@ -88,7 +91,7 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
         if (this.setView$) {
           this.map?.setView(
             new View({
-              center: fromLonLat([changes['geopark'].currentValue.longitude, changes['geopark'].currentValue.latitude]),
+              center: fromLonLat([this.geopark?.longitude, this.geopark?.latitude]),
               zoom: 9,
             })
           );
@@ -142,22 +145,25 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
 
   public ngAfterViewInit(): void {
     setTimeout(() => {
-      // Try to restore cached map state first
       this.restoreMapState().then(restoredState => {
-        // Initialize map with either cached or default state
-        this.initializeMap(restoredState);
-        
-        // If the map is initialized with cached state, load cached layers
+        this.initializeMap();
+  
         if (restoredState) {
-          this.loadCachedLayers();
+          this.loadCachedLayers(); // Загружаем кешированные слои только если карта восстановлена
         }
       });
     });
+    
+    
+    
   }
 
-  private async initializeMap(restoredState?: MapState): Promise<void> {
+  
+  private async initializeMap(): Promise<void> {
+    const restoredState = await this.restoreMapState();
+
     const viewOptions = restoredState 
-      ? { center: DEFAULT_EXTENT.center, zoom: restoredState.zoom }
+      ? { center: restoredState.center, zoom: restoredState.zoom }
       : DEFAULT_EXTENT;
       
     this.map = new Map({
@@ -169,7 +175,17 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
       target: 'map',
       view: new View(viewOptions),
     });
-
+    this.map.on('click', (evt: MapBrowserEvent<any>) => {
+      console.log('Map clicked');
+      this.isSelectingPoint = true;
+      if (this.isSelectingPoint) {
+        const [lon, lat] = toLonLat(evt.coordinate);
+        console.log('Выбор точки:', lat, lon);
+        this.mapClick.emit({ lat, lng: lon });
+      }else{
+        console.log("fdsfs");
+      }
+    });
     if (this.points.length) {
       this.renderPoints();
     }
@@ -205,28 +221,42 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   }
 
   private async cacheMapState(): Promise<void> {
+    if (!this.geopark?.id || !this.map) return;
     const center = this.map?.getView().getCenter();
     const zoom = this.map?.getView().getZoom();
     if (center && zoom !== undefined) {
       const mapState: MapState = {
         center: center,
         zoom: zoom,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        geoparkId: this.geopark.id
       };
-      await this.mapCacheService.set('mapState', mapState);
+      await this.mapCacheService.set(`mapState_${this.geopark.id}`, mapState);
     }
   }
 
   private async restoreMapState(): Promise<MapState | undefined> {
-    const mapState = await this.mapCacheService.get<MapState>('mapState');
-    
-    // If no saved state or the cached state is too old, return undefined
-    if (!mapState || Date.now() - mapState.timestamp > CACHE_TTL) {
-      return undefined;
+    if (!this.geopark?.id) return undefined;
+  
+    try {
+      const mapState = await this.mapCacheService.get<MapState>(`mapState_${this.geopark.id}`);
+  
+      if (mapState && mapState.geoparkId === this.geopark.id && (Date.now() - mapState.timestamp < CACHE_TTL)) {
+        return mapState;
+      }
+    } catch (error) {
+      console.error("Ошибка при восстановлении состояния карты:", error);
     }
-    
-    return mapState;
+  
+    return {
+      center: DEFAULT_EXTENT.center as number[],
+      zoom: DEFAULT_EXTENT.zoom as number,
+      timestamp: Date.now(),
+      geoparkId: this.geopark?.id || "unknown",
+    };
   }
+  
+  
 
   private async cachePoints(): Promise<void> {
     if (this.points.length) {
@@ -250,6 +280,13 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   }
 
   private async cacheGeoparkLayer(id: string, layerData: any): Promise<void> {
+    // const center = this.map?.getView().getCenter();
+    // const zoom = this.map?.getView().getZoom();
+    // const mapState: MapState = {
+    //   center: center,
+    //   zoom: zoom,
+    //   timestamp: Date.now()
+    // };
     await this.mapCacheService.set(`geopark_${id}`, {
       data: layerData,
       timestamp: Date.now()
@@ -359,4 +396,5 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
     this.destroy$.complete();
     this.mapStateChangeDebouncer.complete();
   }
+
 }

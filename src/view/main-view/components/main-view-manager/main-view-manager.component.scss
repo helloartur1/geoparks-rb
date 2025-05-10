@@ -8,6 +8,9 @@
 
 .manager-wrapper {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+
 }
 
 .manager-list {
@@ -23,6 +26,7 @@
     &:not(:last-child) {
         margin-bottom: 10px;
     }
+    
 
     &:hover {
         background-color: var(--new-green-dark-color);
@@ -52,6 +56,9 @@
         font-weight: 500;
         text-align: left;
         color:#fff !important;
+        display: block;  
+        word-wrap: break-word; 
+        white-space: normal;
         &:hover {
             color: #fff !important;
         }

@@ -13,6 +13,7 @@ import { RoutesComponent } from 'src/view/routes/routes.component';
 import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
 import { SystemRoutesComponent } from 'src/view/system-routes/system-routes.component';
 import { RoutesListComponent } from 'src/view/routes/routes-list/routes-list.component';
+import { UsersPointsListComponent } from 'src/view/users-points-list/users-points-list.component';
 
 const routes: Routes = [
   {
@@ -41,6 +42,13 @@ const routes: Routes = [
     component: GeoobjectFormComponent,
     canActivate: [MainGuard],
   },
+
+  {
+    path: `${AppRoutes.USER_POINTS}/:geoparkId`,
+    component: UsersPointsListComponent,
+    canActivate: [MainGuard]
+  },
+
   {
     path: `${AppRoutes.CREATE_FORM}/:geoparkId/:geoobjectId`,
     component: GeoobjectFormComponent,

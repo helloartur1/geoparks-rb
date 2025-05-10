@@ -1,28 +1,34 @@
 :host {
-    background-color: var(--base-green-dark-color);
-    padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;             /* Занимаем всю высоту родителя */
+  overflow: hidden;          /* Прячем «лишний» скролл */
+  background-color: var(--base-green-dark-color);
+  padding: 20px;
 }
-
 .search-route {
-    mat-form-field {
-        width: 100%;
-    }
+  mat-form-field {
+    width: 100%;
+  }
 }
-.route-info {
-    margin-top: 20px;
-}
-.route-stat {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    color: #fff !important;
-    font-size: 14px;
-    margin-left: 10px;
 
-    mat-icon {
-        margin-right: 10px;
-    }
+.route-info {
+  margin-top: 20px;
 }
+
+.route-stat {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  color: #fff !important;
+  font-size: 14px;
+  margin-left: 10px;
+
+  mat-icon {
+    margin-right: 10px;
+  }
+}
+
 .item {
     display: block;
     padding: 10px 15px;
@@ -61,7 +67,7 @@
         font-size: 14px;
         line-height: 16px;
         font-weight: 450;
-        text-align: left;
+        text-align:left;
         color: #fff !important;
         
         white-space: normal !important;
@@ -95,6 +101,16 @@
     margin-right: 5px;
     margin-left: auto;
 }
+.active-route {
+    background-color: var(--new-green-color) !important;
+    color: white !important;
+    border-radius: 20px;
+
+    .item__title {
+        color: white !important;
+    }
+}
+
 
 .profile-buttons button {  
     margin-bottom: 20px;
@@ -113,28 +129,187 @@
     background-color: rgba(255, 255, 255, 0.8); /* Немного прозрачный белый при наведении */  
 }  
 
+.scrollable-list-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Это важно для правильной работы flex-скролла */
+}
+
 .scrollable-list {
-    max-height: 490px; 
-    overflow-y: auto; 
-    padding-right: 10px; 
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  padding-bottom: 20px;
+  height: 100%; /* Добавлено для независимого скролла */
+  max-height: 100%; /* Ограничиваем максимальную высоту */
 
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--base-green-dark-color);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--new-green-light-color);
+    border-radius: 4px;
+    border: 2px solid var(--base-green-dark-color);
+  }
+}
+
+.item:last-child {
+  margin-bottom: 20px;
+}
+
+
+.sort-container {
+margin-top: 8px;
+
+.sort-button {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    padding: 0 16px;
+    height: 30px;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    
+    &:hover {
+    background-color: #e0e0e0;
+    }
+}
+}
+.mat-menu-item.active {
+    background-color: rgba(0, 0, 0, 0.04);
+    font-weight: 500;
+  }
+
+
+
+  .filtered-list {
+    max-height: 300px;
+    overflow-y: auto;
+    background: #e6f5e9; // нежно-зелёный фон
+    border: 2px solid #a5d6a7; // мягкий зелёный бордер
+    border-radius: 8px;
+    margin-bottom: 16px;
+    z-index: 10;
+    position: absolute;
+    width: 350px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
     &::-webkit-scrollbar {
-        width: 8px; 
+      width: 8px;
     }
-
+  
     &::-webkit-scrollbar-track {
-        background: var(--base-green-dark-color); 
+      background: #e6f5e9;
     }
-
+  
     &::-webkit-scrollbar-thumb {
-        background-color: var(--new-green-light-color);
-        border-radius: 4px; /* Скругление */
-        border: 2px solid var(--base-green-dark-color); 
+      background-color: #81c784; // светло-зелёный акцент
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
     }
+  
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: #66bb6a; // чуть ярче на hover
+    }
+  
+    mat-nav-list {
+      padding: 0;
+    }
+  
+    .filtered-list-item {
+      cursor: pointer;
+      font-size: 16px;
+      color: #2e7d32; // тёмно-зелёный текст
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  
+      &:last-child {
+        border-bottom: none;
+      }
+  
+      &:hover {
+        background-color: #c8e6c9; // светло-салатовый hover
+      }
+  
+      h5 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+      }
+    }
+  }
 
-}
-
-.scrollable-list mat-list {
-    display: block; 
-}
-
+  @keyframes fadeIn {
+    from { 
+      opacity: 0; 
+      transform: translateY(-10px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+  
+  .filtered-list {
+    animation: fadeIn 0.2s ease-out forwards;
+  }
+  
+  /* Для формы поиска */
+  .search-route {
+    position: relative;
+    
+    mat-form-field {
+      
+      .mat-form-field-wrapper {
+        padding-bottom: 0;
+      }
+      
+      .mat-form-field-outline {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+      }
+      
+      .mat-form-field-outline-thick {
+        color: var(--new-green-light-color);
+      }
+      
+      .mat-input-element {
+        color: white;
+        caret-color: var(--new-green-light-color);
+      }
+      
+      .mat-form-field-label {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      
+      .mat-form-field-underline {
+        display: none;
+      }
+      
+      .mat-form-field-suffix {
+        .mat-icon {
+          color: rgba(255, 255, 255, 0.7);
+          &:hover {
+            color: var(--new-green-light-color);
+          }
+        }
+      }
+    }
+  }
+  .export-buttons {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 16px 56px;
+  }

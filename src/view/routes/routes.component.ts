@@ -288,6 +288,7 @@ export class RoutesComponent {
             if (elevationRes?.formattedCoords?.length) {
               // Create or update the elevation chart
               this.createElevationChart(elevationRes.formattedCoords);
+              console.log(elevationRes);
             }
           });
     }

@@ -18,7 +18,8 @@ interface IRouteResult {
   descent?: number;  
   elevations?: number[];  // Array of elevation values corresponding to the coordinates
   coord_points? : number[];
-  formattedCoords?: Array<number[]>
+  formattedCoords?: Array<number[]>;
+  steepness_data?: any[]
 }  
 
 @Injectable({  
@@ -34,28 +35,35 @@ export class OpenRouteService {
     return from(orsDirections.calculate({  
       coordinates: coordinates,  
       profile,  
-      format: 'json',  
+      format: 'json',
+      extra_info:["steepness",'surface'],  
       radiuses: [10000],
     })).pipe(map((res: any) => {  
+      console.log("API Response:", res);
       const decodedCoordinates = polyline.decode(res.routes[0].geometry).map((item: [number, number]) => item.reverse());  
       const line: LineString = new LineString(decodedCoordinates);  
       console.log(line);
       line.transform('EPSG:4326', 'EPSG:3857');  
-        // Extracting distance and duration from the response  
+
+      // Extracting distance, duration, ascent, descent from the response  
       const distance = res.routes[0].summary.distance; // distance in meters  
       const duration = res.routes[0].summary.duration; // duration in seconds  
       const ascent = res.routes[0].summary.ascent;  
       const descent = res.routes[0].summary.descent;  
       const elevation = res.routes[0].summary.elevation;
+      // Extracting steepness data
+      const steepnessData = res.routes[0].extras.steepness.values
+      console.log(steepnessData);  
       return {  
         coordinates: decodedCoordinates,  
         distance,  
         duration,  
         ascent,  
-        descent,  
+        descent,
+        steepness_data: steepnessData, // Add steepness data to the returned object
       };  
     }));  
-  } 
+  }
 
   public getElevation$({ coordinates, profile }: IRouteConfig): Observable<IRouteResult> {  
     let orsDirections = new Openrouteservice.Directions({ api_key: '5b3ce3597851110001cf6248d985182c8c784d239613b235b0150a2b' });  
@@ -78,14 +86,16 @@ export class OpenRouteService {
       const geometry = feature.geometry; // Get geometry from the feature  
       const coords = geometry.coordinates;
       const formattedCoords = coords.map((coord: number[]) => [coord[1], coord[0], coord[2]]); // Assuming coord is [lon, lat, elevation] 
-      
+      const steepness_data = res.features[0].properties.extras.steepness.values;
+
       return {  
         coordinates,  
         distance,  
         duration,  
         ascent,  
         descent,
-        formattedCoords
+        formattedCoords,
+        steepness_data,
       };  
     }));  
   } 

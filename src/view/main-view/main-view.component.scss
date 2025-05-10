@@ -1,7 +1,6 @@
 :host {
     display: flex;
     height: 100%;
-
 }
 
 .geopark-title {
@@ -16,6 +15,8 @@
     width: 30%;
     height: 100%;
     background-color: var(--new-dark-green-color);
+    display: flex;
+    flex-direction: column;
 }
 
 .spinner {
@@ -29,14 +30,7 @@
 .buttons-wrapper {
     display: flex;
     justify-content: flex-start;
-}
-
-
-
-.add-button {
-    &.mat-mdc-raised-button:not(:disabled) {
-        background-color: var(--base-green-dark-color);
-    }
+    margin-bottom: 15px;
 }
 
 .route-button {
@@ -47,7 +41,17 @@
 }
 
 .existing-route {
-    margin-right: 20px;
+    &.mat-mdc-raised-button:not(:disabled) {
+        background-color: var(--base-green-dark-color);
+    }
+}
+
+.admin-buttons {
+    margin-bottom: 15px;
+}
+
+.add-button {
+    width: 100%;
     &.mat-mdc-raised-button:not(:disabled) {
         background-color: var(--base-green-dark-color);
     }
@@ -61,6 +65,27 @@
     ::ng-deep {
         mat-form-field {
             width: 100%;
+        }
+    }
+}
+
+.content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.add-marker-footer {
+    padding: 15px;
+    background-color: var(--new-dark-green-color);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto; /* Это прижмет кнопку к низу */
+    
+    .add-marker-button {
+        width: 100%;
+        &.mat-mdc-raised-button:not(:disabled) {
+            background-color: var(--base-green-dark-color);
         }
     }
 }
