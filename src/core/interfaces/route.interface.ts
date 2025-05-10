@@ -25,4 +25,5 @@ export interface IRouteCache {
     coordinates: TRouteCoordinates[];
     distance: number;
     duration: number;
+    stepness: any[]
   }

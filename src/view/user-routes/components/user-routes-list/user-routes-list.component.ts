@@ -17,9 +17,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 export class UserRoutesListComponent {
   @Input() selectedProfile: TRouteProfile = 'foot-walking';
-  @Input() distance?: string;
+  @Input() formattedDistance?: string;
 
-  @Input() duration?: string; 
+  @Input() formattedDuration?: string; 
   @Input() selectedSort?: string;
   @Input() routeCacheMap: Map<string, IRouteCache> = new Map();
   @Input() selectedRoute: IRoute | undefined = undefined; 

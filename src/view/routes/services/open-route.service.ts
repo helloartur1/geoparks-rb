@@ -21,6 +21,8 @@ export interface IRouteResult {
   descent?: number;
   elevations?: number[];                      // при желании
   formattedCoords?: Array<[number, number, number]>; // [lat, lon, elev]
+  steepness_data?: any[]
+
 }
 
 @Injectable({
