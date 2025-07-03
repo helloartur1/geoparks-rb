@@ -2,12 +2,13 @@ import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/
 import { Router } from '@angular/router';
 import { CoordinatesType, IPointGeoObject } from '@core';
 import { Subject } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 export interface ICategoryItem {
   name: string;
   items: IPointGeoObject[];
 }
-const CATEGORY_NAMES: string[] = ['Культура, история и образование', 'Рекрация, отдых и развлечения', 'Природа и геология', 'Общая инфраструктура', 'Интересное место']
+const CATEGORY_NAMES: string[] = ['Культура, история и образование', 'Рекрация, отдых и развлечения', 'Природа и геология', 'Общая инфраструктура', 'Интересное место', 'Опасный участок']
 const DEFAULT_CATEGORY_LIST: ICategoryItem[] = [
   {
     name: 'Культура, история и образование',
@@ -63,6 +64,7 @@ export class MainViewManagerComponent {
   }
 
   public ngOnInit(): void {
+    
     this.initListByCategories(this.items);
   }
 

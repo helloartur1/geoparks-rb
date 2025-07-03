@@ -20,6 +20,7 @@ import { UserRoutesModule } from 'src/view/user-routes/user-routes.module';
 import { FormsModule } from '@angular/forms';
 import { SystemRoutesComponent } from '../view/system-routes/system-routes.component';
 import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
+import { AdminStatComponent } from '../view/admin-stat/admin-stat.component';
 
 
 
@@ -27,7 +28,8 @@ import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component'
 @NgModule({
   declarations: [
     AppComponent,
-    SystemRoutesComponent
+    SystemRoutesComponent,
+    AdminStatComponent
   ],
   imports: [
     BrowserModule,

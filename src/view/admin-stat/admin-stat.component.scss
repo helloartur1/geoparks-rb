@@ -1,0 +1,163 @@
+.page-wrapper {
+  background-color: #f3efe5;
+  min-height: 150vh;
+  overflow-y: auto;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;         
+  padding: 40px 24px;     
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 16px;
+  padding: 20px;
+  padding-left: 100px;
+}
+.container > div {
+    max-width: 500px;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h2 {
+  color: #005e31; // тёмно-зелёный, под стиль шапки
+  margin-bottom: 10px;
+}
+
+button {
+  margin-left: 10px;
+  background-color: #005e31;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #008f4e;
+}
+
+.report{
+  float: right;
+  margin-right: 38px;
+}
+.geopark-switcher {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 16px 40px;
+  background-color: #f3efe5;
+
+  label {
+    font-weight: 600;
+    margin-right: 10px;
+    color: #005e31;
+    font-size: 14px;
+  }
+
+  select {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: white;
+  }
+}
+
+.goto-button {
+  margin-top: 10px;
+  background-color: #005e31;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #00864b;
+  }
+}
+.route-summary {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #444;
+
+  .diagram {
+    margin-top: 8px;
+    height: 8px;
+    background-color: #ddd;
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+
+    .bar {
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .rated {
+      background-color: #00796b; // тёмно-бирюзовый
+    }
+
+    .high {
+      background-color: #ffd700; // золотой
+      top: 0;
+      height: 50%;
+    }
+  }
+}
+.stat-map {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.map-description {
+  font-size: 13px;
+  margin: 0 0 10px;
+  color: #555;
+  line-height: 1.4;
+}
+.heat-legend-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 10px 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .red {
+      background-color: #e53935;
+    }
+
+    .green {
+      background-color: #43a047;
+    }
+  }
+}
+.heatmap-filters {
+  font-size: 13px;
+  margin-bottom: 8px;
+
+  label {
+    margin-right: 16px;
+    user-select: none;
+  }
+}

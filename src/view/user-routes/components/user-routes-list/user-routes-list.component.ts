@@ -4,7 +4,9 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { IRoute, IRouteCache } from '@core';
 import { TRouteProfile } from 'src/view/routes/interfaces/route-config.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-
+import { forkJoin, Observable, of } from 'rxjs';
+import { RouteService } from '@api';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'geo-user-routes-list',
@@ -34,6 +36,12 @@ export class UserRoutesListComponent {
   public searchText: string = '';  
   private originalRoutesOrder: Map<string, number> = new Map();
   private isInitialLoad = true;
+  public avgRatings: { [routeId: string]: number } = {};
+
+  constructor(
+    private routeService: RouteService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.searchControl.valueChanges
@@ -52,6 +60,7 @@ export class UserRoutesListComponent {
       if (this.isInitialLoad) {
         this.routes.forEach((route, index) => {
           this.originalRoutesOrder.set(route.id, index);
+          this.loadAvgRating(route.id);
         });
         this.isInitialLoad = false;
       }
@@ -140,5 +149,48 @@ export class UserRoutesListComponent {
     this.searchControl.setValue('');
     this.clearSearch.emit();
   }
+
+  public showRatingPanel: { [routeId: string]: boolean } = {};
+  public currentRating: { [routeId: string]: number } = {};
+
+  toggleRating(routeId: string): void {
+    this.showRatingPanel[routeId] = !this.showRatingPanel[routeId];
+  }
+
+  rateRoute(routeId: string, score: number): void {
+    this.currentRating[routeId] = score;
+
+    this.routeService.createRouteRatingRouteRouteIdRatePost(routeId, score).subscribe({
+      next: () => {
+          this.snackBar.open('Оценка успешно добавлена', 'OK', {
+          duration: 3000,          // появится на 3 секунды
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+
+        // при желании обновляем средний рейтинг
+        this.loadAvgRating(routeId);
+        this.showRatingPanel[routeId] = false;
+      },
+      error: (err) => {
+        console.error('Ошибка при отправке оценки', err);
+      }
+    });
+  }
+
+loadAvgRating(routeId: string): void {
+  this.routeService.getAvgScoreRouteRouteRouteIdAvgRateGet(routeId).subscribe({
+    next: (res: any) => {
+      console.log(`Средняя оценка для маршрута ${routeId}:`, res);
+      this.avgRatings[routeId] = res.average_score;
+    },
+    error: (err) => {
+      console.error(`Ошибка при получении оценки маршрута ${routeId}:`, err);
+      this.avgRatings[routeId] = 0;
+    }
+  });
+}
+
+
 }
 

@@ -43,6 +43,8 @@ export class MainViewComponent implements OnInit, OnDestroy {
 
     const geoparkId: string = this.activatedRoute.snapshot.params['id'];
     this.mainViewModelService.init(geoparkId);
+    this.trackUsage('object-viewer');
+
   }
 
   public onSearch(search: string): void {
@@ -88,6 +90,7 @@ export class MainViewComponent implements OnInit, OnDestroy {
         latitude: coords.lat,
         longitude: coords.lng
       };
+
       geoparkId: this.activatedRoute.snapshot.params['id'],
       this.dialog.open(UserPointModalComponent, {
         width: '400px',
@@ -140,4 +143,15 @@ export class MainViewComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  private trackUsage(section: string): void {
+  const geoparkId = this.activatedRoute.snapshot.params['id'] || 'global';
+  const key = `usage_${geoparkId}`;
+  const usage = JSON.parse(localStorage.getItem(key) || '{}');
+
+  usage[section] = (usage[section] || 0) + 1;
+
+  localStorage.setItem(key, JSON.stringify(usage));
+}
+
 }

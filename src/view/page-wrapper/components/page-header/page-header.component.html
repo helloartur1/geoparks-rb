@@ -5,7 +5,13 @@
     </a>
     <div class="auth-banner" *ngIf="showBanner()">
         <ng-container *ngIf="authData; else loginButton">
-            <h5 class="auth-banner__username">{{ authData.userName }}</h5>
+             <button mat-button [matMenuTriggerFor]="userMenu" class="auth-banner__username-button"> {{ authData.userName }} </button>
+
+      <!-- Меню пользователя -->
+            <mat-menu #userMenu="matMenu" class="menu">
+                <button *ngIf="isAdmin" mat-menu-item (click)="goToStats()" class="gotost">Статистика</button>
+            </mat-menu>
+
             <button class="logout-button" mat-icon-button (click)="logout()">
                 <mat-icon>input icon</mat-icon>
             </button>

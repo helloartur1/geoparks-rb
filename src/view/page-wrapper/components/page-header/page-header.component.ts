@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppRoutes, IUserData } from '@core';
 import { AuthAdminService } from '@shared';
+import { AuthService } from '@api';
 
 @Component({
   selector: 'geo-page-header',
@@ -9,8 +10,8 @@ import { AuthAdminService } from '@shared';
   styleUrls: ['./page-header.component.scss']
 })
 export class PageHeaderComponent {
-  constructor(private router: Router, private authAdminService: AuthAdminService, private activatedRoute: ActivatedRoute) {}
-
+  constructor(private router: Router, private authAdminService: AuthAdminService, private activatedRoute: ActivatedRoute, private authService: AuthService) {}
+  
   public moveToMainPage(): void {
     this.router.navigate(['']);
   }
@@ -30,4 +31,12 @@ export class PageHeaderComponent {
   public showBanner(): boolean {
     return !(this.activatedRoute.snapshot.firstChild?.routeConfig?.path?.includes(AppRoutes.LOGIN));
   }
+
+  public get isAdmin(): boolean {
+    return this.authAdminService.getAuthData()?.role === 'admin';
+  }
+  public goToStats(): void {
+    this.router.navigate([`${AppRoutes.USER_STATISTIC}/${this.activatedRoute.snapshot.params['id']}`]);
+}
+
 }

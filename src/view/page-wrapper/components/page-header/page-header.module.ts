@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PageHeaderComponent } from './page-header.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-
+import { MatMenuModule } from '@angular/material/menu';
 
 
 @NgModule({
@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
     CommonModule,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
   ],
   exports: [
     PageHeaderComponent

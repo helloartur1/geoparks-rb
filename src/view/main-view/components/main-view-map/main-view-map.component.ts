@@ -20,6 +20,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
 import { MapCacheService } from './map-cache.service';
+import { ActivatedRoute } from '@angular/router';
 
 interface MapState {
   center: number[];
@@ -55,14 +56,39 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   private markerLayer: VectorLayer<any> | undefined = undefined;
   private markerListenerCallBack: ((evt: MapBrowserEvent<any>) => void) | undefined = undefined;
   private mapStateChangeDebouncer: Subject<void> = new Subject<void>();
-
+  private static readonly GPK_CACHE_KEY_PREFIX = 'geopark_';
+  private static readonly GEO_CACHE_TTL = 24 * 60 * 60 * 1000; 
   constructor(
     private dialog: MatDialog,
     private changeDetectorRef: ChangeDetectorRef,
-    private mapCacheService: MapCacheService
+    private mapCacheService: MapCacheService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
-  public ngOnChanges(changes: SimpleChanges): void {
+  public async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    if (changes['points']) {
+      // если офлайн, пробуем снова кеш и выходим, если он есть
+      if (!navigator.onLine) {
+        const loaded = await this.loadAndRenderCachedPoints();
+        if (loaded) {
+          return;
+        }
+      }
+
+      // иначе (онлайн или кеша нет) — рисуем новые точки и кешируем их
+      this.renderPoints();
+      await this.cacheCurrentPoints();
+    }
+    if (changes['geopark'] && this.geopark) {
+      const layerData = LayerByIdMap.get(this.geopark.id);
+      if (layerData && this.map) {
+        // если офлайн, или кеш ещё не загружен, рисуем из пришедших данных
+        if (navigator.onLine) {
+          this.drawGeoparkBoundary(layerData);
+          await this.cacheCurrentGeopark(layerData);
+        }
+      }
+    }
     if (changes['geopark']) {
       if (changes['geopark'].currentValue) {
         const style = new Style({
@@ -109,8 +135,65 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
       }
     }
   }
+  private async loadAndRenderCachedGeopark(): Promise<boolean> {
+  const id = this.activatedRoute.snapshot.params['geoparkId'];
+  const key = MainViewMapComponent.GPK_CACHE_KEY_PREFIX + id;
+  const cached = await this.mapCacheService.get<{ data: any; timestamp: number }>(key);
+  if (cached && (Date.now() - cached.timestamp) < MainViewMapComponent.GEO_CACHE_TTL) {
+    this.drawGeoparkBoundary(cached.data);
+    return true;
+  }
+  return false;
+}
+private async cacheCurrentGeopark(data: any): Promise<void> {
+  const id = this.activatedRoute.snapshot.params['geoparkId'];
+  const key = MainViewMapComponent.GPK_CACHE_KEY_PREFIX + id;
+  await this.mapCacheService.set(key, { data, timestamp: Date.now() });
+}
+private drawGeoparkBoundary(layerData: any) {
+  if (!this.map || !layerData) return;
+  const style = new Style({
+    stroke: new Stroke({ color: 'red', width: 1 }),
+    fill: new Fill({ color: 'rgba(0,0,0,0)' })
+  });
+  const source = new VectorSource({
+    features: new GeoJSON().readFeatures(layerData, { featureProjection: 'EPSG:3857' })
+  });
+  this.map.addLayer(new VectorLayer({ source, style }));
+}
+ private static readonly POINTS_CACHE_KEY = 'cachedPoints';
+  private static readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24 часа
+   private async loadAndRenderCachedPoints(): Promise<boolean> {
+    const cached = await this.mapCacheService.get<{
+      points: IPointGeoObject[];
+      timestamp: number;
+    }>(MainViewMapComponent.POINTS_CACHE_KEY);
 
-  public ngOnInit(): void {
+    if (cached && (Date.now() - cached.timestamp) < MainViewMapComponent.CACHE_TTL) {
+      this.points = cached.points;
+      this.renderPoints();
+      return true;
+    }
+    return false;
+  }
+
+  private async cacheCurrentPoints(): Promise<void> {
+    if (this.points?.length) {
+      await this.mapCacheService.set(MainViewMapComponent.POINTS_CACHE_KEY, {
+        points: this.points,
+        timestamp: Date.now()
+      });
+    }
+  }
+
+  public async ngOnInit(): Promise<void> {
+    this.trackUsage('object-viewer');
+
+    await this.loadAndRenderCachedPoints();
+    const gotGeo = await this.loadAndRenderCachedGeopark();
+
+
+    await this.loadAndRenderCachedPoints();
     if (this.setView$) {
       this.setView$
         .pipe(takeUntil(this.destroy$))
@@ -154,10 +237,12 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
       });
     });
     
-    
-    
   }
-
+  saveClick(lat: number, lon: number): void {
+    const existing = JSON.parse(localStorage.getItem('map_clicks') || '[]');
+    existing.push({ latitude: lat, longitude: lon });
+    localStorage.setItem('map_clicks', JSON.stringify(existing));
+  }
   
   private async initializeMap(): Promise<void> {
     const restoredState = await this.restoreMapState();
@@ -175,6 +260,13 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
       target: 'map',
       view: new View(viewOptions),
     });
+
+    this.map.on('click', (evt) => {
+    const coord = evt.coordinate;
+    const [lon, lat] = toLonLat(coord);
+    this.saveClick(lat, lon);
+  });
+
     this.map.on('click', (evt: MapBrowserEvent<any>) => {
       console.log('Map clicked');
       this.isSelectingPoint = true;
@@ -396,5 +488,15 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
     this.destroy$.complete();
     this.mapStateChangeDebouncer.complete();
   }
+  private trackUsage(section: string): void {
+  const geoparkId = this.activatedRoute.snapshot.params['geoparkId'] || 'global';
+  const key = `usage_${geoparkId}`;
+  const usage = JSON.parse(localStorage.getItem(key) || '{}');
+
+  usage[section] = (usage[section] || 0) + 1;
+
+  localStorage.setItem(key, JSON.stringify(usage));
+  }
+
 
 }

@@ -14,6 +14,7 @@ import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component'
 import { SystemRoutesComponent } from 'src/view/system-routes/system-routes.component';
 import { RoutesListComponent } from 'src/view/routes/routes-list/routes-list.component';
 import { UsersPointsListComponent } from 'src/view/users-points-list/users-points-list.component';
+import { AdminStatComponent } from 'src/view/admin-stat/admin-stat.component';
 
 const routes: Routes = [
   {
@@ -65,6 +66,10 @@ const routes: Routes = [
   {
     path: `${AppRoutes.SYSTEM_ROUTES}/:geoparkId`, 
     component: SystemRoutesComponent,
+  },
+  {
+    path: `${AppRoutes.USER_STATISTIC}/:geoparkId`,
+    component: AdminStatComponent,
   }
 ];
 

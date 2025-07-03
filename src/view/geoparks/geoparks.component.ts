@@ -18,14 +18,14 @@ import Point from 'ol/geom/Point';
 import Icon from 'ol/style/Icon';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import {
   get as getProjection,
 } from 'ol/proj.js';
 const DEFAULT_EXTENT: ViewOptions = {
   center: fromLonLat([55.958596, 54.735148]),
   zoom: 7,
-  projection: getProjection('EPSG:2500')!,
+  projection: getProjection('EPSG:3857')!,
 }
 @Component({
   selector: 'geo-geoparks',
@@ -43,13 +43,15 @@ export class GeoparksComponent {
     '../../assets/img/Геопарк Торатау-1.jpg',
   ];
   public activeImageIndex: number = 0;
-  constructor(private dialog: MatDialog, private router: Router) {}
+  constructor(private dialog: MatDialog, 
+    private router: Router) {}
   videoPath: string = '../../assets/img/X2Download.com-Геопарк «Торатау».mp4';
   public setFullExtent(): void {
     this.map?.setView(new View({...DEFAULT_EXTENT}));
   }
 
   public ngAfterViewInit(): void {
+
     const video = document.querySelector('video');
   if (video) {
     video.volume = 0;
@@ -141,6 +143,7 @@ export class GeoparksComponent {
       }
     }
     this.map?.on('click', this.markerListenerCallBack);
+    
   }
 
   public togglePrevPhoto(evt: MouseEvent): void {
@@ -162,5 +165,6 @@ export class GeoparksComponent {
     evt.preventDefault();
     this.router.navigate([`geopark/${id}`])
   }
+
 
 }

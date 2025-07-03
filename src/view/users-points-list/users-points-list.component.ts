@@ -37,13 +37,13 @@ interface GeoLabel {
 
 export const GeoparksCoordsMap: {[key: string]: { latitude: number, longitude: number, layer: any }} = {
   '41f271c8-e8ba-4225-b21d-403f9751e5a7': {
-    latitude: 58.2935,
-    longitude: 55.2455,
+    latitude: 55.2455,
+    longitude: 58.2935,
     layer: YA_LAYER,
   },
   '07599ea7-76aa-4bbf-8335-86e2436b0254': {
-    latitude: 53.554764,
-    longitude: 56.096764,
+    latitude: 53.654764,
+    longitude: 56.296764,
     layer: LAYER_TOROTAU,
   }
 };
@@ -151,7 +151,7 @@ export class UsersPointsListComponent implements OnInit, AfterViewInit, OnDestro
       target: "form-map",
       view: new View({
         center: fromLonLat([geoparkCoords.longitude, geoparkCoords.latitude]),
-        zoom: 9,
+        zoom: 9.5,
       }),
       layers: [
         new Tile({

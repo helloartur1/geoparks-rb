@@ -114,17 +114,46 @@
 
 <div class="scrollable-list-container">
   <div class="scrollable-list">
-    <mat-list class="route-list">
+    <mat-list class="route-list" >
         <ng-container *ngFor="let route of routes; let i = index">
-            <mat-list-item class="item" [ngClass]="{'active-route': selectedRoute === route}">
-                <div class="content" (click)="cancelContextMenu($event)">
-                    <h5 matListItemTitle class="item__title">{{ route.name }}</h5>
-                </div>
-                <button mat-icon-button (click)="onShowRoute(route)" aria-label="Отобразить на карте" class="show-route-button">
-                    <mat-icon>visibility</mat-icon>
-                </button>
-            </mat-list-item>
+           <mat-list-item class="item" [ngClass]="{
+    'active-route': selectedRoute === route,
+    'expanded': showRatingPanel[route.id]
+  }">
+  <div class="content" (click)="cancelContextMenu($event)">
+    <!-- Название маршрута -->
+    <h5 matListItemTitle class="item__title">{{ route.name }}</h5>
+
+    <!-- Блок рейтинга -->
+    <div *ngIf="showRatingPanel[route.id]" class="rating-panel">
+      <span class="rating-label">Оцените общее впечатление о маршруте:</span>
+      <div class="stars">
+        <mat-icon *ngFor="let s of [1,2,3,4,5]"
+                  (click)="rateRoute(route.id, s)"
+                  [ngClass]="{'selected': s <= (currentRating[route.id] || 0)}">
+          {{ s <= (currentRating[route.id] || 0) ? 'star' : 'star_border' }}
+        </mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопки справа -->
+  <button mat-icon-button (click)="onShowRoute(route)" aria-label="Отобразить на карте" class="show-route-button">
+    <mat-icon>visibility</mat-icon>
+  </button>
+
+<div class="rating-trigger">
+  <button mat-icon-button (click)="toggleRating(route.id)" aria-label="Оценить маршрут">
+    <mat-icon>star</mat-icon>
+  </button>
+  <div class="avg-rating-display" *ngIf="avgRatings[route.id] !== undefined">
+    {{ avgRatings[route.id] | number: '1.1-1' }}
+  </div>
+</div>
+
+</mat-list-item>
+
         </ng-container>
     </mat-list>
-  </div>
+    </div>
 </div>

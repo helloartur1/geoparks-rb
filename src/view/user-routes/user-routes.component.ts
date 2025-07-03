@@ -26,7 +26,9 @@ import { TRouteCoordinates, TRouteProfile } from '../routes/interfaces/route-con
 
 export const GeoparksCoordsMap: { [key: string]: { latitude: number, longitude: number, layer: any } } = {
   '41f271c8-e8ba-4225-b21d-403f9751e5a7': { latitude: 55.2455, longitude: 58.2935, layer: YA_LAYER },
-  '07599ea7-76aa-4bbf-8335-86e2436b0254': { latitude: 53.554764, longitude: 56.096764, layer: LAYER_TOROTAU },
+  '07599ea7-76aa-4bbf-8335-86e2436b0254': {     latitude: 53.654764,
+    longitude: 56.296764,
+    layer: LAYER_TOROTAU, },
 };
 
 interface RouteMetrics {
@@ -61,7 +63,6 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
   public isObjectsShowed: boolean = false;
   public steepnessLegend: { color: string, label: string }[] = [
     { color: 'blue', label: 'Крутой спуск' },
-    { color: 'darkgreen', label: 'Легкий спуск' },
     { color: 'green', label: 'Ровные участки' },
     { color: 'orange', label: 'Легкий подъем' },
     { color: 'red', label: 'Крутой подъем' },
@@ -89,18 +90,54 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.selectedSort = localStorage.getItem('userSort') || 'time-asc';
-    const geoparkId = this.activatedRoute.snapshot.params['geoparkId'];
-    this.routeService.getRouteByGeoparkRouteSystemRoutesGeoparkIdGet(geoparkId)
-      .pipe(take(1))
-      .subscribe(async (routes: IRoute[]) => {
-        this.routes = routes as RouteWithMetrics[];
-        await this.precacheRoutes(routes);
-        await this.sortRoutes();
-        this.initMap();
-        this.showExtentForGeopark();
-      });
+  this.selectedSort = localStorage.getItem('userSort') || 'time-asc';
+  const geoparkId = this.activatedRoute.snapshot.params['geoparkId'];
+  const db = await this.getDb();
+
+  // 1) читаем кеш только для текущего geopark
+  let routes = await db
+    .transaction('routes')
+    .objectStore('routes')
+    .index('byGeopark')
+    .getAll(geoparkId) as IRoute[];
+
+  const needFetch = !routes.length && navigator.onLine;
+  if (needFetch) {
+    try {
+      // 2) фечим с сервера
+      routes = await this.routeService
+        .getRouteByGeoparkRouteSystemRoutesGeoparkIdGet(geoparkId)
+        .pipe(take(1))
+        .toPromise();
+
+      // 3) чистим старые маршруты именно этого geoparkId
+      const tx = db.transaction('routes', 'readwrite');
+      const index = tx.objectStore('routes').index('byGeopark');
+      const keys = await index.getAllKeys(geoparkId) as [string,string][];
+      for (const key of keys) {
+        tx.objectStore('routes').delete(key);
+      }
+      // 4) сохраняем новые — добавляем поле geoparkId в каждый объект
+      for (const r of routes) {
+        tx.objectStore('routes').put({ geoparkId, ...r });
+      }
+      await tx.done;
+
+    } catch (err) {
+      console.warn('Не удалось получить маршруты из API, остаёмся на кеше', err);
+    }
   }
+
+  // 5) дальше ваш существующий pipeline
+  this.routes = routes as RouteWithMetrics[];
+  await this.precacheRoutes(this.routes);
+  await this.sortRoutes();
+  this.initMap();
+  this.showExtentForGeopark();
+  this.trackUsage('route-viewer');
+}
+
+
 
   ngAfterViewInit(): void {}
 
@@ -151,6 +188,8 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
   }
 
   public async showRoute(route: RouteWithMetrics): Promise<void> {
+    this.saveViewedRoute(route.id);
+
     this.selectedRoute = route;
     
     this.clearMapLayers();
@@ -218,11 +257,10 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
     const segments: Feature<LineString>[] = [];
     
     const getColorForSteepness = (steepness: number): string => {
-      if (steepness <= -5 || steepness === -4) return 'blue';
-      if (steepness === -3) return 'darkgreen';
+      if (steepness <= -5 || steepness === -4 ||steepness === -3)  return 'blue';
       if (steepness === -2 || steepness === -1 || steepness === 0) return 'green';
-      if (steepness === 1 || steepness === 2 || steepness === 3) return 'orange';
-      if (steepness >= 4) return 'red';
+      if (steepness === 1 || steepness === 2) return 'orange';
+      if (steepness >= 3) return 'red';
       return 'gray'; 
     };
 
@@ -352,28 +390,34 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
 
       this.map?.setView(new View({
         center: fromLonLat([geoparkData.longitude, geoparkData.latitude]),
-        zoom: 9
+        zoom: 9.5
       }));
       this.map?.addLayer(vectorLayer);
     }
   }
 
   private async getDb(): Promise<IDBPDatabase> {
-    return openDB('RoutesDB', 3, {
-      upgrade(db: IDBPDatabase) {
-        if (!db.objectStoreNames.contains('routes')) {
-          db.createObjectStore('routes', { keyPath: 'id' });
-        }
-  
-        if (!db.objectStoreNames.contains('routeCache')) {
-          const store = db.createObjectStore('routeCache', { 
-            keyPath: ['routeId', 'profile'] 
-          });
-          store.createIndex('byRoute', 'routeId'); // теперь TS не ругается
-        }
-      },
-    });
-  }
+  return openDB('RoutesDB', 5, {
+    upgrade(db, oldVersion) {
+      // 1) Всегда удаляем старый стор routes (и индекс в нём), если он есть
+      if (db.objectStoreNames.contains('routes')) {
+        db.deleteObjectStore('routes');
+      }
+      // 2) Создаём заново routes с keyPath = [geoparkId, id] и индексом byGeopark
+      const routesStore = db.createObjectStore('routes', {
+        keyPath: ['geoparkId', 'id']
+      });
+      routesStore.createIndex('byGeopark', 'geoparkId');
+
+      if (!db.objectStoreNames.contains('routeCache')) {
+        const cacheStore = db.createObjectStore('routeCache', {
+          keyPath: ['routeId', 'profile']
+        });
+        cacheStore.createIndex('byRoute', 'routeId');
+      }
+    }
+  });
+}
   
 
   public async sortRoutes(criteria?: string): Promise<void> {
@@ -576,4 +620,21 @@ export class UserRoutesComponent implements OnInit, AfterViewInit {
   }
 
 
+  private saveViewedRoute(routeId: string): void {
+  const existing = JSON.parse(localStorage.getItem('viewed_routes') || '[]');
+
+  if (!existing.includes(routeId)) {
+    existing.push(routeId);
+    localStorage.setItem('viewed_routes', JSON.stringify(existing));
+  }
+}
+private trackUsage(section: string): void {
+  const geoparkId = this.activatedRoute.snapshot.params['geoparkId'] || 'global';
+  const key = `usage_${geoparkId}`;
+  const usage = JSON.parse(localStorage.getItem(key) || '{}');
+
+  usage[section] = (usage[section] || 0) + 1;
+
+  localStorage.setItem(key, JSON.stringify(usage));
+}
 }

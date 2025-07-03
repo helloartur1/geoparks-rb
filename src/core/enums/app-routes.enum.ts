@@ -8,4 +8,5 @@ export enum AppRoutes {
     USER_ROUTES = 'user-routes',
     SYSTEM_ROUTES = 'system-routes',
     USER_POINTS = 'user-points',
+    USER_STATISTIC = 'user-statistics',
 }

@@ -41,7 +41,7 @@ export const GeoparksCoordsMap: {[key: string]: { latitude:number, longitude: nu
 
 const DEFAULT_EXTENT: ViewOptions = {
   center: fromLonLat([55.958596, 54.735148]),
-  zoom: 9,
+  zoom: 10,
   projection: getProjection('EPSG:3857')!,
 }
 

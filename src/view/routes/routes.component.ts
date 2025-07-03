@@ -5,7 +5,7 @@ import Tile from 'ol/layer/Tile';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import View, { ViewOptions } from 'ol/View';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
 import { get as getProjection } from 'ol/proj.js';
 import { OSM } from 'ol/source';
 import VectorSource from 'ol/source/Vector';
@@ -37,15 +37,15 @@ export const GeoparksCoordsMap: {[key: string]: { latitude:number, longitude: nu
     layer: YA_LAYER,
   },
   '07599ea7-76aa-4bbf-8335-86e2436b0254': {
-    latitude: 53.554764,
-    longitude: 56.096764,
+    latitude: 53.654764,
+    longitude: 56.296764,
     layer: LAYER_TOROTAU,
   }
 };
 
 const DEFAULT_EXTENT: ViewOptions = {
   center: fromLonLat([55.958596, 54.735148]),
-  zoom: 9,
+  zoom: 9.5,
   projection: getProjection('EPSG:3857')!,
 }
 
@@ -123,7 +123,17 @@ export class RoutesComponent {
       }
       )
     }
+    this.trackUsage('route-builder');
   }
+  private trackUsage(section: string): void {
+  const geoparkId = this.activatedRoute.snapshot.params['geoparkId'] || 'global';
+  const key = `usage_${geoparkId}`;
+  const usage = JSON.parse(localStorage.getItem(key) || '{}');
+
+  usage[section] = (usage[section] || 0) + 1;
+
+  localStorage.setItem(key, JSON.stringify(usage));
+}
 
   public onAddPoint(point: IPointGeoObject): void {
     this.points.push(point);
@@ -314,7 +324,6 @@ export class RoutesComponent {
       return;
     }
 
-    // Уничтожаем предыдущий график, если он существует
     if (this.chart) {
       this.chart.destroy();
     }
@@ -409,8 +418,20 @@ export class RoutesComponent {
           center: fromLonLat([longitude, latitude]),
         }),
       });
+
+      this.map.on('click', (evt) => {
+      const coord = evt.coordinate;
+      const [lon, lat] = toLonLat(coord);
+      this.saveClick(lat, lon);
+    });
     });
   }
+  saveClick(lat: number, lon: number): void {
+  const existing = JSON.parse(localStorage.getItem('map_clicks') || '[]');
+  existing.push({ latitude: lat, longitude: lon });
+  localStorage.setItem('map_clicks', JSON.stringify(existing));
+}
+
   ngOnDestroy(): void {
     if (this.chart) {
       this.chart.destroy();

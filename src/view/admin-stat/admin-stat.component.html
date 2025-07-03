@@ -1,0 +1,73 @@
+<div class="page-wrapper">
+    <div class="geopark-switcher" >
+        <label for="geopark-select">Геопарк:</label>
+        <select id="geopark-select" [(ngModel)]="selectedGeopark" (change)="onGeoparkChange()">
+            <option value="toratau">Торатау</option>
+            <option value="yangantau">Янган-Тау</option>
+    </select>
+    </div>
+    <button class="report" mat-raised-button color="primary" (click)="generatePdfReport()"> 📄 Скачать отчет в PDF </button>
+
+<div class="container">
+
+
+    <div class="useract">
+        <h2>Активность пользователей по разделам</h2>
+        <canvas id="userActivityChart" width="300" height="300"></canvas>
+    </div>
+
+
+
+    <div class="route-stat">
+        <h2>Карта пользовательской активности</h2>
+        <span class="map-description">
+            На карте отображены участки, представляющие интерес для пользователей:
+            <ul class="heat-legend-list">
+                <li><span class="dot red"></span><strong> Яркие зоны</strong> — частые клики по карте</li>
+                <li><span class="dot green"></span><strong> Слабые зоны</strong> — просмотренные маршруты и метки</li>
+            </ul>
+        </span>
+        <div class="heatmap-filters">
+            <label><input type="checkbox" [(ngModel)]="showClicks" (change)="initHeatmap()"> Зоны кликов</label>
+            <label><input type="checkbox" [(ngModel)]="showLabels" (change)="initHeatmap()"> Жалобы</label>
+            <label><input type="checkbox" [(ngModel)]="showViewedRoutes" (change)="initHeatmap()"> Просмотры маршрутов</label>
+        </div>
+        <div id="stat-map" class="stat-map"></div>
+        <div class="route-summary">
+            <p>Просмотрено маршрутов: {{ viewedRoutesCount }}/{{ totalRoutesCount }}
+                ({{ (viewedRoutesCount / totalRoutesCount * 100) | number: '1.0-0' }}%)
+            </p>
+        </div>
+
+    </div>
+
+    <div class="pending-markers" style="font-size: 18px;">
+        <h2>Ожидающие метки ({{ pendingLabels.length }})</h2>
+        <ul>
+            <li *ngFor="let label of pendingLabels">
+            {{ label.comment || 'Без описания' }}
+            </li>
+        </ul>
+        <button class="goto-button" (click)="goToUserPoints()">Перейти в раздел</button>
+    </div>
+
+    <div class="other">
+        <h2>Популярные маршруты</h2>
+        <ul>
+            <li *ngFor="let route of routes">
+                {{ route.name }} — <span style="color: #FFD700;">★</span> {{ avgRatings[route.id] | number: '1.1-1' }}
+                <span *ngIf="ratingCounts[route.id]">({{ ratingCounts[route.id] }} голосов)</span>
+            </li>
+        </ul>
+
+        <div class="route-summary">
+            <p>Оценено маршрутов: {{ ratedRoutesCount }}/{{ routes.length }}
+                ({{ (ratedRoutesCount / routes.length * 100) | number: '1.0-0' }}%)
+            </p>
+            <p>Маршрутов с рейтингом ≥ 4.0: {{ highRatedRoutesCount }}/{{ routes.length }} 
+                ({{ (highRatedRoutesCount / routes.length * 100) | number: '1.0-0' }}%)
+            </p>
+        </div>
+    </div>
+</div>
+</div>
