@@ -1,0 +1,20 @@
+<div class="login">
+  <div class="login-form" [formGroup]="form">
+    <h3 class="login-form__title">Регистрация</h3>
+    <div class="login-form__fields">
+      <mat-form-field>
+        <mat-label>Имя пользователя</mat-label>
+        <input matInput formControlName="userName" placeholder="Имя пользователя">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Пароль</mat-label>
+        <input matInput type="password" formControlName="password" placeholder="Пароль">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Подтвердите пароль</mat-label>
+        <input matInput type="password" formControlName="confirmPassword" placeholder="Подтвердите пароль">
+      </mat-form-field>
+    </div>
+    <button class="login-button" mat-raised-button color="primary" (click)="registerSubmit()">Зарегистрироваться</button>
+  </div>
+</div>

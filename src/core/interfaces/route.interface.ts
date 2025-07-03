@@ -10,11 +10,13 @@ export interface IRoutePoint {
 }
 
 export interface IRoute {
+    user_id: string;
     id: string;
     name: string;
     description: string;
     route_points: Array<IRoutePoint>; 
     route_type?: 'admin' | 'user';
+    
 }
 
 export interface IRouteCache {

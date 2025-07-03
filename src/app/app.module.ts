@@ -59,12 +59,12 @@ async function initDB() {
     MatIconModule,
     HttpClientModule,
     FormsModule,
-    ApiModule.forRoot(() => new Configuration({ basePath: "http://192.168.1.112:8000"})),
+    ApiModule.forRoot(() => new Configuration({ basePath: "http://127.0.0.1:8000"})),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable
       // or after 30 seconds (whichever comes first).
-      registrationStrategy: 'registerWhenStable:30000'
+      registrationStrategy: 'registerWhenStable'
     }),
   ],
   providers: [

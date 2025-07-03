@@ -136,6 +136,9 @@ export class OpenRouteService {
         const coords3d: number[][] = feature.geometry.coordinates;
         const formattedCoords = coords3d.map(c => [c[1], c[0], c[2]] as [number,number,number]);
         const summary = feature.properties.summary;
+        console.log(res);
+        console.log("formatted",formattedCoords);
+        console.log("coords", coordinates)
         return {
           coordinates,
           formattedCoords,

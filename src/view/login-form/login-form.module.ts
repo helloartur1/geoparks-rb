@@ -7,12 +7,14 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { RegisterComponent } from './register/register.component';
 
-
+import { Router, RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
     LoginFormComponent,
+    RegisterComponent,
   ],
   imports: [
     CommonModule,
@@ -22,6 +24,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
+    RouterModule
   ],
   exports: [
     LoginFormComponent,

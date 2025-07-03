@@ -1,138 +1,152 @@
-<div class="search-point">
+<div class="routes-list-wrapper" style="max-height:100vh; overflow:auto;">
+  <div class="search-point">
     <ng-container *ngIf="items.length">
-        <mat-form-field appearance="fill">
-            <mat-label>Поиск объекта</mat-label>
-            <input type="text"
-                   matInput
-                   [formControl]="pointControl"
-                   [matAutocomplete]="auto">
-            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                <mat-option *ngFor="let item of filteredOptions | async" [value]="item">
-                    {{ item.name }}
-                </mat-option>
-            </mat-autocomplete>
+      <div class="from-to-select">
+        <!-- Поле "Откуда" -->
+        <mat-form-field appearance="fill" class="from-field">
+          <mat-label>Откуда</mat-label>
+          <input
+            matInput
+            [formControl]="fromControl"
+            [matAutocomplete]="autoFrom"
+            placeholder="Выберите точку отправления">
+          <button matSuffix mat-icon-button *ngIf="fromControl.value" (click)="clearFrom()">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-autocomplete #autoFrom="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let item of filteredFromOptions | async" [value]="item">
+              {{ item.name }}
+            </mat-option>
+          </mat-autocomplete>
         </mat-form-field>
-    </ng-container>
-   
 
+        <!-- Поле "Куда" -->
+        <mat-form-field appearance="fill" class="to-field">
+          <mat-label>Куда</mat-label>
+          <input
+            matInput
+            [formControl]="toControl"
+            [matAutocomplete]="autoTo"
+            placeholder="Выберите точку назначения">
+          <button matSuffix mat-icon-button *ngIf="toControl.value" (click)="clearTo()">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-autocomplete #autoTo="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let item of filteredToOptions | async" [value]="item">
+              {{ item.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+
+      <!-- Кнопка добавления новой точки -->
+      <div class="add-point-button">
+        <button mat-raised-button color="accent" (click)="addExtraPoint()">
+          Добавить точку
+        </button>
+      </div>
+
+      <!-- Дополнительные поля динамически -->
+      <ng-container *ngFor="let ctrl of extraControls; let i = index">
+        <mat-form-field appearance="fill" class="extra-field">
+          <mat-label>Точка {{ i + 1 }}</mat-label>
+          <input
+            matInput
+            [formControl]="ctrl"
+            [matAutocomplete]="autoExtra"
+            placeholder="Выберите точку">
+          <button matSuffix mat-icon-button (click)="removeExtraPoint(i)">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-autocomplete #autoExtra="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let item of filteredExtraOptions[i] | async" [value]="item">
+              {{ item.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </ng-container>
+    </ng-container>
+
+    <!-- Профили маршрута -->
     <div class="profile-buttons">
-        <button mat-button
-                [ngClass]="{'active': selectedProfile === 'foot-walking'}"
-                (click)="selectProfile('foot-walking')">
-            <mat-icon>directions_walk</mat-icon>
-            Пеший
-        </button>
-        <button mat-button
-                [ngClass]="{'active': selectedProfile === 'driving-car'}"
-                (click)="selectProfile('driving-car')">
-            <mat-icon>directions_car</mat-icon>
-            Автомобиль
-        </button>
-        <button mat-button
-                [ngClass]="{'active': selectedProfile === 'cycling-regular'}"
-                (click)="selectProfile('cycling-regular')">
-            <mat-icon>directions_bike</mat-icon>
-            Велосипед
-        </button>
-        <button mat-button
-                [ngClass]="{'active': selectedProfile === 'river'}"
-                (click)="selectProfile('river')">
-            <mat-icon>directions_boat</mat-icon>
-            Речной
-        </button>
+      <button mat-button [ngClass]="{'active': selectedProfile === 'foot-walking'}" (click)="selectProfile('foot-walking')">
+        <mat-icon>directions_walk</mat-icon> Пеший
+      </button>
+      <button mat-button [ngClass]="{'active': selectedProfile === 'driving-car'}" (click)="selectProfile('driving-car')">
+        <mat-icon>directions_car</mat-icon> Автомобиль
+      </button>
+      <button mat-button [ngClass]="{'active': selectedProfile === 'cycling-regular'}" (click)="selectProfile('cycling-regular')">
+        <mat-icon>directions_bike</mat-icon> Велосипед
+      </button>
+      <button mat-button [ngClass]="{'active': selectedProfile === 'river'}" (click)="selectProfile('river')">
+        <mat-icon>directions_boat</mat-icon> Речной
+      </button>
     </div>
+
+    <!-- Кнопки построения/сохранения маршрута -->
     <div class="route-buttons" *ngIf="showRouteButtons">
-        <button mat-raised-button 
-                color="primary" 
-                [disabled]="!pointControl.value" 
-                (click)="addPointToRoute()">
-            Добавить в маршрут
-        </button>
-        <button *ngIf="isAuthenticated()" 
-                mat-raised-button 
-                color="primary" 
-                [disabled]="currentPoints.length < 2" 
-                (click)="onSaveRoute()">
-            Сохранить маршрут
-        </button>
+      <!-- <button mat-raised-button color="primary" [disabled]="!fromControl.value || !toControl.value" (click)="buildRoute()">
+        Построить маршрут
+      </button> -->
+      <button *ngIf="isAuthenticated()" mat-raised-button color="primary" [disabled]="currentPoints.length < 2" (click)="onSaveRoute()">
+        Сохранить маршрут
+      </button>
     </div>
-</div>
-<button class="elevation-chart-toggle" mat-button (click)="onToggleWeather()">
-    <mat-icon >cloud</mat-icon>
-    {{ showWeatherInfo ? 'Скрыть погоду' : 'Показать погоду' }}
-  </button>
-<!-- Weather Information Section -->
-<div *ngIf="showWeatherInfo" class="weather-info">
-    <div class="weather-header">
+
+    <!-- Кнопка переключения погоды -->
+    <button class="elevation-chart-toggle" mat-button (click)="onToggleWeather()">
+      <mat-icon>cloud</mat-icon>
+      {{ showWeatherInfo ? 'Скрыть погоду' : 'Показать погоду' }}
+    </button>
+
+    <!-- Информация о погоде -->
+    <div *ngIf="showWeatherInfo" class="weather-info">
+      <div class="weather-header">
         <h3>Погода</h3>
         <div class="weather-icon">
-            <img [src]="getWeatherIconUrl()" alt="Weather Icon">
+          <img [src]="getWeatherIconUrl()" alt="Weather Icon">
         </div>
+      </div>
+      <p><strong>Температура:</strong> {{ roundTemperature(weatherData?.main?.temp) }}°C</p>
+      <p><strong>Влажность:</strong> {{ weatherData?.main?.humidity }}%</p>
+      <p><strong>Ветер:</strong> {{ weatherData?.wind?.speed }} м/с</p>
+      <p><strong>Описание:</strong> {{ weatherData?.weather[0]?.description }}</p>
     </div>
-    <p><strong>Температура:</strong> {{ roundTemperature(weatherData?.main?.temp) }}°C</p>
-    <p><strong>Влажность:</strong> {{ weatherData?.main?.humidity }}%</p>
-    <p><strong>Ветер:</strong> {{ weatherData?.wind?.speed }} м/с</p>
-    <p><strong>Описание:</strong> {{ weatherData?.weather[0]?.description }}</p>
-</div>
 
-<!-- Кнопка для переключения отображения погоды -->
-
-
-
-
-<div class="route-info" *ngIf="distance || duration">  
-    <div class="info-box">  
-        <div *ngIf="distance" class="route-stat">  
-            <mat-icon>  
-                <ng-container [ngSwitch]="selectedProfile">  
-                    <ng-container *ngSwitchCase="'foot-walking'">directions_walk</ng-container>  
-                    <ng-container *ngSwitchCase="'driving-car'">directions_car</ng-container>  
-                    <ng-container *ngSwitchCase="'cycling-regular'">directions_bike</ng-container>
-                      
-                    <ng-container *ngSwitchDefault>directions_walk</ng-container> <!-- Значение по умолчанию -->  
-                </ng-container>  
-            </mat-icon>  
-            <span>Расстояние: {{ distance }}</span>  
-        </div>  
-        <div *ngIf="duration" class="route-stat">  
-            <mat-icon>  
-                <ng-container [ngSwitch]="selectedProfile">  
-                    <ng-container *ngSwitchCase="'foot-walking'">schedule</ng-container>  
-                    <ng-container *ngSwitchCase="'driving-car'">schedule</ng-container>  
-                    <ng-container *ngSwitchCase="'cycling-regular'">schedule</ng-container>  
-                    <ng-container *ngSwitchCase="'river'">schedule</ng-container>
-                    <ng-container *ngSwitchDefault>schedule</ng-container> <!-- Значение по умолчанию -->  
-                </ng-container>  
-            </mat-icon> 
-            <span>Время в пути: {{ duration }}</span>  
-        </div>  
-    </div>  
-</div>  
-<div class="scroll">
-    <div class="points-list">
-        <mat-list>
-            <ng-container *ngFor="let point of currentPoints; let i = index">
-                <mat-list-item class="item">
-                    <div class="content" style="flex: 1;">
-                        <h5 matListItemTitle class="item__title">{{ point.name }}</h5>
-                    </div>
-                    <button mat-icon-button 
-                            (click)="deletePointFromRoute(point.id)" 
-                            aria-label="Удалить">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </mat-list-item>
+    <!-- Статистика маршрута -->
+    <div class="route-info" *ngIf="distance || duration">
+      <div class="info-box">
+        <div *ngIf="distance" class="route-stat">
+          <mat-icon>
+            <ng-container [ngSwitch]="selectedProfile">
+              <ng-container *ngSwitchCase="'foot-walking'">directions_walk</ng-container>
+              <ng-container *ngSwitchCase="'driving-car'">directions_car</ng-container>
+              <ng-container *ngSwitchCase="'cycling-regular'">directions_bike</ng-container>
+              <ng-container *ngSwitchDefault>directions_walk</ng-container>
             </ng-container>
-        </mat-list>
+          </mat-icon>
+          <span>Расстояние: {{ distance }}</span>
+        </div>
+        <div *ngIf="duration" class="route-stat">
+          <mat-icon>
+            <ng-container [ngSwitch]="selectedProfile">
+              <ng-container *ngSwitchCase="'foot-walking'">schedule</ng-container>
+              <ng-container *ngSwitchCase="'driving-car'">schedule</ng-container>
+              <ng-container *ngSwitchCase="'cycling-regular'">schedule</ng-container>
+              <ng-container *ngSwitchCase="'river'">schedule</ng-container>
+              <ng-container *ngSwitchDefault>schedule</ng-container>
+            </ng-container>
+          </mat-icon>
+          <span>Время в пути: {{ duration }}</span>
+        </div>
+      </div>
     </div>
-    <button mat-button
-                (click)="toggleElevationChart()"
-                class="elevation-chart-toggle">
-                <mat-icon > bar_chart</mat-icon>
-            {{ showElevationChart ? 'Скрыть график высот' : 'Показать график высот' }}
-        </button>
-    <canvas *ngIf="duration && showElevationChart" 
-        id="elevationChart" 
-        class="elevation-chart">
-    </canvas>
-</div>
+
+    <!-- Список точек и график высот -->
+      <button mat-button (click)="toggleElevationChart()" class="elevation-chart-toggle">
+        <mat-icon>bar_chart</mat-icon>
+        {{ showElevationChart ? 'Скрыть график высот' : 'Показать график высот' }}
+      </button>
+      <canvas [hidden]="!showElevationChart" id="elevationChart" class="elevation-chart" style="width: 100%; height: 300px;"></canvas>
+    </div>
+  </div>

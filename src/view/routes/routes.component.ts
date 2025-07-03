@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
 import Map from 'ol/Map';
 import Fill from 'ol/style/Fill';
 import Tile from 'ol/layer/Tile';
@@ -15,10 +15,10 @@ import LineString from 'ol/geom/LineString';
 import Point from 'ol/geom/Point';
 import { Feature } from 'ol';
 import Icon from 'ol/style/Icon';
-import Text from 'ol/style/Text.js';
+import CircleStyle from 'ol/style/Circle';
 
 import { FormControl } from '@angular/forms';
-import { Chart, Filler, LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend } from 'chart.js';
+import { Chart, Filler, LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend, ChartEvent } from 'chart.js';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -85,7 +85,8 @@ export class RoutesComponent implements OnInit, AfterViewInit, OnDestroy {
     private routeService: RouteService,
     private router: Router,
     private dialog: MatDialog,
-    private authAdminService: AuthAdminService
+    private authAdminService: AuthAdminService,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -196,7 +197,7 @@ export class RoutesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.openRouteService.getElevation$({ coordinates: coords, profile: this.selectedProfile })
         .pipe(take(1))
         .subscribe(elevRes => {
-          if (elevRes.formattedCoords) {
+          if (elevRes.formattedCoords && this.showElevationChart) {
             this.createElevationChart(elevRes.formattedCoords);
           }
         });
@@ -210,15 +211,8 @@ export class RoutesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private renderRoute(res: IRouteResult): void {
-    console.log('❇️ River res.coordinates length:', res.coordinates.length);
-    console.log('First 5 coords:', res.coordinates.slice(0, 5));
-    if (!res.coordinates || res.coordinates.length === 0) {
-      console.warn('Водный маршрут не найден или нет координат');
-      return;
-    }
-   
-  
-    const coords3857 = (res.coordinates as [number,number][]).map(([lon, lat]) => fromLonLat([lon, lat]));
+    if (!res.coordinates || res.coordinates.length === 0) return;
+    const coords3857 = (res.coordinates as [number, number][]).map(([lon, lat]) => fromLonLat([lon, lat]));
     const line = new LineString(coords3857);
     this.lineLayer = new VectorLayer({
       source: new VectorSource({ features: [new Feature({ geometry: line })] }),
@@ -239,9 +233,8 @@ export class RoutesComponent implements OnInit, AfterViewInit, OnDestroy {
     const features = this.points.map((p, i) => {
       const feat = new Feature({ geometry: new Point(fromLonLat([p.longitude, p.latitude])) });
       feat.setId(p.id);
-      const iconName = 'pin-map.png';
       feat.setStyle(new Style({
-        image: new Icon({ src: `assets/icons/${iconName}`, scale: 0.05 })
+        image: new Icon({ src: `assets/icons/pin-map.png`, scale: 0.05 })
       }));
       return feat;
     });
@@ -263,6 +256,25 @@ export class RoutesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public toggleElevationChart(): void {
     this.showElevationChart = !this.showElevationChart;
+
+    // если включаем и есть хотя бы две точки — запрашиваем профиль
+    if (this.showElevationChart && this.points.length > 1) {
+      const coords = this.points.map(p => [p.longitude, p.latitude] as [number, number]);
+      this.openRouteService.getElevation$({ coordinates: coords, profile: this.selectedProfile })
+        .pipe(take(1))
+        .subscribe(elevRes => {
+
+          if (elevRes.formattedCoords) {
+            this.createElevationChart(elevRes.formattedCoords);
+          }
+        });
+    }
+
+    // при выключении удаляем старый график
+    if (!this.showElevationChart && this.chart) {
+      this.chart.destroy();
+      this.chart = null;
+    }
   }
 
   public toggleWeather(): void {
@@ -271,25 +283,77 @@ export class RoutesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private createElevationChart(coords: number[][]): void {
     const canvas = document.getElementById('elevationChart') as HTMLCanvasElement;
-    const ctx = canvas?.getContext('2d');
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
     if (this.chart) this.chart.destroy();
 
+    // Prepare data
     const elevs = coords.map(c => c[2]);
     const base = elevs[0];
-    const data = elevs.map(e => e - base);
+    const relativeElevations = elevs.map(e => e - base);
     const labels = coords.map((_, i) => ((i * (this.distance! / coords.length) / 1000)).toFixed(1));
 
     this.chart = new Chart(ctx, {
       type: 'line',
-      data: { labels, datasets: [{ label: 'Высота (м)', data, fill: true }] },
+      data: {
+        labels,
+        datasets: [{
+          label: 'Высота (м)',
+          data: relativeElevations,
+          borderColor: '#305C3F',
+          fill: true,
+          backgroundColor: 'rgba(48, 92, 63, 0.2)'
+        }]
+      },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-          tooltip: { callbacks: { title: ([item]) => `${item.label} км`, label: ctx => `Высота: ${ctx.parsed.y.toFixed(1)} м` } }
-        },
-        scales: { x: { title: { display: true, text: 'Расстояние (км)' } }, y: { title: { display: true, text: 'Высота (м)' }, beginAtZero: true } }
-      }
+          title: { display: true, text: 'Профиль высот маршрута' },
+          tooltip: {
+            callbacks: {
+              label: ctx => `Высота: ${ctx.parsed.y.toFixed(1)} м`,
+              title: items => `${items[0].label} км`
+            }
+          }
+        }
+      },
+      plugins: [{
+        id: 'hoverPlugin',
+        afterEvent: (chart, args) => {
+          const event = args.event as unknown as MouseEvent;
+          const elements = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+          console.log('hover elements', elements);
+          this.ngZone.run(() => {
+            if (elements.length) {
+              const idx = elements[0].index;
+              const [lon, lat] = coords[idx];
+              this.createHoverMarker(lon, lat);
+            } else if (this.hoverMarkerLayer) {
+              this.map?.removeLayer(this.hoverMarkerLayer);
+              this.hoverMarkerLayer = undefined;
+            }
+          });
+        }
+      }]
     });
+  }
+
+  private createHoverMarker(lon: number, lat: number): void {
+    console.log('createHoverMarker', lon, lat);
+    if (this.hoverMarkerLayer) {
+      this.map?.removeLayer(this.hoverMarkerLayer);
+    }
+    const point = new Feature({ geometry: new Point(fromLonLat([lat, lon])) });
+    point.setStyle(new Style({
+      image: new CircleStyle({
+        radius: 8,
+        fill: new Fill({ color: 'rgba(255, 165, 0, 0.7)' }),
+        stroke: new Stroke({ color: '#FFA500', width: 2 })
+      })
+    }));
+    this.hoverMarkerLayer = new VectorLayer({ source: new VectorSource({ features: [point] }) });
+    this.hoverMarkerLayer.setZIndex(999);
+    this.map?.addLayer(this.hoverMarkerLayer);
   }
 }

@@ -22,19 +22,22 @@ export class UserRoutesListComponent {
 
   @Input()
   set routes(value: IRoute[]) {
-    this._routes = value;
+    this._routes = (value ?? []).filter(route => route.user_id === "1c0b3204-5c44-454f-91c1-e4a48f4ba39c");
+    console.log('Геопарковские маршруты:', this._routes);
     this.updateCategoryItems();
   }
+
   get routes(): IRoute[] {
     return this._routes;
   }
 
   @Input()
   set routes_user(value: IRoute[]) {
-    console.log('routes_user:', value); // Отладочный вывод
-    this._routes_user = value;
+    this._routes_user = value ?? [];
+    console.log('Сохраненные маршруты пользователя:', this._routes_user);
     this.updateCategoryItems();
   }
+
   get routes_user(): IRoute[] {
     return this._routes_user;
   }
@@ -60,17 +63,17 @@ export class UserRoutesListComponent {
     this.categoryItems = [
       {
         name: 'Маршруты геопарка',
-        items: this.routes,
+        items: this._routes,
       },
       {
         name: 'Сохраненные маршруты',
-        items: this.routes_user,
+        items: this._routes_user,
       },
     ];
-    this.cdr.detectChanges(); // Принудительно обновляем представление
+    this.cdr.detectChanges();
   }
 
-  public trackByCategory(index: number, item: any): number {
+  public trackByCategory(index: number): number {
     return index;
   }
 
@@ -80,9 +83,7 @@ export class UserRoutesListComponent {
 
   public openContextMenu(evt: MouseEvent, index: number): void {
     evt.preventDefault();
-    if (this.triggers) {
-      this.triggers.get(index)?.openMenu();
-    }
+    this.triggers?.get(index)?.openMenu();
   }
 
   public selectProfile(profile: TRouteProfile): void {

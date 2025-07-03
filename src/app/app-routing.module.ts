@@ -13,6 +13,7 @@ import { RoutesComponent } from 'src/view/routes/routes.component';
 import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
 import { SystemRoutesComponent } from 'src/view/system-routes/system-routes.component';
 import { RoutesListComponent } from 'src/view/routes/routes-list/routes-list.component';
+import { RegisterComponent } from 'src/view/login-form/register/register.component';
 
 const routes: Routes = [
   {
@@ -30,6 +31,10 @@ const routes: Routes = [
   {
     path: AppRoutes.LOGIN,
     component: LoginFormComponent,
+  },
+  {
+    path: 'register',
+    component: RegisterComponent,
   },
   {
     path: `${AppRoutes.EDIT_FORM}/:geoobjectUid`,

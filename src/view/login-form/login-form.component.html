@@ -12,7 +12,9 @@
             </mat-form-field>
         </div>
         <button class="login-button" mat-raised-button color="primary" (click)="loginSubmit()">Войти</button>
-    </div>
+        <button class="login-button" mat-raised-button color="primary" [routerLink]="['/register']">
+            Нет аккаунта? Зарегистрироваться
+        </button>
     <ng-container *ngIf="showError">
         <p class="login-error">Произошла ошибка при входе</p>
     </ng-container>
