@@ -30,7 +30,9 @@ interface MapState {
 }
 
 const DEFAULT_EXTENT: ViewOptions = {
-  center: fromLonLat([55.958596, 54.735148]),
+
+  center: fromLonLat([51.155889, 55.179724]),
+
   zoom: 9,
 };
 
@@ -46,9 +48,10 @@ export class MainViewMapComponent implements OnChanges, OnInit, AfterViewInit, O
   @Input() public setSearch$: Subject<string> | undefined = undefined;
   @Input() public points: IPointGeoObject[] = [];
   @Input() public geopark: any | undefined = undefined;
+
   @Output() mapClick = new EventEmitter<{ lat: number; lng: number }>();
   @Input() public isSelectingPoint: boolean = false;
-  
+
   public map: Map | undefined = undefined;
   public isLegendShowed: boolean = false;
   public destroy$: Subject<void> = new Subject<void>();
@@ -236,6 +239,7 @@ private drawGeoparkBoundary(layerData: any) {
         }
       });
     });
+<<<<<<< HEAD
     
   }
   saveClick(lat: number, lon: number): void {
@@ -244,6 +248,12 @@ private drawGeoparkBoundary(layerData: any) {
     localStorage.setItem('map_clicks', JSON.stringify(existing));
   }
   
+=======
+
+  }
+
+
+>>>>>>> 5ea7a60df049debe85e7254cb6416bf3858dcb86
   private async initializeMap(): Promise<void> {
     const restoredState = await this.restoreMapState();
 
@@ -261,12 +271,15 @@ private drawGeoparkBoundary(layerData: any) {
       view: new View(viewOptions),
     });
 
+<<<<<<< HEAD
     this.map.on('click', (evt) => {
     const coord = evt.coordinate;
     const [lon, lat] = toLonLat(coord);
     this.saveClick(lat, lon);
   });
 
+=======
+>>>>>>> 5ea7a60df049debe85e7254cb6416bf3858dcb86
     this.map.on('click', (evt: MapBrowserEvent<any>) => {
       console.log('Map clicked');
       this.isSelectingPoint = true;
@@ -278,6 +291,7 @@ private drawGeoparkBoundary(layerData: any) {
         console.log("fdsfs");
       }
     });
+
     if (this.points.length) {
       this.renderPoints();
     }
@@ -488,6 +502,7 @@ private drawGeoparkBoundary(layerData: any) {
     this.destroy$.complete();
     this.mapStateChangeDebouncer.complete();
   }
+<<<<<<< HEAD
   private trackUsage(section: string): void {
   const geoparkId = this.activatedRoute.snapshot.params['geoparkId'] || 'global';
   const key = `usage_${geoparkId}`;
@@ -499,4 +514,6 @@ private drawGeoparkBoundary(layerData: any) {
   }
 
 
+=======
+>>>>>>> 5ea7a60df049debe85e7254cb6416bf3858dcb86
 }

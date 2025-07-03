@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -22,16 +22,34 @@ import { SystemRoutesComponent } from '../view/system-routes/system-routes.compo
 import { UserRoutesComponent } from 'src/view/user-routes/user-routes.component';
 import { AdminStatComponent } from '../view/admin-stat/admin-stat.component';
 
+import { openDB } from 'idb';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
+const DB_NAME = 'RoutesDB';
+const STORE_NAME = 'routes';
+
+async function initDB() {
+  return await openDB(DB_NAME, 1, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+      }
+    },
+  });
+}
 
 
 @NgModule({
   declarations: [
     AppComponent,
     SystemRoutesComponent,
+<<<<<<< HEAD
     AdminStatComponent
+=======
+>>>>>>> 5ea7a60df049debe85e7254cb6416bf3858dcb86
   ],
   imports: [
+    HttpClientModule,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
@@ -47,7 +65,14 @@ import { AdminStatComponent } from '../view/admin-stat/admin-stat.component';
     MatIconModule,
     HttpClientModule,
     FormsModule,
-    ApiModule.forRoot(() => new Configuration({ basePath: "http://localhost:8000"})),
+
+    ApiModule.forRoot(() => new Configuration({ basePath: "http://192.168.1.112:8000"})),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
 
   ],
   providers: [

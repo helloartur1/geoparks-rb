@@ -1,6 +1,47 @@
 @import 'normalize.css';
 @import './styles/variables.scss';
 @import './styles/utils.scss';
+@import './styles/media.scss';
+@import './styles/responsive.scss';
+
+/* Общие адаптивные стили */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Адаптивные изображения по умолчанию */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Адаптивные контейнеры */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 24px !important;
+  }
+  
+  h2 {
+    font-size: 22px !important;
+  }
+  
+  h3 {
+    font-size: 20px !important;
+  }
+  
+  p {
+    font-size: 14px !important;
+  }
+}
 
 @font-face {
     font-family: Roboto;

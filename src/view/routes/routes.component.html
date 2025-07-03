@@ -4,10 +4,12 @@
    [items]="items" 
    [distance]="formattedDistance"
    [duration]="formattedDuration"
+   [weatherData]="weatherData"
    (addPoint)="onAddPoint($event)" 
    (deletePoint)="onDeletePoint($event)"
    (saveRoute)="onSaveRoute()"
    (toggleChart)="toggleElevationChart()"
+   (toggleWeather)="toggleWeather()"
 > 
 </geo-routes-list>
 <!-- <select id="profileSelect" [(ngModel)]="selectedProfile" (change)="onProfileChange()">

@@ -1,3 +1,5 @@
+@import '../../styles/media.scss';
+
 :host {
     display: block;
     height: 100vh;
@@ -9,4 +11,10 @@
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+    
+    @include mobile {
+        padding-bottom: 60px; // Добавляем отступ внизу для мобильных устройств
+    }
 }
+
+

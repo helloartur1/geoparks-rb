@@ -18,8 +18,11 @@ export class RoutesListComponent implements OnInit {
   @Input() distance?: string;  // Add this
   @Input() duration?: string;  // Add this
   @Input() selectedProfile: TRouteProfile = 'foot-walking'; 
+  @Input() weatherData: any; // Добавьте это
+  @Output() toggleWeather = new EventEmitter<void>();
 
   public showElevationChart = false;
+  public showWeatherInfo = false; // Добавьте это
   @Output()
   public toggleChart: EventEmitter<void> = new EventEmitter<void>();
   @Input() showRouteButtons: boolean = true;
@@ -49,6 +52,7 @@ export class RoutesListComponent implements OnInit {
       }),
     );
   }
+
   public toggleElevationChart(): void { 
     if(this.showElevationChart){
       this.showElevationChart=false;
@@ -57,9 +61,24 @@ export class RoutesListComponent implements OnInit {
     }
     this.toggleChart.emit();
   }
+  public roundTemperature(temp: number | undefined): number | undefined {
+    if (temp === undefined) return undefined; // Если температура не определена, возвращаем undefined
+    return Math.round(temp); // Округляем до ближайшего целого
+  }
+  // Метод для переключения отображения погоды
+  public onToggleWeather(): void {
+    this.showWeatherInfo = !this.showWeatherInfo;
+    this.toggleWeather.emit(); // Отправляем событие родительскому компоненту
+  }
 
+  public getWeatherIconUrl(): string {
+    if (this.weatherData?.weather?.length > 0) {
+      const iconCode = this.weatherData.weather[0].icon; // Получаем код иконки
+      return `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+    }
+    return ''; // Возвращаем пустую строку, если данных нет
+  }
   
-
   public addPointToRoute(): void {
     const point: IPointGeoObject | undefined = this.pointControl.value;
     if (point) {
@@ -93,7 +112,9 @@ export class RoutesListComponent implements OnInit {
   public isAdmin(): boolean {
     return this.authService.getAuthData()?.role === 'admin';
   }
-
+  public isAuthenticated(): boolean {
+    return this.authService.isAuthenticated(); // Используем метод из сервиса
+  }
   public cancelContextMenu(evt: MouseEvent): void {
     evt.stopPropagation();
   }

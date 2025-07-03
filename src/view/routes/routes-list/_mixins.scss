@@ -1,0 +1,71 @@
+// Медиа-запросы для адаптивности
+// Мобильные устройства (портретная ориентация)
+$mobile-small: 320px;
+$mobile-medium: 375px;
+$mobile-large: 425px;
+$tablet: 768px;
+$desktop-small: 1024px;
+$desktop-medium: 1280px;
+$desktop-large: 1440px;
+
+// Миксины для медиа-запросов
+@mixin mobile-small {
+  @media (max-width: #{$mobile-small}) {
+    @content;
+  }
+}
+
+@mixin mobile-medium {
+  @media (max-width: #{$mobile-medium}) {
+    @content;
+  }
+}
+
+@mixin mobile-large {
+  @media (max-width: #{$mobile-large}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: #{$tablet}) {
+    @content;
+  }
+}
+
+@mixin desktop-small {
+  @media (max-width: #{$desktop-small}) {
+    @content;
+  }
+}
+
+@mixin desktop-medium {
+  @media (max-width: #{$desktop-medium}) {
+    @content;
+  }
+}
+
+@mixin desktop-large {
+  @media (max-width: #{$desktop-large}) {
+    @content;
+  }
+}
+
+// Общие медиа-запросы
+@mixin mobile {
+  @media (max-width: #{$mobile-large}) {
+    @content;
+  }
+}
+
+@mixin tablet-and-below {
+  @media (max-width: #{$tablet}) {
+    @content;
+  }
+}
+
+@mixin desktop-and-below {
+  @media (max-width: #{$desktop-medium}) {
+    @content;
+  }
+}

@@ -34,6 +34,12 @@
             <mat-icon>directions_bike</mat-icon>
             Велосипед
         </button>
+        <button mat-button
+                [ngClass]="{'active': selectedProfile === 'river'}"
+                (click)="selectProfile('river')">
+            <mat-icon>directions_boat</mat-icon>
+            Речной
+        </button>
     </div>
     <div class="route-buttons" *ngIf="showRouteButtons">
         <button mat-raised-button 
@@ -42,7 +48,7 @@
                 (click)="addPointToRoute()">
             Добавить в маршрут
         </button>
-        <button *ngIf="isAdmin()" 
+        <button *ngIf="isAuthenticated()" 
                 mat-raised-button 
                 color="primary" 
                 [disabled]="currentPoints.length < 2" 
@@ -51,6 +57,28 @@
         </button>
     </div>
 </div>
+<button class="elevation-chart-toggle" mat-button (click)="onToggleWeather()">
+    <mat-icon >cloud</mat-icon>
+    {{ showWeatherInfo ? 'Скрыть погоду' : 'Показать погоду' }}
+  </button>
+<!-- Weather Information Section -->
+<div *ngIf="showWeatherInfo" class="weather-info">
+    <div class="weather-header">
+        <h3>Погода</h3>
+        <div class="weather-icon">
+            <img [src]="getWeatherIconUrl()" alt="Weather Icon">
+        </div>
+    </div>
+    <p><strong>Температура:</strong> {{ roundTemperature(weatherData?.main?.temp) }}°C</p>
+    <p><strong>Влажность:</strong> {{ weatherData?.main?.humidity }}%</p>
+    <p><strong>Ветер:</strong> {{ weatherData?.wind?.speed }} м/с</p>
+    <p><strong>Описание:</strong> {{ weatherData?.weather[0]?.description }}</p>
+</div>
+
+<!-- Кнопка для переключения отображения погоды -->
+
+
+
 
 <div class="route-info" *ngIf="distance || duration">  
     <div class="info-box">  
@@ -59,7 +87,8 @@
                 <ng-container [ngSwitch]="selectedProfile">  
                     <ng-container *ngSwitchCase="'foot-walking'">directions_walk</ng-container>  
                     <ng-container *ngSwitchCase="'driving-car'">directions_car</ng-container>  
-                    <ng-container *ngSwitchCase="'cycling-regular'">directions_bike</ng-container>  
+                    <ng-container *ngSwitchCase="'cycling-regular'">directions_bike</ng-container>
+                      
                     <ng-container *ngSwitchDefault>directions_walk</ng-container> <!-- Значение по умолчанию -->  
                 </ng-container>  
             </mat-icon>  
@@ -71,6 +100,7 @@
                     <ng-container *ngSwitchCase="'foot-walking'">schedule</ng-container>  
                     <ng-container *ngSwitchCase="'driving-car'">schedule</ng-container>  
                     <ng-container *ngSwitchCase="'cycling-regular'">schedule</ng-container>  
+                    <ng-container *ngSwitchCase="'river'">schedule</ng-container>
                     <ng-container *ngSwitchDefault>schedule</ng-container> <!-- Значение по умолчанию -->  
                 </ng-container>  
             </mat-icon> 
@@ -98,7 +128,7 @@
     <button mat-button
                 (click)="toggleElevationChart()"
                 class="elevation-chart-toggle">
-            <mat-icon>{{ showElevationChart ? 'expand_less' : 'expand_more' }}</mat-icon>
+                <mat-icon > bar_chart</mat-icon>
             {{ showElevationChart ? 'Скрыть график высот' : 'Показать график высот' }}
         </button>
     <canvas *ngIf="duration && showElevationChart" 

@@ -1,3 +1,5 @@
+@import '../../styles/media.scss';
+
 :host {
     display: block;
 }
@@ -7,21 +9,77 @@
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 70px;
+    
+    @include tablet-and-below {
+        width: 90%;
+        height: 400px;
+        margin-bottom: 40px;
+    }
+    
+    @include mobile {
+        width: 100%;
+        height: 300px;
+        margin-bottom: 30px;
+    }
 }
 
 .map-wrapper {
     background-color: var(--base-beige-color);
     padding: 0 20px;
+    position: relative;
+    
+    @include mobile {
+        padding: 0 10px;
+    }
+}
+
+.map-custom-controls {
+    position: absolute;
+    bottom: 80px;
+    right: 30px;
+    z-index: 1000;
+    
+    @include tablet-and-below {
+        bottom: 50px;
+        right: 20px;
+    }
+    
+    @include mobile {
+        bottom: 40px;
+        right: 15px;
+    }
+    
+    .full-button {
+        @include mobile {
+            transform: scale(0.9);
+        }
+    }
 }
 
 .container {
     margin: 0 auto;
     width: 1200px;
+    
+    @include desktop-and-below {
+        width: 100%;
+        max-width: 1200px;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
 }
 
 .geoparks-intro {
     background-color: var(--base-beige-color);
     padding: 50px 25px;
+    
+    @include tablet-and-below {
+        padding: 30px 15px;
+    }
+    
+    @include mobile {
+        padding: 20px 10px;
+    }
+    
     &__title {
         margin: 0;
         margin-bottom: 30px;
@@ -32,6 +90,18 @@
         color: var(--new-green-color);
         font-weight: 700;
         text-transform: uppercase;
+        
+        @include tablet-and-below {
+            font-size: 24px;
+            line-height: 28px;
+            margin-bottom: 20px;
+        }
+        
+        @include mobile {
+            font-size: 20px;
+            line-height: 24px;
+            margin-bottom: 15px;
+        }
     }
 }
 
@@ -41,6 +111,11 @@
       justify-content: flex-start;
       align-items: center;
       width: 100%;
+      
+      @include tablet-and-below {
+        flex-direction: column;
+        align-items: center;
+      }
    }
 
    &-galery {
@@ -53,6 +128,20 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      
+      @include desktop-and-below {
+        width: 100%;
+        max-width: 750px;
+      }
+      
+      @include tablet-and-below {
+        min-height: 350px;
+      }
+      
+      @include mobile {
+        min-height: 250px;
+      }
+      
       .arrow-prev {
         position: absolute;
         top: calc(50% - 32px);
@@ -76,15 +165,65 @@
       box-sizing: border-box;
       border-radius: 8px;
       margin-right: 20px;
+      
+      @include desktop-and-below {
+        width: 100%;
+        max-width: 400px;
+      }
+      
+      @include tablet-and-below {
+        margin-right: 0;
+        margin-bottom: 20px;
+        min-height: auto;
+        order: -1; // Показываем определение перед видео на планшетах и мобильных
+      }
+      
       &__text {
         margin: 0;
         color: var(--new-green-color);
         font-size: 16px;
         line-height: 20px;
+        
+        @include mobile {
+          font-size: 14px;
+          line-height: 18px;
+        }
+        
         &-main {
             font-size: 20px;
             line-height: 22px;
             font-weight: 700;
+            
+            @include mobile {
+              font-size: 18px;
+              line-height: 20px;
+            }
+        }
+      }
+   }
+   
+   &-video {
+      @include tablet-and-below {
+        width: 100%;
+      }
+      
+      .main-video {
+        width: 750px;
+        height: 400px;
+        
+        @include desktop-and-below {
+          width: 100%;
+          height: auto;
+          max-width: 750px;
+        }
+        
+        @include tablet-and-below {
+          max-width: 100%;
+        }
+        
+        @include mobile {
+          max-width: 100%;
+          height: auto;
         }
       }
    }
@@ -93,6 +232,11 @@
 .select {
     background-color: var(--base-beige-color);
     padding-bottom: 30px;
+    
+    @include mobile {
+        padding-bottom: 20px;
+    }
+    
     &-title {
         color: var(--new-green-color);
         font-size: 36px;
@@ -102,11 +246,28 @@
         padding-bottom: 40px;
         font-weight: 700;
         text-transform: uppercase;
+        
+        @include tablet-and-below {
+            font-size: 30px;
+            line-height: 34px;
+            padding-bottom: 30px;
+        }
+        
+        @include mobile {
+            font-size: 24px;
+            line-height: 28px;
+            padding-bottom: 20px;
+        }
     }
 
     &-wrapper {
         display: flex;
         justify-content: center;
+        
+        @include tablet-and-below {
+            flex-direction: column;
+            align-items: center;
+        }
     }
 
     .select-item {
@@ -122,42 +283,83 @@
         justify-content: flex-end;
         font-family: 'Monserat',  Arial, sans-serif;
         color: #fff;
+        
+        @include desktop-and-below {
+            width: 100%;
+            max-width: 570px;
+        }
+        
+        @include tablet-and-below {
+            height: 320px;
+        }
+        
+        @include mobile {
+            height: 280px;
+            padding: 10px;
+        }
 
         &-link {
             cursor: pointer;
+            
+            @include tablet-and-below {
+                display: block;
+                width: 100%;
+                max-width: 570px;
+                margin-bottom: 20px;
+            }
         }
 
         &-action {
             font-size: 16px;
             line-height: 20px;
             font-weight: 500;
+            
+            @include mobile {
+                font-size: 14px;
+                line-height: 18px;
+            }
         }
 
         &-title {
             font-size: 36px;
             line-height: 40px;
             font-weight: 700;
+            
+            @include tablet-and-below {
+                font-size: 30px;
+                line-height: 34px;
+            }
+            
+            @include mobile {
+                font-size: 24px;
+                line-height: 28px;
+            }
         }
 
         &-description {
             font-weight: 500;
             font-size: 14px;
             line-height: 18px;
+            
+            @include mobile {
+                font-size: 12px;
+                line-height: 16px;
+            }
         }
-
-
 
         &--left {
             background-image: url('../../assets/img/424689e3266131a6648d94fa64ca7eb6.png');
             margin-right: 15px;
             text-align: left;
+            
+            @include tablet-and-below {
+                margin-right: 0;
+            }
         }
 
         &--right {
             background-image: url('../../assets//img/e91b0d26b17a9c87421a26c24e01274e.png');
             text-align: right;
         }
-
-
     }
 }

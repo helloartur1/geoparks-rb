@@ -1,25 +1,69 @@
+@import './_mixins.scss';
+
 :host {
     display: block;
     width: 100%;
 }
+
 .detail-sidebar {
     padding: 20px;
     width: 35%;
+    
+    @include tablet-and-below {
+        width: 100%;
+        padding: 15px;
+        order: 2;
+    }
+    
+    @include mobile {
+        padding: 10px;
+    }
 }
 
 .detail {
     display: flex;
     width: 100%;
     justify-content: flex-start;
+    
+    @include tablet-and-below {
+        flex-direction: column;
+    }
+    
     &-title {
         margin: 20px 0;
         font-size: 18px;
         line-height: 14px;
         font-weight: 500;
+        
+        @include tablet-and-below {
+            text-align: center;
+        }
+        
+        @include mobile {
+            font-size: 16px;
+            margin: 15px 0;
+        }
+    }
+    
+    &-description {
+        @include mobile {
+            font-size: 14px;
+            line-height: 1.4;
+        }
     }
 }
 
 .map {
     width: 65%;
     height: 1000px;
+    
+    @include tablet-and-below {
+        width: 100%;
+        height: 400px;
+        order: 1;
+    }
+    
+    @include mobile {
+        height: 300px;
+    }
 }

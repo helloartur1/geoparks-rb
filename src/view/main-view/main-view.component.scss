@@ -1,6 +1,12 @@
+@import './_mixins.scss';
+
 :host {
     display: flex;
     height: 100%;
+    
+    @include tablet-and-below {
+        flex-direction: column;
+    }
 }
 
 .geopark-title {
@@ -9,14 +15,29 @@
     line-height: 28px;
     font-weight: 500;
     color: #fff;
+    
+    @include tablet-and-below {
+        font-size: 20px;
+        line-height: 24px;
+        text-align: center;
+    }
+    
+    @include mobile {
+        font-size: 18px;
+        line-height: 22px;
+    }
 }
 
 .sidebar {
     width: 30%;
     height: 100%;
     background-color: var(--new-dark-green-color);
-    display: flex;
-    flex-direction: column;
+    
+    @include tablet-and-below {
+        width: 100%;
+        height: auto;
+        order: 2;
+    }
 }
 
 .spinner {
@@ -30,7 +51,26 @@
 .buttons-wrapper {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: 15px;
+    
+    @include tablet-and-below {
+        flex-wrap: wrap;
+    }
+    
+    @include mobile {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.add-button {
+    &.mat-mdc-raised-button:not(:disabled) {
+        background-color: var(--base-green-dark-color);
+    }
+    
+    @include mobile {
+        margin-top: 10px;
+        width: 100%;
+    }
 }
 
 .route-button {
@@ -38,22 +78,24 @@
     &.mat-mdc-raised-button:not(:disabled) {
         background-color: var(--base-green-dark-color);
     }
-}
-
-.existing-route {
-    &.mat-mdc-raised-button:not(:disabled) {
-        background-color: var(--base-green-dark-color);
+    
+    @include mobile {
+        margin-right: 0;
+        margin-bottom: 10px;
+        width: 100%;
     }
 }
 
-.admin-buttons {
-    margin-bottom: 15px;
-}
-
-.add-button {
-    width: 100%;
+.existing-route {
+    margin-right: 20px;
     &.mat-mdc-raised-button:not(:disabled) {
         background-color: var(--base-green-dark-color);
+    }
+    
+    @include mobile {
+        margin-right: 0;
+        margin-bottom: 10px;
+        width: 100%;
     }
 }
 
@@ -62,6 +104,11 @@
     width: 100%;
     box-sizing: border-box;
     background-color: var(--new-dark-green-color);
+    
+    @include mobile {
+        padding: 8px;
+    }
+    
     ::ng-deep {
         mat-form-field {
             width: 100%;
@@ -69,23 +116,15 @@
     }
 }
 
-.content-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.add-marker-footer {
-    padding: 15px;
-    background-color: var(--new-dark-green-color);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: auto; /* Это прижмет кнопку к низу */
-    
-    .add-marker-button {
+/* Стили для карты */
+geo-main-view-map {
+    @include tablet-and-below {
         width: 100%;
-        &.mat-mdc-raised-button:not(:disabled) {
-            background-color: var(--base-green-dark-color);
-        }
+        height: 400px;
+        order: 1;
+    }
+    
+    @include mobile {
+        height: 300px;
     }
 }

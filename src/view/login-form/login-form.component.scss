@@ -1,3 +1,5 @@
+@import './_mixins.scss';
+
 :host {
     display: flex;
     flex-direction: column;
@@ -6,17 +8,45 @@
     height: 100%;
     background-color: var(--base-green-light-color);
     padding-top: 200px;
+    
+    @include tablet-and-below {
+        padding-top: 150px;
+    }
+    
+    @include mobile {
+        padding-top: 100px;
+    }
 }
 
 .login {
     margin: 0 auto;
+    width: 400px;
+    
+    @include tablet-and-below {
+        width: 90%;
+        max-width: 400px;
+    }
+    
+    @include mobile {
+        width: 95%;
+    }
 }
 
 .login-form {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+    @include mobile {
+        padding: 20px 15px;
+    }
+    
     &__fields {
         mat-form-field {
             display: block;
             margin-bottom: 20px;
+            width: 100%;
         }
     }
 
@@ -24,11 +54,29 @@
         font-weight: 700;
         font-size: 24px;
         line-height: 32px;
+        text-align: center;
+        margin-bottom: 20px;
+        
+        @include mobile {
+            font-size: 20px;
+            line-height: 28px;
+            margin-bottom: 15px;
+        }
     }
 }
 
+.login-button {
+    width: 100%;
+    margin-top: 10px;
+    
+    &.mat-mdc-raised-button:not(:disabled) {
+        background-color: var(--new-green-color);
+    }
+}
 
 .login-error {
     padding: 0;
     padding-top: 20px;
+    color: red;
+    text-align: center;
 }

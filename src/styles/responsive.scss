@@ -1,0 +1,132 @@
+/* Общие адаптивные стили для всего приложения */
+@import './media.scss';
+
+/* Скрываем элементы на мобильных устройствах */
+@include mobile {
+  .hide-on-mobile {
+    display: none !important;
+  }
+}
+
+/* Скрываем элементы на планшетах и мобильных */
+@include tablet-and-below {
+  .hide-on-tablet {
+    display: none !important;
+  }
+}
+
+/* Адаптивные изображения */
+img.responsive-img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Адаптивные контейнеры */
+.responsive-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+/* Адаптивные кнопки */
+.responsive-button {
+  @include mobile {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+/* Адаптивные формы */
+.responsive-form {
+  @include tablet-and-below {
+    width: 100%;
+  }
+  
+  .form-field {
+    @include mobile {
+      width: 100%;
+    }
+  }
+}
+
+/* Адаптивные таблицы */
+.responsive-table {
+  @include tablet-and-below {
+    overflow-x: auto;
+    display: block;
+    width: 100%;
+  }
+}
+
+/* Адаптивные карточки */
+.responsive-card {
+  @include desktop-and-below {
+    width: calc(50% - 20px);
+  }
+  
+  @include tablet-and-below {
+    width: calc(100% - 20px);
+  }
+}
+
+/* Адаптивные сетки */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  
+  @include desktop-small {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Адаптивные отступы */
+.responsive-padding {
+  padding: 40px;
+  
+  @include tablet-and-below {
+    padding: 30px;
+  }
+  
+  @include mobile {
+    padding: 20px;
+  }
+}
+
+/* Адаптивные шрифты */
+.responsive-text {
+  font-size: 16px;
+  
+  @include tablet-and-below {
+    font-size: 14px;
+  }
+  
+  @include mobile {
+    font-size: 12px;
+  }
+}
+
+.responsive-heading {
+  font-size: 32px;
+  line-height: 38px;
+  
+  @include tablet-and-below {
+    font-size: 28px;
+    line-height: 34px;
+  }
+  
+  @include mobile {
+    font-size: 24px;
+    line-height: 30px;
+  }
+}

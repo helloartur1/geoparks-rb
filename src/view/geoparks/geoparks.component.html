@@ -12,9 +12,7 @@
                         muted
                         autoplay
                         loop
-                        width="750"
-                        height="400"
-                        class="main-video"
+                        class="main-video responsive-img"
                         >
                         <source [src]="videoPath" type="video/mp4">
                         Ваш браузер не поддерживает видео элемент.
@@ -35,6 +33,7 @@
                     <p class="select-item-description">Уникальный шихан Торатау, возвышающийся над бескрайнями просторами Башкирии, манит своей мистической атмосферой и легендами о спрятанных сокровищах. Любители активного отдыха оценят возможность покорить вершину шихану, а поклонники истории - исследовать древние пещеры и археологические памятники</p>
                 </div>
             </a>
+            
             <a class="select-item-link" (click)="moveToGeopark($event, '41f271c8-e8ba-4225-b21d-403f9751e5a7')">
                 <div class="select-item select-item--right">
                     <b class="select-item-action">Перейти к геопарку</b>
@@ -47,9 +46,8 @@
 </section>
 <div class="map-wrapper">
     <div class="map" id="map"></div>
-
     <div class="map-custom-controls">
-        <button class="full-button" mat-mini-fab color="primary" aria-label="Полный экстент" (click)="setFullExtent()">
+        <button class="full-button responsive-button" mat-mini-fab color="primary" aria-label="Полный экстент" (click)="setFullExtent()">
             <!-- <mat-icon>public</mat-icon> -->
         </button>
     </div>

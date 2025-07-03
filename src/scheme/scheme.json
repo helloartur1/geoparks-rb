@@ -1258,6 +1258,7 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/route/{route_id}/avg_rate": {
             "get": {
                 "tags": [
@@ -1277,6 +1278,12 @@
                         }
                     }
                 ],
+=======
+        "/proxy/openrouteservice": {
+            "get": {
+                "summary": "Proxy Ors",
+                "operationId": "proxy_ors_proxy_openrouteservice_get",
+>>>>>>> 5ea7a60df049debe85e7254cb6416bf3858dcb86
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -1285,6 +1292,7 @@
                                 "schema": {}
                             }
                         }
+<<<<<<< HEAD
                     },
                     "422": {
                         "description": "Validation Error",
@@ -1402,6 +1410,8 @@
                                 }
                             }
                         }
+=======
+>>>>>>> 5ea7a60df049debe85e7254cb6416bf3858dcb86
                     }
                 }
             }

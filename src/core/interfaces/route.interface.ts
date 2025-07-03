@@ -16,6 +16,7 @@ export interface IRoute {
     name: string;
     description: string;
     route_points: Array<IRoutePoint>; 
+    route_type?: 'admin' | 'user';
 }
 
 export interface IRouteCache {
@@ -24,5 +25,4 @@ export interface IRouteCache {
     coordinates: TRouteCoordinates[];
     distance: number;
     duration: number;
-    steepness: any[];
   }

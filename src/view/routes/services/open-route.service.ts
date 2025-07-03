@@ -1,133 +1,150 @@
+// src/app/services/open-route.service.ts
+
 import { Injectable } from '@angular/core';
-// @ts-expect-error miss type declaration  
-import Openrouteservice from 'openrouteservice-js';  
-// @ts-expect-error miss type declaration  
-import polyline from '@mapbox/polyline';  
-import LineString from 'ol/geom/LineString';  
-import { Observable, from, of } from 'rxjs';  
-import { IRouteConfig } from '../interfaces/route-config.interface';  
-import { catchError, map } from 'rxjs/operators';  
-import { format } from 'ol/coordinate';
+import { HttpClient, HttpParams } from '@angular/common/http';
+// @ts-expect-error отсутствуют типы
+import Openrouteservice from 'openrouteservice-js';
+// @ts-expect-error отсутствуют типы
+import polyline from '@mapbox/polyline';
+import { Observable, from, forkJoin, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import LineString from 'ol/geom/LineString';
 
-// Define a new interface for the route result  
-interface IRouteResult {  
-  coordinates: Array<[number, number]>;  
-  distance: number; // distance in meters  
-  duration: number; // duration in seconds  
-  ascent?: number;  
-  descent?: number;  
-  elevations?: number[];  // Array of elevation values corresponding to the coordinates
-  coord_points? : number[];
-  formattedCoords?: Array<number[]>;
-  steepness_data?: any[]
-}  
+import { IRouteConfig } from '../interfaces/route-config.interface';
+import { environment } from 'src/environments/enviroments';
 
-@Injectable({  
-  providedIn: 'root'  
-})  
-export class OpenRouteService {  
+export interface IRouteResult {
+  coordinates: Array<[number, number]>;      // [lon, lat]
+  distance: number;                           // в метрах
+  duration: number;                           // в секундах
+  ascent?: number;
+  descent?: number;
+  elevations?: number[];                      // при желании
+  formattedCoords?: Array<[number, number, number]>; // [lat, lon, elev]
+}
 
-  constructor() { }  
+@Injectable({
+  providedIn: 'root'
+})
+export class OpenRouteService {
+  private orsKey = environment.orsApiKey;  // положите ключ в environment.ts
+  private orsClient = new Openrouteservice.Directions({ api_key: this.orsKey });
+  private waterUrl = `${environment.apiUrl}/water-route`;
 
-  public getRoute$({ coordinates, profile }: IRouteConfig): Observable<IRouteResult> {  
-    let orsDirections = new Openrouteservice.Directions({ api_key: '5b3ce3597851110001cf6248f0d961a50bc04e17b315f4ccec8fe8de' });  
+  constructor(private http: HttpClient) {}
 
-    return from(orsDirections.calculate({  
-      coordinates: coordinates,  
-      profile,  
+  /**
+   * Получить маршрут.
+   * - Для profile==='river' идём на свой бэкенд.
+   * - Иначе — ORS JS + polyline.
+   */
+  public getRoute$({ coordinates, profile }: IRouteConfig): Observable<IRouteResult> {
+    // 1) Речной профиль
+    if (profile === 'river') {
+      // а) ровно 2 точки — простой GET
+      if (coordinates.length === 2) {
+        const [start, end] = coordinates;
+        const params = new HttpParams()
+          .set('origin.lat', String(start[1]))
+          .set('origin.lon', String(start[0]))
+          .set('destination.lat', String(end[1]))
+          .set('destination.lon', String(end[0]));
+        return this.http.get<IRouteResult>(this.waterUrl, { params });
+      }
+      // б) >2 точек — разбиваем на сегменты и склеиваем
+      const legs: [number, number][][] = [];
+      for (let i = 0; i < coordinates.length - 1; i++) {
+        legs.push([coordinates[i], coordinates[i + 1]]);
+      }
+      return forkJoin(
+        legs.map(pair => {
+          const [s, e] = pair;
+          const p = new HttpParams()
+            .set('origin.lat', String(s[1]))
+            .set('origin.lon', String(s[0]))
+            .set('destination.lat', String(e[1]))
+            .set('destination.lon', String(e[0]));
+          return this.http.get<IRouteResult>(this.waterUrl, { params: p }).pipe(
+            map(r => r.coordinates as [number, number][])
+          );
+        })
+      ).pipe(
+        map((paths: [number, number][][]) => {
+          // склеиваем, убирая дубли первой точки каждого сегмента
+          const full: [number, number][] = [];
+          paths.forEach((pts, idx) => {
+            if (idx === 0) {
+              full.push(...pts);
+            } else {
+              full.push(...pts.slice(1));
+            }
+          });
+          alert(coordinates);
+          return {
+            coordinates: full,
+            distance: 0,
+            duration: 0
+          } as IRouteResult;
+        })
+      );
+    }
+
+    // 2) Обычные профили ORS
+    return from(this.orsClient.calculate({
+      coordinates,
+      profile,
       format: 'json',
-      extra_info:["steepness",'surface'],  
-      radiuses: [10000],
-    })).pipe(map((res: any) => {  
-      console.log("API Response:", res);
-      const decodedCoordinates = polyline.decode(res.routes[0].geometry).map((item: [number, number]) => item.reverse());  
-      const line: LineString = new LineString(decodedCoordinates);  
-      console.log(line);
-      line.transform('EPSG:4326', 'EPSG:3857');  
-
-      // Extracting distance, duration, ascent, descent from the response  
-      const distance = res.routes[0].summary.distance; // distance in meters  
-      const duration = res.routes[0].summary.duration; // duration in seconds  
-      const ascent = res.routes[0].summary.ascent;  
-      const descent = res.routes[0].summary.descent;  
-      const elevation = res.routes[0].summary.elevation;
-      // Extracting steepness data
-      const steepnessData = res.routes[0].extras.steepness.values
-      console.log(steepnessData);  
-      return {  
-        coordinates: decodedCoordinates,  
-        distance,  
-        duration,  
-        ascent,  
-        descent,
-        steepness_data: steepnessData, // Add steepness data to the returned object
-      };  
-    }));  
+      radiuses: Array(coordinates.length).fill(10000),
+    })).pipe(
+      map((res: any) => {
+        // декодируем polyline и меняем [lat,lon] → [lon,lat]
+        const decoded = polyline
+          .decode(res.routes[0].geometry)
+          .map(([lat, lon]: [number, number]) => [lon, lat] as [number, number]);
+        const summary = res.routes[0].summary;
+        return {
+          coordinates: decoded,
+          distance: summary.distance,
+          duration: summary.duration,
+          ascent: summary.ascent,
+          descent: summary.descent
+        } as IRouteResult;
+      })
+    );
   }
 
-  public getElevation$({ coordinates, profile }: IRouteConfig): Observable<IRouteResult> {  
-    let orsDirections = new Openrouteservice.Directions({ api_key: '5b3ce3597851110001cf6248d985182c8c784d239613b235b0150a2b' });  
-
-    return from(orsDirections.calculate({  
-      coordinates: coordinates,  
-      profile : profile,  
-      format: 'geojson',  
+  /**
+   * Получить высоты для маршрута.
+   * Для речного профиля можно вернуть пустой ответ или свою логику.
+   * Для остальных — ORS geojson + elevation=true.
+   */
+  public getElevation$({ coordinates, profile }: IRouteConfig): Observable<IRouteResult> {
+    if (profile === 'river') {
+      // Например, просто возвращаем пустую высоту
+      return of({ coordinates, distance: 0, duration: 0 } as IRouteResult);
+    }
+    return from(this.orsClient.calculate({
+      coordinates,
+      profile,
+      format: 'geojson',
       elevation: true,
-      extra_info:["steepness",'surface'],
-      radiuses: [10000],
-    })).pipe(map((res: any) => {  
-      console.log(res)
-      const duration = res.features[0].summary; // duration in seconds  
-      const ascent = res.features[0].summary;  
-      const descent = res.features[0].summary;  
-      const elevation = res.features[0].summary;
-      const distance = 0;
-      const feature = res.features[0];  // Access the first feature  
-      const geometry = feature.geometry; // Get geometry from the feature  
-      const coords = geometry.coordinates;
-      const formattedCoords = coords.map((coord: number[]) => [coord[1], coord[0], coord[2]]); // Assuming coord is [lon, lat, elevation] 
-      const steepness_data = res.features[0].properties.extras.steepness.values;
-
-      return {  
-        coordinates,  
-        distance,  
-        duration,  
-        ascent,  
-        descent,
-        formattedCoords,
-        steepness_data,
-      };  
-    }));  
-  } 
-  // public Altitude$({ coordinates, profile }: IRouteConfig): Observable<IRouteResult> {
-  //   const Elevation = new Openrouteservice.Elevation({
-  //     api_key: '5b3ce3597851110001cf6248d985182c8c784d239613b235b0150a2b',
-  //   });
-
-  //   // Формат входных и выходных данных
-
-  //   return from(Elevation.lineElevation({
-  //     format_in: 'encodedpolyline5', 
-  //     format_out: 'encodedpolyline5',
-  //     geometry: coordinates,
-  //   })).pipe(
-  //     map((res: any) => {
-  //       // Log the response structure to verify the expected data
-  //       console.log("@@@@", res);
-  //       const decodedCoordinates = polyline.decode(res.routes[0].geometry).map((item: [number, number]) => item.reverse());
-    
-  //       // Safely check if geometry and coordinates exist before calling .map
-  //       if (res && res.geometry && res.geometry.coordinates) {
-  //         const elevations = res.geometry.coordinates.map((coord: any) => coord[2]);
-  //         console.log("Elevations: ", elevations);
-  //       } else {
-  //         console.error("Error: No geometry or coordinates found in response");
-  //       }
-    
-  //       return res;
-  //     }),
-      
-  //   )
-    
-  // }
+      extra_info: ['steepness', 'surface'],
+      radiuses: Array(coordinates.length).fill(10000)
+    })).pipe(
+      map((res: any) => {
+        const feature = res.features[0];
+        const coords3d: number[][] = feature.geometry.coordinates;
+        const formattedCoords = coords3d.map(c => [c[1], c[0], c[2]] as [number,number,number]);
+        const summary = feature.properties.summary;
+        return {
+          coordinates,
+          formattedCoords,
+          distance: summary.distance,
+          duration: summary.duration,
+          ascent: summary.ascent,
+          descent: summary.descent
+        } as IRouteResult;
+      })
+    );
+  }
 }
